@@ -1,0 +1,84 @@
+﻿using System;
+using System.Net.Http;
+using Newtonsoft.Json;
+
+namespace CouchDB.Client
+{
+    /// <summary>
+    /// Represents CouchDB server instance. 
+    /// Starting point for all interactions with CouchDB.
+    /// </summary>
+    public sealed class CouchDBServer : IDisposable
+    {
+        private readonly HttpClient _http;
+
+        /// <summary>
+        /// Initializes new instance of <see cref="CouchDBServer"/> class.
+        /// </summary>
+        /// <param name="baseUrl">(Required) base URL for CouchDB (e.g. "http://localhost:5984/")</param>
+        public CouchDBServer(string baseUrl)
+        {
+            if (string.IsNullOrWhiteSpace(baseUrl))
+                throw new ArgumentNullException(nameof(baseUrl));
+
+            Uri serverUri;
+            if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out serverUri))
+                throw new FormatException("URL is not in valid format.");
+
+            _http = new HttpClient();
+            _http.BaseAddress = serverUri;
+        }
+
+        /// <summary>
+        /// Disposes <see cref="CouchDBServer"/> instance, after which it becomes unusable.
+        /// </summary>
+        public void Dispose()
+        {
+            _http.Dispose();
+        }
+
+        #region GetInfo
+
+        /// <summary>
+        /// Accessing the root of a CouchDB instance returns meta information about the instance. 
+        /// The response is a JSON structure (represented as C# object) containing information 
+        /// about the server, including a welcome message and the version of the server.
+        /// </summary>
+        /// <returns></returns>
+        public ServerInfo GetInfo()
+        {
+            var serverInfoJsonString = _http.GetStringAsync(string.Empty).Result;
+            var serverInfoDTO = JsonConvert.DeserializeObject<ServerInfoDTO>(serverInfoJsonString);
+
+            var serverInfo = new ServerInfo(serverInfoDTO);
+            return serverInfo;
+        }
+
+        internal sealed class ServerInfoDTO
+        {
+            public string CouchDB { get; set; }
+
+            public string Version { get; set; }
+
+            public VendorInfoDTO Vendor { get; set; }
+
+            public sealed class VendorInfoDTO
+            {
+                public string Name { get; set; }
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Returns a list of all the databases in the CouchDB instance.
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetAllDbNames()
+        {
+            var dbNamesJson = _http.GetStringAsync("_all_dbs").Result;
+            var dbNamesArray = JsonConvert.DeserializeObject<string[]>(dbNamesJson);
+            return dbNamesArray;
+        }
+    }
+}

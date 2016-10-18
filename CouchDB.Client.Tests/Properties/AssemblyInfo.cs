@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CouchDB.Client")]
-[assembly: AssemblyDescription("CouchDB .NET Client Library")]
+[assembly: AssemblyTitle("CouchDB.Client.Tests")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Tengiz Tutisani")]
-[assembly: AssemblyProduct("CouchDB.Client")]
-[assembly: AssemblyCopyright("Copyright © Tengiz Tutisani 2016")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("CouchDB.Client.Tests")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1304afca-f675-4af5-9a9a-3b0dc7c135d9")]
+[assembly: Guid("e11c371c-43bb-42f0-8162-a87e643c1059")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,5 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-[assembly: InternalsVisibleTo("CouchDB.Client.Tests")]

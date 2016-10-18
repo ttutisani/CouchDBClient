@@ -5,6 +5,10 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CouchDB.Client", "CouchDB.Client\CouchDB.Client.csproj", "{1304AFCA-F675-4AF5-9A9A-3B0DC7C135D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CouchDB.ClientDemo", "CouchDB.ClientDemo\CouchDB.ClientDemo.csproj", "{97FBB15F-EC0F-48D5-A008-F4D51CB6DFE0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CouchDB.Client.Tests", "CouchDB.Client.Tests\CouchDB.Client.Tests.csproj", "{E11C371C-43BB-42F0-8162-A87E643C1059}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{1304AFCA-F675-4AF5-9A9A-3B0DC7C135D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1304AFCA-F675-4AF5-9A9A-3B0DC7C135D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1304AFCA-F675-4AF5-9A9A-3B0DC7C135D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97FBB15F-EC0F-48D5-A008-F4D51CB6DFE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97FBB15F-EC0F-48D5-A008-F4D51CB6DFE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97FBB15F-EC0F-48D5-A008-F4D51CB6DFE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97FBB15F-EC0F-48D5-A008-F4D51CB6DFE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E11C371C-43BB-42F0-8162-A87E643C1059}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E11C371C-43BB-42F0-8162-A87E643C1059}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E11C371C-43BB-42F0-8162-A87E643C1059}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E11C371C-43BB-42F0-8162-A87E643C1059}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
