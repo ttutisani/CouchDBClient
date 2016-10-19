@@ -16,6 +16,8 @@ namespace CouchDB.Client
         /// Initializes new instance of <see cref="CouchDBServer"/> class.
         /// </summary>
         /// <param name="baseUrl">(Required) base URL for CouchDB (e.g. "http://localhost:5984/")</param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="FormatException"><paramref name="baseUrl"/> is not in valid format.</exception>
         public CouchDBServer(string baseUrl)
         {
             if (string.IsNullOrWhiteSpace(baseUrl))
@@ -44,7 +46,7 @@ namespace CouchDB.Client
         /// The response is a JSON structure (represented as C# object) containing information 
         /// about the server, including a welcome message and the version of the server.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see cref="ServerInfo"/> object containing server metadata information.</returns>
         public ServerInfo GetInfo()
         {
             var serverInfoJsonString = _http.GetStringAsync(string.Empty).Result;
@@ -73,7 +75,7 @@ namespace CouchDB.Client
         /// <summary>
         /// Returns a list of all the databases in the CouchDB instance.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>String array containing all database names.</returns>
         public string[] GetAllDbNames()
         {
             var dbNamesJson = _http.GetStringAsync("_all_dbs").Result;
