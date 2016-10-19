@@ -6,6 +6,8 @@ I just started the code, so not much to look into from the usage standpoint.
 
 # Building & Running the code
 
+I'm currently using Visual Studio 2015 Community Edition.
+
 Solution contains a demo project in it, which is a console app.
 Just run that demo, and it will ask you to enter one of the supported commands into the console.
 
