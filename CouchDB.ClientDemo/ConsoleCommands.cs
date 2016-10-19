@@ -10,7 +10,7 @@ namespace CouchDB.ClientDemo
         {
             UsingServer(server =>
             {
-                var serverInfo = server.GetInfo();
+                var serverInfo = server.GetInfo().Result;
 
                 Console.WriteLine(Serialize(serverInfo));
             });
@@ -20,7 +20,7 @@ namespace CouchDB.ClientDemo
         {
             UsingServer(server => 
             {
-                var allDbs = server.GetAllDbNames();
+                var allDbs = server.GetAllDbNames().Result;
 
                 Console.WriteLine(Serialize(allDbs));
             });

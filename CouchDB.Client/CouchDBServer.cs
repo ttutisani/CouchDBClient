@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace CouchDB.Client
 {
@@ -47,9 +48,9 @@ namespace CouchDB.Client
         /// about the server, including a welcome message and the version of the server.
         /// </summary>
         /// <returns><see cref="ServerInfo"/> object containing server metadata information.</returns>
-        public ServerInfo GetInfo()
+        public async Task<ServerInfo> GetInfo()
         {
-            var serverInfoJsonString = _http.GetStringAsync(string.Empty).Result;
+            var serverInfoJsonString = await _http.GetStringAsync(string.Empty);
             var serverInfoDTO = JsonConvert.DeserializeObject<ServerInfoDTO>(serverInfoJsonString);
 
             var serverInfo = new ServerInfo(serverInfoDTO);
@@ -76,9 +77,9 @@ namespace CouchDB.Client
         /// Returns a list of all the databases in the CouchDB instance.
         /// </summary>
         /// <returns>String array containing all database names.</returns>
-        public string[] GetAllDbNames()
+        public async Task<string[]> GetAllDbNames()
         {
-            var dbNamesJson = _http.GetStringAsync("_all_dbs").Result;
+            var dbNamesJson = await _http.GetStringAsync("_all_dbs");
             var dbNamesArray = JsonConvert.DeserializeObject<string[]>(dbNamesJson);
             return dbNamesArray;
         }
