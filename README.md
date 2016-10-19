@@ -22,5 +22,5 @@ Once the task is in place, and we both know what you want to contribute, you can
 
 Fork -> Write code -> Commit to your fork -> Pull request -> wait until I review and merge.
 
-I'm coming with ABOVE senior level engineering and sofwtare architecture backgrounds, so I will be reviewing every letter you wrote.
+I'm coming with ABOVE senior level engineering and software architecture backgrounds, so I will be reviewing every letter you wrote.
 I welcome contributors, and I value quality over quantity.
