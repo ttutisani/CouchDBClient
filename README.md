@@ -11,7 +11,7 @@ I'm currently using Visual Studio 2015 Community Edition.
 Solution contains a demo project in it, which is a console app.
 Just run that demo, and it will ask you to enter one of the supported commands into the console.
 
-Demo assumes that you have CouchDB running under http://localhost:5984/
+Demo assumes that you have CouchDB running under [http://localhost:5984/](http://localhost:5984/).
 
 
 # Contributing rules
