@@ -1,6 +1,5 @@
 ﻿using CouchDB.Client;
 using System;
-using System.Linq;
 
 namespace CouchDB.ClientDemo
 {
@@ -13,6 +12,25 @@ namespace CouchDB.ClientDemo
                 var serverInfo = server.GetInfo().Result;
 
                 Console.WriteLine(Serialize(serverInfo));
+            });
+        }
+
+        public void adddb()
+        {
+            UsingServer(server => 
+            {
+                try
+                {
+                    Console.WriteLine("Enter new DB name followed by <ENTER>:");
+                    var dbName = Console.ReadLine();
+
+                    server.CreateDb(dbName).GetAwaiter().GetResult();
+                    Console.WriteLine("Just created DB named '{0}'.", dbName);
+                }
+                catch (CouchDBClientException ex)
+                {
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, Serialize(ex.ServerResponse));
+                }
             });
         }
 

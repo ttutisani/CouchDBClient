@@ -83,5 +83,46 @@ namespace CouchDB.Client
             var dbNamesArray = JsonConvert.DeserializeObject<string[]>(dbNamesJson);
             return dbNamesArray;
         }
+
+        #region CreateDb
+
+        /// <summary>
+        /// Creates a new database.
+        /// </summary>
+        /// <param name="dbName">Database name which will be created.</param>
+        /// <returns><see cref="Task"/> which can be awaited.</returns>
+        public async Task CreateDb(string dbName)
+        { 
+            if (string.IsNullOrWhiteSpace(dbName))
+                throw new ArgumentNullException(nameof(dbName));
+
+            var httpResponse = await _http.PutAsync(dbName, null);
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                var errorMessage = $"Http status code '{httpResponse.StatusCode}', Http reason phrase '{httpResponse.ReasonPhrase}'.";
+
+                var responseJson = await httpResponse.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(responseJson))
+                {
+                    throw new CouchDBClientException(errorMessage, null, null);
+                }
+
+                var responseObject = JsonConvert.DeserializeObject<ServerResponseDTO>(responseJson);
+                throw new CouchDBClientException(errorMessage, new ServerResponse(responseObject), null);
+            }
+            
+            //All's cool. Carry on.
+        }
+
+        internal sealed class ServerResponseDTO
+        {
+            public bool OK { get; set; }
+
+            public ServerResponseError Error { get; set; }
+
+            public string Reason { get; set; }
+        }
+
+        #endregion
     }
 }
