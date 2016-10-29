@@ -8,7 +8,7 @@ Create database:
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    await server.CreateDb("nmy-db");
+    await server.CreateDb("my-db");
 }
 ```
 
