@@ -1,7 +1,29 @@
 # CouchDBClient
-Couch DB .NET Client
+Couch DB .NET Client - easy to use, intuitive, self-describing library.
 
-I just started the code, so not much to look into from the usage standpoint.
+# Examples
+
+Create database:
+``` C#
+using (var server = new CouchDBServer("http://localhost:5984"))
+{
+    await server.CreateDb("nmy-db");
+}
+```
+
+Get list of all databases:
+``` C#
+using (var server = new CouchDBServer("http://localhost:5984"))
+{
+    var allDbs = await server.GetAllDbNames();
+
+    foreach (var dbName in allDbs)
+    {
+        Console.WriteLine(dbName);
+    }
+}
+```
+
 
 
 # Building & Running the code
