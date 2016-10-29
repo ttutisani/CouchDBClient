@@ -40,7 +40,12 @@ namespace CouchDB.ClientDemo
             {
                 var allDbs = server.GetAllDbNames().Result;
 
-                Console.WriteLine(Serialize(allDbs));
+                Console.WriteLine("Databases found:");
+                foreach (var dbName in allDbs)
+                {
+                    Console.WriteLine(dbName);
+                }
+                Console.WriteLine("End of list.");
             });
         }
 
