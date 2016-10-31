@@ -11,7 +11,11 @@ namespace CouchDB.ClientDemo
             {
                 var serverInfo = server.GetInfo().Result;
 
-                Console.WriteLine(Serialize(serverInfo));
+                Console.WriteLine("Info received:");
+                Console.WriteLine("CouchDB --> {0}.", serverInfo.CouchDB);
+                Console.WriteLine("Version --> {0}.", serverInfo.Version);
+                Console.WriteLine("Vendor name --> {0}.", serverInfo.Vendor.Name);
+                Console.WriteLine("End of message.");
             });
         }
 
@@ -43,9 +47,28 @@ namespace CouchDB.ClientDemo
                 Console.WriteLine("Databases found:");
                 foreach (var dbName in allDbs)
                 {
-                    Console.WriteLine(dbName);
+                    Console.WriteLine("--> {0}", dbName);
                 }
                 Console.WriteLine("End of list.");
+            });
+        }
+
+        public void deletedb()
+        {
+            UsingServer(server => 
+            {
+                try
+                {
+                    Console.WriteLine("Enter DB name followed by <ENTER>:");
+                    var dbName = Console.ReadLine();
+
+                    server.DeleteDb(dbName).GetAwaiter().GetResult();
+                    Console.WriteLine("Just deleted DB '{0}'.", dbName);
+                }
+                catch (CouchDBClientException ex)
+                {
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, Serialize(ex.ServerResponse));
+                }
             });
         }
 

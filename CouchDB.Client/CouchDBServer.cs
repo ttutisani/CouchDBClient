@@ -50,10 +50,10 @@ namespace CouchDB.Client
         /// <returns><see cref="ServerInfo"/> object containing server metadata information.</returns>
         public async Task<ServerInfo> GetInfo()
         {
-            var serverInfoJsonString = await _http.GetStringAsync(string.Empty);
-            var serverInfoDTO = JsonConvert.DeserializeObject<ServerInfoDTO>(serverInfoJsonString);
+            var infoHttpResponse = await _http.GetAsync(string.Empty);
+            var infoDTO = await HttpClientHelper.HandleResponse<ServerInfoDTO>(infoHttpResponse);
+            var serverInfo = new ServerInfo(infoDTO);
 
-            var serverInfo = new ServerInfo(serverInfoDTO);
             return serverInfo;
         }
 
@@ -79,8 +79,9 @@ namespace CouchDB.Client
         /// <returns>String array containing all database names.</returns>
         public async Task<string[]> GetAllDbNames()
         {
-            var dbNamesJson = await _http.GetStringAsync("_all_dbs");
-            var dbNamesArray = JsonConvert.DeserializeObject<string[]>(dbNamesJson);
+            var dbNamesHttpResponse = await _http.GetAsync("_all_dbs");
+            var dbNamesArray = await HttpClientHelper.HandleResponse<string[]>(dbNamesHttpResponse);
+            
             return dbNamesArray;
         }
 
@@ -91,27 +92,14 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="dbName">Database name which will be created.</param>
         /// <returns><see cref="Task"/> which can be awaited.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public async Task CreateDb(string dbName)
         { 
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
 
-            var httpResponse = await _http.PutAsync(dbName, null);
-            if (!httpResponse.IsSuccessStatusCode)
-            {
-                var errorMessage = $"Http status code '{httpResponse.StatusCode}', Http reason phrase '{httpResponse.ReasonPhrase}'.";
-
-                var responseJson = await httpResponse.Content.ReadAsStringAsync();
-                if (string.IsNullOrWhiteSpace(responseJson))
-                {
-                    throw new CouchDBClientException(errorMessage, null, null);
-                }
-
-                var responseObject = JsonConvert.DeserializeObject<ServerResponseDTO>(responseJson);
-                throw new CouchDBClientException(errorMessage, new ServerResponse(responseObject), null);
-            }
-            
-            //All's cool. Carry on.
+            var createDbHttpResponse = await _http.PutAsync(dbName, null);
+            await HttpClientHelper.HandleResponse(createDbHttpResponse);
         }
 
         internal sealed class ServerResponseDTO
@@ -124,5 +112,21 @@ namespace CouchDB.Client
         }
 
         #endregion
+
+        /// <summary>
+        /// Deletes the specified database, 
+        /// and all the documents and attachments contained within it.
+        /// </summary>
+        /// <param name="dbName">Database name to be deleted.</param>
+        /// <returns>Awaitable task.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task DeleteDb(string dbName)
+        {
+            if (string.IsNullOrWhiteSpace(dbName))
+                throw new ArgumentNullException(nameof(dbName));
+
+            var deleteHttpResponse = await _http.DeleteAsync(dbName);
+            await HttpClientHelper.HandleResponse(deleteHttpResponse);
+        }
     }
 }

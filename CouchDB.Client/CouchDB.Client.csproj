@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="CouchDBClientException.cs" />
     <Compile Include="CouchDBServer.cs" />
+    <Compile Include="HttpClientHelper.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerResponse.cs" />
