@@ -25,6 +25,13 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 }
 ```
 
+Delete database:
+``` C#
+using (var server = new CouchDBServer("http://localhost:5984"))
+{
+    await server.DeleteDb("my-db");
+}
+```
 
 
 # Building & Running the code
