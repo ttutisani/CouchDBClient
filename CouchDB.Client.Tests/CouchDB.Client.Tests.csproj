@@ -71,6 +71,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="QueryParamsTests.cs" />
     <Compile Include="ServerInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CouchDBClientExceptionTests.cs" />

@@ -53,6 +53,23 @@ namespace CouchDB.ClientDemo
             });
         }
 
+        public void alldbslimit()
+        {
+            UsingServer(server => 
+            {
+                Console.WriteLine("Enter limit:");
+                int limit; int.TryParse(Console.ReadLine(), out limit);
+                Console.WriteLine("Databases found with limit {0}:", limit);
+
+                var allDbs = server.GetAllDbNames(new QueryParams { Limit = limit }).Result;
+                foreach (var dbName in allDbs)
+                {
+                    Console.WriteLine("--> {0}", dbName);
+                }
+                Console.WriteLine("End of list.");
+            });
+        }
+
         public void deletedb()
         {
             UsingServer(server => 
