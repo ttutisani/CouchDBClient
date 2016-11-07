@@ -48,7 +48,7 @@ namespace CouchDB.Client
         /// about the server, including a welcome message and the version of the server.
         /// </summary>
         /// <returns><see cref="ServerInfo"/> object containing server metadata information.</returns>
-        public async Task<ServerInfo> GetInfo()
+        public async Task<ServerInfo> GetInfoAsync()
         {
             var infoHttpResponse = await _http.GetAsync(string.Empty);
             var infoDTO = await HttpClientHelper.HandleResponse<ServerInfoDTO>(infoHttpResponse);
@@ -77,7 +77,7 @@ namespace CouchDB.Client
         /// Returns a list of all the databases in the CouchDB instance.
         /// </summary>
         /// <returns>String array containing all database names.</returns>
-        public async Task<string[]> GetAllDbNames(QueryParams queryParams = null)
+        public async Task<string[]> GetAllDbNamesAsync(QueryParams queryParams = null)
         {
             var allDbsQuery = QueryParams.AppendQueryParams("_all_dbs", queryParams);
 
@@ -95,7 +95,7 @@ namespace CouchDB.Client
         /// <param name="dbName">Database name which will be created.</param>
         /// <returns><see cref="Task"/> which can be awaited.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task CreateDb(string dbName)
+        public async Task CreateDbAsync(string dbName)
         { 
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
@@ -122,7 +122,7 @@ namespace CouchDB.Client
         /// <param name="dbName">Database name to be deleted.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task DeleteDb(string dbName)
+        public async Task DeleteDbAsync(string dbName)
         {
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));

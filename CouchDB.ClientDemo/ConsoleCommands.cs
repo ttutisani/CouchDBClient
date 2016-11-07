@@ -9,7 +9,7 @@ namespace CouchDB.ClientDemo
         {
             UsingServer(server =>
             {
-                var serverInfo = server.GetInfo().Result;
+                var serverInfo = server.GetInfoAsync().Result;
 
                 Console.WriteLine("Info received:");
                 Console.WriteLine("CouchDB --> {0}.", serverInfo.CouchDB);
@@ -28,7 +28,7 @@ namespace CouchDB.ClientDemo
                     Console.WriteLine("Enter new DB name followed by <ENTER>:");
                     var dbName = Console.ReadLine();
 
-                    server.CreateDb(dbName).GetAwaiter().GetResult();
+                    server.CreateDbAsync(dbName).GetAwaiter().GetResult();
                     Console.WriteLine("Just created DB named '{0}'.", dbName);
                 }
                 catch (CouchDBClientException ex)
@@ -42,7 +42,7 @@ namespace CouchDB.ClientDemo
         {
             UsingServer(server => 
             {
-                var allDbs = server.GetAllDbNames().Result;
+                var allDbs = server.GetAllDbNamesAsync().Result;
 
                 Console.WriteLine("Databases found:");
                 foreach (var dbName in allDbs)
@@ -61,7 +61,7 @@ namespace CouchDB.ClientDemo
                 int limit; int.TryParse(Console.ReadLine(), out limit);
                 Console.WriteLine("Databases found with limit {0}:", limit);
 
-                var allDbs = server.GetAllDbNames(new QueryParams { Limit = limit }).Result;
+                var allDbs = server.GetAllDbNamesAsync(new QueryParams { Limit = limit }).Result;
                 foreach (var dbName in allDbs)
                 {
                     Console.WriteLine("--> {0}", dbName);
@@ -79,7 +79,7 @@ namespace CouchDB.ClientDemo
                     Console.WriteLine("Enter DB name followed by <ENTER>:");
                     var dbName = Console.ReadLine();
 
-                    server.DeleteDb(dbName).GetAwaiter().GetResult();
+                    server.DeleteDbAsync(dbName).GetAwaiter().GetResult();
                     Console.WriteLine("Just deleted DB '{0}'.", dbName);
                 }
                 catch (CouchDBClientException ex)
