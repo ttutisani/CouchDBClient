@@ -8,7 +8,7 @@ Create database:
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    await server.CreateDb("my-db");
+    await server.CreateDbAsync("my-db");
 }
 ```
 
@@ -16,7 +16,7 @@ Get list of all databases:
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    var allDbs = await server.GetAllDbNames();
+    var allDbs = await server.GetAllDbNamesAsync();
 
     foreach (var dbName in allDbs)
     {
@@ -29,7 +29,7 @@ Delete database:
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    await server.DeleteDb("my-db");
+    await server.DeleteDbAsync("my-db");
 }
 ```
 
