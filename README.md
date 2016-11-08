@@ -33,6 +33,22 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 }
 ```
 
+Create document:
+Delete database:
+``` C#
+using (var server = new CouchDBServer("http://localhost:5984"))
+{
+    using (var db = server.SelectDatabase("my-db"))
+    {
+        var newDoc = new { _id = "some-id", someProp = "some value" };
+        
+        var response = await db.SaveDocument(newDoc);
+        
+        Console.WriteLine($"{response.Id}, {response.Revision}");
+    }
+}
+```
+
 
 # Building & Running the code
 
