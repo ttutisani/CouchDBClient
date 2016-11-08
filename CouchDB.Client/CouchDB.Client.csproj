@@ -54,10 +54,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CouchDBClientException.cs" />
-    <Compile Include="CouchDBServer.cs" />
-    <Compile Include="HttpClientHelper.cs" />
+    <Compile Include="Database\CouchDBDatabase.cs" />
+    <Compile Include="Database\DocumentResponse.cs" />
+    <Compile Include="Helpers\UrlHelper.cs" />
+    <Compile Include="Server\CouchDBServer.cs" />
+    <Compile Include="Helpers\HttpClientHelper.cs" />
     <Compile Include="QueryParams.cs" />
-    <Compile Include="ServerInfo.cs" />
+    <Compile Include="Server\ServerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerResponse.cs" />
     <Compile Include="ServerResponseError.cs" />

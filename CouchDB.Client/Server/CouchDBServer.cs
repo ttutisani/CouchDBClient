@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace CouchDB.Client
@@ -25,7 +24,7 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(baseUrl));
 
             Uri serverUri;
-            if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out serverUri))
+            if (!Uri.TryCreate(UrlHelper.CombineUrl(baseUrl, "/"), UriKind.Absolute, out serverUri))
                 throw new FormatException("URL is not in valid format.");
 
             _http = new HttpClient();
@@ -129,6 +128,20 @@ namespace CouchDB.Client
 
             var deleteHttpResponse = await _http.DeleteAsync(dbName);
             await HttpClientHelper.HandleResponse(deleteHttpResponse);
+        }
+
+        /// <summary>
+        /// Selects specific database for working with documents in it.
+        /// </summary>
+        /// <param name="dbName">Name of database to be selected.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public CouchDBDatabase SelectDatabase(string dbName)
+        {
+            if (string.IsNullOrWhiteSpace(dbName))
+                throw new ArgumentNullException(nameof(dbName));
+
+            return new CouchDBDatabase(UrlHelper.CombineUrl(_http.BaseAddress.OriginalString, dbName));
         }
     }
 }

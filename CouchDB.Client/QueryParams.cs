@@ -167,9 +167,19 @@ namespace CouchDB.Client
             queryParts.Add($"{paramName}={paramValue}");
         }
 
+        /// <summary>
+        /// Enumeration of options for stale data.
+        /// </summary>
         public enum StaleOption
         {
+            /// <summary>
+            /// Ok to include stale data.
+            /// </summary>
             Ok,
+
+            /// <summary>
+            /// Ok to include, but update after fetch.
+            /// </summary>
             Update_After
         }
 

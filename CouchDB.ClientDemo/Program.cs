@@ -46,7 +46,7 @@ namespace CouchDB.ClientDemo
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(SerializationHelper.Serialize(ex));
             }
         }
     }

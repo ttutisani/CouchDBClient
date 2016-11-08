@@ -33,7 +33,7 @@ namespace CouchDB.ClientDemo
                 }
                 catch (CouchDBClientException ex)
                 {
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, Serialize(ex.ServerResponse));
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
                 }
             });
         }
@@ -84,22 +84,112 @@ namespace CouchDB.ClientDemo
                 }
                 catch (CouchDBClientException ex)
                 {
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, Serialize(ex.ServerResponse));
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
                 }
             });
         }
 
-        private static string Serialize(object any)
+        private void UsingServer(Action<CouchDBServer> body)
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(any);
-        }
-
-        private static void UsingServer(Action<CouchDBServer> body)
-        {
-            using (var server = new CouchDBServer("http://localhost:5984"))
+            using (var server = new CouchDBServer(_serverUrl))
             {
                 body(server);
             }
+        }
+
+        private string _serverUrl = "http://localhost:5984/";
+
+        public void SetServer()
+        {
+            Console.WriteLine("Enter server url:");
+            var serverUrl = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(serverUrl))
+                serverUrl = _serverUrl;
+
+            _serverUrl = serverUrl;
+            Console.WriteLine("Server url was set to '{0}'.", _serverUrl);
+        }
+
+        private void UsingDatabase(Action<CouchDBDatabase> body)
+        {
+            UsingServer(server => 
+            {
+                using (var db = server.SelectDatabase(_dbName))
+                {
+                    body(db);
+                }
+            });
+        }
+
+        private string _dbName = "my-db";
+
+        public void SetDb()
+        {
+            Console.WriteLine("Enter db name:");
+            var dbName = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(dbName))
+                dbName = _dbName;
+
+            _dbName = dbName;
+            Console.WriteLine("DB name was set to '{0}'.", _dbName);
+        }
+
+        public void SaveDoc()
+        {
+            Console.WriteLine("Enter document id:");
+            var docId = Console.ReadLine();
+
+            Console.WriteLine("Enter doc JSON:");
+            var docJson = Console.ReadLine();
+
+            UsingDatabase(db => 
+            {
+                try
+                {
+                    var response = db.SaveDocumentAsync(docId, docJson).Result;
+                    Console.WriteLine("Successfully saved document '{0}'. Id: '{1}', Rev: '{2}'.", docId, response.Id, response.Revision);
+                }
+                catch (CouchDBClientException ex)
+                {
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+            });
+        }
+
+        public void SaveObj()
+        {
+            Console.WriteLine("Enter Id:");
+            var id = Console.ReadLine();
+            Console.WriteLine("Enter Author:");
+            var author = Console.ReadLine();
+            Console.WriteLine("Enter revision:");
+            var revision = Console.ReadLine();
+
+            UsingDatabase(db => 
+            {
+                object obj = !string.IsNullOrWhiteSpace(revision)
+                    ? (object)new
+                    {
+                        _id = id,
+                        author = author,
+                        _rev = revision
+                    }
+                    : new
+                    {
+                        _id = id,
+                        author = author
+                    };
+
+                try
+                {
+                    var response = db.SaveDocumentAsync(obj).GetAwaiter().GetResult();
+                    Console.WriteLine("Successfully saved document '{0}'. Id: '{1}', Rev: '{2}'.", id, response.Id, response.Revision);
+                }
+                catch (CouchDBClientException ex)
+                {
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+            });
         }
     }
 }
