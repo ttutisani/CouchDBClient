@@ -34,7 +34,6 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 ```
 
 Create document:
-Delete database:
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
