@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace CouchDB.Client
             await HandleResponse<CouchDBServer.ServerResponseDTO>(httpResponse);
         }
 
-        internal async static Task<TResult> HandleResponse<TResult>(HttpResponseMessage httpResponse)
+        internal async static Task<TResult> HandleResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer)
         {
             var responseJson = await httpResponse.Content.ReadAsStringAsync();
             if (!httpResponse.IsSuccessStatusCode)
@@ -26,8 +27,13 @@ namespace CouchDB.Client
                 throw new CouchDBClientException(errorMessage, new ServerResponse(responseObject), null);
             }
 
-            var resultObject = JsonConvert.DeserializeObject<TResult>(responseJson);
+            var resultObject = deserializer(responseJson);
             return resultObject;
+        }
+
+        internal async static Task<TResult> HandleResponse<TResult>(HttpResponseMessage httpResponse)
+        {
+            return await HandleResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson));
         }
     }
 }

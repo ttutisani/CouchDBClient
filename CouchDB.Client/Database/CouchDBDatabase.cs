@@ -37,7 +37,7 @@ namespace CouchDB.Client
             _http.Dispose();
         }
 
-        #region Save string doc
+        #region Save doc
 
         /// <summary>
         /// Creates a new named document, or creates a new revision of the existing document.
@@ -66,8 +66,6 @@ namespace CouchDB.Client
 
             public string Rev { get; set; }
         }
-
-        #endregion
 
         /// <summary>
         /// Creates a new named document, or creates a new revision of the existing document.
@@ -153,5 +151,65 @@ namespace CouchDB.Client
 
             return await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject.ToString());
         }
+
+        #endregion
+
+        #region Get doc
+
+        /// <summary>
+        /// Returns document by the specified docid from the specified db. 
+        /// Unless you request a specific revision, the latest revision of the document will always be returned.
+        /// </summary>
+        /// <param name="docId">Document ID.</param>
+        /// <param name="queryParams">Additional query parameters for retrieving document.</param>
+        /// <returns><see cref="string"/> containing document JSON.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task<string> GetDocumentAsync(string docId, DocQueryParams queryParams = null)
+        {
+            if (string.IsNullOrWhiteSpace(docId))
+                throw new ArgumentNullException(nameof(docId));
+
+            var docQuery = QueryParams.AppendQueryParams(docId, queryParams);
+
+            var docResponse = await _http.GetAsync(docQuery);
+            var documentString = await HttpClientHelper.HandleResponse(docResponse, deserializer: strJson => strJson);
+
+            return documentString;
+        }
+
+        /// <summary>
+        /// Returns document by the specified docid from the specified db. 
+        /// Unless you request a specific revision, the latest revision of the document will always be returned.
+        /// </summary>
+        /// <param name="docId">Document ID.</param>
+        /// <param name="queryParams">Additional query parameters for retrieving document.</param>
+        /// <returns><see cref="JObject"/> containing document JSON.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task<JObject> GetDocumentJsonAsync(string docId, DocQueryParams queryParams = null)
+        {
+            var jsonString = await GetDocumentAsync(docId, queryParams);
+            var jsonObject = JObject.Parse(jsonString);
+
+            return jsonObject;
+        }
+
+        /// <summary>
+        /// Returns document by the specified docid from the specified db. 
+        /// Unless you request a specific revision, the latest revision of the document will always be returned.
+        /// </summary>
+        /// <typeparam name="TResult">Specify type to which the document will be deserialized.</typeparam>
+        /// <param name="docId">Document ID.</param>
+        /// <param name="queryParams">Additional query parameters for retrieving document.</param>
+        /// <returns>Object containing deserialized document.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task<TResult> GetDocumentAsync<TResult>(string docId, DocQueryParams queryParams = null)
+        {
+            var jsonString = await GetDocumentAsync(docId, queryParams);
+            var resultObject = JsonConvert.DeserializeObject<TResult>(jsonString);
+
+            return resultObject;
+        }
+
+        #endregion
     }
 }

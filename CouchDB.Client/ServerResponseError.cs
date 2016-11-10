@@ -24,6 +24,11 @@
         /// <summary>
         /// Conflict while executing operation. e.g. revision number did not match.
         /// </summary>
-        Conflict
+        Conflict,
+
+        /// <summary>
+        /// Object cannot be found on the server. e.g. database or document does not exist.
+        /// </summary>
+        Not_Found
     }
 }

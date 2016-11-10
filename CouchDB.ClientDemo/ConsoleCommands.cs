@@ -61,7 +61,7 @@ namespace CouchDB.ClientDemo
                 int limit; int.TryParse(Console.ReadLine(), out limit);
                 Console.WriteLine("Databases found with limit {0}:", limit);
 
-                var allDbs = server.GetAllDbNamesAsync(new QueryParams { Limit = limit }).Result;
+                var allDbs = server.GetAllDbNamesAsync(new ListQueryParams { Limit = limit }).Result;
                 foreach (var dbName in allDbs)
                 {
                     Console.WriteLine("--> {0}", dbName);
@@ -187,6 +187,104 @@ namespace CouchDB.ClientDemo
                 }
                 catch (CouchDBClientException ex)
                 {
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+            });
+        }
+
+        public void GetDoc()
+        {
+            Console.WriteLine("Enter Document id:");
+            var docId = Console.ReadLine();
+
+            UsingDatabase(db => 
+            {
+                try
+                {
+                    var doc = db.GetDocumentJsonAsync(docId).Result;
+                    Console.WriteLine("Found document:");
+                    Console.WriteLine(doc);
+                    Console.WriteLine("End of document.");
+                }
+                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
+                {
+                    var ex = ae.InnerException as CouchDBClientException;
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+            });
+        }
+
+        private sealed class SampleDoc
+        {
+            public string _id { get; set; }
+
+            public string author { get; set; }
+
+            public string _rev { get; set; }
+        }
+
+        public void GetObj()
+        {
+            Console.WriteLine("Enter document id:");
+            var docId = Console.ReadLine();
+
+            UsingDatabase(db => 
+            {
+                try
+                {
+                    var obj = db.GetDocumentAsync<SampleDoc>(docId).Result;
+
+                    Console.WriteLine("Found document:");
+                    Console.WriteLine(SerializationHelper.Serialize(obj));
+                    Console.WriteLine("End of document.");
+                }
+                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
+                {
+                    var ex = ae.InnerException as CouchDBClientException;
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+            });
+        }
+
+        public void GetDocWithRevs()
+        {
+            Console.WriteLine("Enter Document id:");
+            var docId = Console.ReadLine();
+
+            UsingDatabase(db => 
+            {
+                try
+                {
+                    var doc = db.GetDocumentAsync(docId, new DocQueryParams { Revs = true, Revs_Info = true }).Result;
+                    Console.WriteLine("Found document:");
+                    Console.WriteLine(doc);
+                    Console.WriteLine("End of document.");
+                }
+                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
+                {
+                    var ex = ae.InnerException as CouchDBClientException;
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+            });
+        }
+
+        public void GetDocOpenRevs()
+        {
+            Console.WriteLine("Enter Document id:");
+            var docId = Console.ReadLine();
+
+            UsingDatabase(db =>
+            {
+                try
+                {
+                    var doc = db.GetDocumentAsync(docId, new DocQueryParams { Open_Revs = new DocQueryParams.OpenRevs() }).Result;
+                    Console.WriteLine("Found document:");
+                    Console.WriteLine(doc);
+                    Console.WriteLine("End of document.");
+                }
+                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
+                {
+                    var ex = ae.InnerException as CouchDBClientException;
                     Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
                 }
             });

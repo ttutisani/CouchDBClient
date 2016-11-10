@@ -72,6 +72,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DbResponseTests.cs" />
+    <Compile Include="DocQueryParamsTests.cs" />
+    <Compile Include="ListQueryParamsTests.cs" />
     <Compile Include="QueryParamsTests.cs" />
     <Compile Include="ServerInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

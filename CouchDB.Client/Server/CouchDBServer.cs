@@ -76,7 +76,7 @@ namespace CouchDB.Client
         /// Returns a list of all the databases in the CouchDB instance.
         /// </summary>
         /// <returns>String array containing all database names.</returns>
-        public async Task<string[]> GetAllDbNamesAsync(QueryParams queryParams = null)
+        public async Task<string[]> GetAllDbNamesAsync(ListQueryParams queryParams = null)
         {
             var allDbsQuery = QueryParams.AppendQueryParams("_all_dbs", queryParams);
 

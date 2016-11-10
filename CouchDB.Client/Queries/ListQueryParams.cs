@@ -7,7 +7,7 @@ namespace CouchDB.Client
     /// <summary>
     /// Represents query parameters to CouchDB server.
     /// </summary>
-    public sealed class QueryParams
+    public sealed class ListQueryParams
     {
         /// <summary>
         /// Includes conflicts information in response. Ignored if include_docs isn’t true. Default is false.
@@ -181,28 +181,6 @@ namespace CouchDB.Client
             /// Ok to include, but update after fetch.
             /// </summary>
             Update_After
-        }
-
-        internal static string AppendQueryParams(string url, QueryParams queryParams)
-        {
-            if (url == null)
-                throw new ArgumentNullException(nameof(url));
-
-            if (queryParams == null)
-                return url;
-
-            var query = queryParams.ToQueryString();
-            if (string.IsNullOrWhiteSpace(query))
-                return url;
-
-            var qmarkIndex = url.IndexOf('?');
-            if (qmarkIndex < 0)
-                return $"{url}?{query}";
-
-            if (qmarkIndex == url.Length - 1)
-                return $"{url}{query}";
-
-            return $"{url}&{query}";
         }
     }
 }
