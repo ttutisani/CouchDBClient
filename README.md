@@ -41,7 +41,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
     {
         var newDoc = new { _id = "some-id", someProp = "some value" };
         
-        var response = await db.SaveDocument(newDoc);
+        var response = await db.SaveDocumentAsync(newDoc);
         
         Console.WriteLine($"{response.Id}, {response.Revision}");
     }
