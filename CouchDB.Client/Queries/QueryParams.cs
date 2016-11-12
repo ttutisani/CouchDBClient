@@ -70,5 +70,13 @@ namespace CouchDB.Client
 
             return FromDelegate(from.ToQueryString);
         }
+
+        public static implicit operator QueryParams(DocUpdateParams from)
+        {
+            if (from == null)
+                return null;
+
+            return FromDelegate(from.ToQueryString);
+        }
     }
 }

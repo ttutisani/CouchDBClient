@@ -44,15 +44,18 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="docId">Document Id.</param>
         /// <param name="documentJsonString">JSON of document to be saved.</param>
+        /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="DocumentResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task<DocumentResponse> SaveDocumentAsync(string docId, string documentJsonString)
+        public async Task<DocumentResponse> SaveDocumentAsync(string docId, string documentJsonString, DocUpdateParams updateParams = null)
         {
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
 
             if (string.IsNullOrWhiteSpace(documentJsonString))
                 throw new ArgumentNullException(nameof(documentJsonString));
+
+            var newDocUrl = QueryParams.AppendQueryParams(docId, updateParams);
 
             var newDocResponse = await _http.PutAsync(docId, new StringContent(documentJsonString));
             var dbResponseDTO = await HttpClientHelper.HandleResponse<DocumentResponseDTO>(newDocResponse);
@@ -72,14 +75,15 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="docId">Document Id.</param>
         /// <param name="documentJsonObject">JSON of document to be saved.</param>
+        /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task SaveDocumentAsync(string docId, JObject documentJsonObject)
+        public async Task SaveDocumentAsync(string docId, JObject documentJsonObject, DocUpdateParams updateParams = null)
         {
             if (documentJsonObject == null)
                 throw new ArgumentNullException(nameof(documentJsonObject));
 
-            var saveResponse = await SaveDocumentAsync(docId, documentJsonObject.ToString());
+            var saveResponse = await SaveDocumentAsync(docId, documentJsonObject.ToString(), updateParams);
             documentJsonObject[_idPropertyName] = saveResponse.Id;
             documentJsonObject[_revisionPropertyName] = saveResponse.Revision;
         }
@@ -89,23 +93,25 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="docId">Document Id.</param>
         /// <param name="documentObject">Document object to be saved.</param>
+        /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="DocumentResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task<DocumentResponse> SaveDocumentAsync(string docId, object documentObject)
+        public async Task<DocumentResponse> SaveDocumentAsync(string docId, object documentObject, DocUpdateParams updateParams = null)
         {
             if (documentObject == null)
                 throw new ArgumentNullException(nameof(documentObject));
 
-            return await SaveDocumentAsync(docId, JsonConvert.SerializeObject(documentObject));
+            return await SaveDocumentAsync(docId, JsonConvert.SerializeObject(documentObject), updateParams);
         }
 
         /// <summary>
         /// Creates a new named document, or creates a new revision of the existing document.
         /// </summary>
         /// <param name="documentJsonString">JSON of document to be saved.</param>
+        /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="DocumentResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task<DocumentResponse> SaveDocumentAsync(string documentJsonString)
+        public async Task<DocumentResponse> SaveDocumentAsync(string documentJsonString, DocUpdateParams updateParams = null)
         {
             if (string.IsNullOrWhiteSpace(documentJsonString))
                 throw new ArgumentNullException(nameof(documentJsonString));
@@ -114,16 +120,17 @@ namespace CouchDB.Client
             JToken idPropertyValue;
             documentJsonObject.TryGetValue(_idPropertyName, out idPropertyValue);
 
-            return await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject.ToString());
+            return await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject.ToString(), updateParams);
         }
 
         /// <summary>
         /// Creates a new named document, or creates a new revision of the existing document.
         /// </summary>
         /// <param name="documentJsonObject">JSON of document to be saved.</param>
+        /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task SaveDocumentAsync(JObject documentJsonObject)
+        public async Task SaveDocumentAsync(JObject documentJsonObject, DocUpdateParams updateParams = null)
         {
             if (documentJsonObject == null)
                 throw new ArgumentNullException(nameof(documentJsonObject));
@@ -131,16 +138,17 @@ namespace CouchDB.Client
             JToken idPropertyValue;
             documentJsonObject.TryGetValue(_idPropertyName, out idPropertyValue);
 
-            await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject);
+            await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject, updateParams);
         }
 
         /// <summary>
         /// Creates a new named document, or creates a new revision of the existing document.
         /// </summary>
         /// <param name="documentObject">Document object to be saved.</param>
+        /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="DocumentResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task<DocumentResponse> SaveDocumentAsync(object documentObject)
+        public async Task<DocumentResponse> SaveDocumentAsync(object documentObject, DocUpdateParams updateParams = null)
         {
             if (documentObject == null)
                 throw new ArgumentNullException(nameof(documentObject));
@@ -149,7 +157,7 @@ namespace CouchDB.Client
             JToken idPropertyValue;
             documentJsonObject.TryGetValue(_idPropertyName, out idPropertyValue);
 
-            return await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject.ToString());
+            return await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject.ToString(), updateParams);
         }
 
         #endregion

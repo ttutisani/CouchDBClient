@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="DbResponseTests.cs" />
     <Compile Include="DocQueryParamsTests.cs" />
+    <Compile Include="DocUpdateParamsTests.cs" />
     <Compile Include="ListQueryParamsTests.cs" />
     <Compile Include="QueryParamsTests.cs" />
     <Compile Include="ServerInfoTests.cs" />
