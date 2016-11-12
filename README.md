@@ -20,7 +20,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 {
     string[] allDbs = await server.GetAllDbNamesAsync();
 
-    Console.WriteLine($"Total cound of DBs: {allDbs.Length}.");
+    Console.WriteLine($"Total count of DBs: {allDbs.Length}.");
 }
 ```
 
