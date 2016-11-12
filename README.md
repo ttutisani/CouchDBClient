@@ -34,7 +34,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 
 ### Documents
 
-You can work with documents as strings, or JObject's (JSON objects), or your own custom objects.
+You can work with documents as strings, or JObject's (JSON objects), or your own custom objects (generics when loading, System.Object when saving).
 All operations with objects will target to support this flexible approach.
 Examples below are using one or another approach just for simplicity's sake.
 
