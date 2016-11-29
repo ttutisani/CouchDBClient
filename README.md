@@ -54,7 +54,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 }
 ```
 
-Get document by ID:
+Get document by ID (can get as JObject or your own custom type through generics as well):
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
@@ -63,6 +63,19 @@ using (var server = new CouchDBServer("http://localhost:5984"))
         string document = await db.GetDocumentAsync("some-id");
         
         Console.WriteLine($"Found document JSON string: {document}");
+    }
+}
+```
+
+Get all documents as strings (can get as JObject or your own custom type through generics as well):
+``` C#
+using (var server = new CouchDBServer("http://localhost:5984"))
+{
+    using (var db = server.SelectDatabase("my-db"))
+    {
+        var allDocsObject = await db.GetAllStringDocumentsAsync("some-id");
+        
+        Console.WriteLine($"Total count of docs found: {allDocsObject.Rows.Count}");
     }
 }
 ```
