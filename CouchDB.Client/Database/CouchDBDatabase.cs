@@ -281,6 +281,7 @@ namespace CouchDB.Client
         /// NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
         /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
         /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+        /// <exception cref="ArgumentException"><paramref name="extractDocumentAsObject"/> can be true only when Include_Docs is true within <paramref name="queryParams"/>.</exception>
         public async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(ListQueryParams queryParams = null, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null)
         {
             if (extractDocumentAsObject && (queryParams?.Include_Docs != true))
