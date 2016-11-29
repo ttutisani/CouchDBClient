@@ -55,7 +55,8 @@
   <ItemGroup>
     <Compile Include="CouchDBClientException.cs" />
     <Compile Include="Database\CouchDBDatabase.cs" />
-    <Compile Include="Documents\DocumentResponse.cs" />
+    <Compile Include="Documents\DocListResponse.cs" />
+    <Compile Include="Documents\SaveDocResponse.cs" />
     <Compile Include="Documents\DocUpdateParams.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Documents\DocQueryParams.cs" />

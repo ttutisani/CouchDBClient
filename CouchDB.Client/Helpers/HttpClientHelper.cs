@@ -35,5 +35,10 @@ namespace CouchDB.Client
         {
             return await HandleResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson));
         }
+
+        internal async static Task<string> HandleStringResponse(HttpResponseMessage httpResponse)
+        {
+            return await HandleResponse(httpResponse, strJson => strJson);
+        }
     }
 }

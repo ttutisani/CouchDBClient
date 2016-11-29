@@ -9,7 +9,7 @@ namespace CouchDB.Client.Tests
         public void Ctor_RequiresDTO()
         {
             //act / assert.
-            Assert.Throws<ArgumentNullException>(() => new DocumentResponse(null));
+            Assert.Throws<ArgumentNullException>(() => new SaveDocResponse(null));
         }
 
         [Fact]
@@ -19,7 +19,7 @@ namespace CouchDB.Client.Tests
             var dto = new CouchDBDatabase.DocumentResponseDTO { Id = "some id", Rev = "some rev" };
 
             //act.
-            var sut = new DocumentResponse(dto);
+            var sut = new SaveDocResponse(dto);
 
             //assert.
             Assert.Equal(dto.Id, sut.Id);

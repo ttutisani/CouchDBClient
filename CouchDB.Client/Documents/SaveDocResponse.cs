@@ -5,9 +5,9 @@ namespace CouchDB.Client
     /// <summary>
     /// Represents response of document operation.
     /// </summary>
-    public sealed class DocumentResponse
+    public sealed class SaveDocResponse
     {
-        internal DocumentResponse(CouchDBDatabase.DocumentResponseDTO docResponseDTO)
+        internal SaveDocResponse(CouchDBDatabase.DocumentResponseDTO docResponseDTO)
         {
             if (docResponseDTO == null)
                 throw new ArgumentNullException(nameof(docResponseDTO));

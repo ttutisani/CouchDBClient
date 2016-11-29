@@ -1,4 +1,5 @@
 ﻿using CouchDB.Client;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace CouchDB.ClientDemo
@@ -287,6 +288,126 @@ namespace CouchDB.ClientDemo
                     var ex = ae.InnerException as CouchDBClientException;
                     Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
                 }
+            });
+        }
+
+        public void GetAllDocs()
+        {
+            UsingDatabase(db => 
+            {
+                var allDocs = db.GetAllStringDocumentsAsync().Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+
+                foreach (var doc in allDocs.Rows)
+                {
+                    Console.WriteLine(doc);
+                    Console.WriteLine("----------");
+                }
+
+                Console.WriteLine("End of list.");
+            });
+        }
+
+        public void GetAllDocsJson()
+        {
+            UsingDatabase(db =>
+            {
+                var allDocs = db.GetAllJsonDocumentsAsync().Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+
+                foreach (var doc in allDocs.Rows)
+                {
+                    Console.WriteLine(doc.ToString());
+                    Console.WriteLine("----------");
+                }
+
+                Console.WriteLine("End of list.");
+            });
+        }
+
+        private sealed class AuthorInfo
+        {
+            public string _Id { get; set; }
+
+            public string Author { get; set; }
+
+            public string _Rev { get; set; }
+        }
+
+        public void GetAllDocsObj()
+        {
+            UsingDatabase(db =>
+            {
+                var allDocs = db.GetAllObjectDocumentsAsync<AuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true }).Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+
+                foreach (var doc in allDocs.Rows)
+                {
+                    Console.WriteLine("ID: {0}", doc._Id);
+                    Console.WriteLine("Rev: {0}", doc._Rev);
+                    Console.WriteLine("Author: {0}", doc.Author);
+                    Console.WriteLine("----------");
+                }
+
+                Console.WriteLine("End of list.");
+            });
+        }
+
+        public void GetAllDocsLimit()
+        {
+            int skip;
+            Console.WriteLine("Enter SKIP count or empty for default:");
+            if (!int.TryParse(Console.ReadLine(), out skip)) skip = 0;
+
+            int limit;
+            Console.WriteLine("Enter LIMIT count or empty for default:");
+            if (!int.TryParse(Console.ReadLine(), out limit)) limit = int.MaxValue;
+
+            UsingDatabase(db =>
+            {
+                var allDocs = db.GetAllObjectDocumentsAsync<AuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true, Skip = skip, Limit = limit }).Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+
+                foreach (var doc in allDocs.Rows)
+                {
+                    Console.WriteLine("ID: {0}", doc._Id);
+                    Console.WriteLine("Rev: {0}", doc._Rev);
+                    Console.WriteLine("Author: {0}", doc.Author);
+                    Console.WriteLine("----------");
+                }
+
+                Console.WriteLine("End of list.");
+            });
+        }
+
+        private sealed class NiceAuthorInfo
+        {
+            public string Id { get; }
+
+            public string Author { get; }
+
+            public NiceAuthorInfo(JObject from)
+            {
+                Id = from["_id"].ToString();
+                Author = from["author"].ToString();
+            }
+        }
+
+        public void GetAllDocsNice()
+        {
+            UsingDatabase(db =>
+            {
+                var allDocs = db.GetAllObjectDocumentsAsync<NiceAuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true }, deserializer: jObject => new NiceAuthorInfo(jObject)).Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+
+                foreach (var doc in allDocs.Rows)
+                {
+                    Console.WriteLine("ID: {0}", doc.Id);
+                    Console.WriteLine("Author: {0}", doc.Author);
+                    Console.WriteLine("----------");
+                }
+
+                Console.WriteLine("End of list.");
             });
         }
     }
