@@ -54,7 +54,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 }
 ```
 
-Get document by ID (can get as JObject or your own custom type through generics as well):
+Get document JSON string by ID (can get as JObject or your own custom type through generics as well):
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
