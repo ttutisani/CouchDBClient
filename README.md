@@ -1,5 +1,5 @@
 # CouchDBClient
-Couch DB .NET Client - easy to use, intuitive, self-describing library.     
+CouchDB .NET Client - easy to use, intuitive, self-describing library.     
 Caution: work in progress! don't use in production code.
 
 ## Examples
