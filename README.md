@@ -38,7 +38,7 @@ You can work with documents as strings, or JObject's (JSON objects), or your own
 All operations with objects will target to support this flexible approach.
 Examples below are using one or another approach just for simplicity's sake.
 
-Create document:
+Create new or save existing document (to save existing, _id and _rev is needed; to create new, none of these is required):
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
