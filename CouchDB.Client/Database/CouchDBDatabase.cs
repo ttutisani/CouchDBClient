@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CouchDB.Client
@@ -57,10 +58,10 @@ namespace CouchDB.Client
 
             var newDocUrl = QueryParams.AppendQueryParams(docId, updateParams);
 
-            var newDocResponse = await _http.PutAsync(docId, new StringContent(documentJsonString));
-            var dbResponseDTO = await HttpClientHelper.HandleResponse<DocumentResponseDTO>(newDocResponse);
+            var newDocResponse = await _http.PutAsync(newDocUrl, new StringContent(documentJsonString));
+            var docResponseDTO = await HttpClientHelper.HandleResponse<DocumentResponseDTO>(newDocResponse);
 
-            return new SaveDocResponse(dbResponseDTO);
+            return new SaveDocResponse(docResponseDTO);
         }
 
         internal sealed class DocumentResponseDTO
@@ -120,7 +121,17 @@ namespace CouchDB.Client
             JToken idPropertyValue;
             documentJsonObject.TryGetValue(_idPropertyName, out idPropertyValue);
 
-            return await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject.ToString(), updateParams);
+            if (idPropertyValue != null)
+            {
+                return await SaveDocumentAsync(idPropertyValue.ToString(), documentJsonString, updateParams);
+            }
+
+            //post instead of put.
+            var newDocUrl = QueryParams.AppendQueryParams(string.Empty, updateParams);
+            var newDocResponse = await _http.PostAsync(newDocUrl, new StringContent(documentJsonString, Encoding.UTF8, "application/json"));
+            var docResponseDTO = await HttpClientHelper.HandleResponse<DocumentResponseDTO>(newDocResponse);
+
+            return new SaveDocResponse(docResponseDTO);
         }
 
         /// <summary>
@@ -135,10 +146,9 @@ namespace CouchDB.Client
             if (documentJsonObject == null)
                 throw new ArgumentNullException(nameof(documentJsonObject));
 
-            JToken idPropertyValue;
-            documentJsonObject.TryGetValue(_idPropertyName, out idPropertyValue);
-
-            await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject, updateParams);
+            var saveResponse = await SaveDocumentAsync(documentJsonObject.ToString(), updateParams);
+            documentJsonObject[_idPropertyName] = saveResponse.Id;
+            documentJsonObject[_revisionPropertyName] = saveResponse.Revision;
         }
 
         /// <summary>
@@ -153,11 +163,7 @@ namespace CouchDB.Client
             if (documentObject == null)
                 throw new ArgumentNullException(nameof(documentObject));
 
-            var documentJsonObject = JObject.FromObject(documentObject);
-            JToken idPropertyValue;
-            documentJsonObject.TryGetValue(_idPropertyName, out idPropertyValue);
-
-            return await SaveDocumentAsync(idPropertyValue?.ToString(), documentJsonObject.ToString(), updateParams);
+            return await SaveDocumentAsync(JsonConvert.SerializeObject(documentObject), updateParams);
         }
 
         #endregion

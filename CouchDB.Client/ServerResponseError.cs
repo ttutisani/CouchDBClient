@@ -29,6 +29,11 @@
         /// <summary>
         /// Object cannot be found on the server. e.g. database or document does not exist.
         /// </summary>
-        Not_Found
+        Not_Found,
+
+        /// <summary>
+        /// Data sent to server has invalid content type, i.e. "Content-Type" header has wrong value in it.
+        /// </summary>
+        Bad_Content_Type
     }
 }

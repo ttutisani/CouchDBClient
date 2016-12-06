@@ -137,7 +137,7 @@ namespace CouchDB.ClientDemo
 
         public void SaveDoc()
         {
-            Console.WriteLine("Enter document id:");
+            Console.WriteLine("Enter document id (optional):");
             var docId = Console.ReadLine();
 
             Console.WriteLine("Enter doc JSON:");
@@ -147,7 +147,9 @@ namespace CouchDB.ClientDemo
             {
                 try
                 {
-                    var response = db.SaveDocumentAsync(docId, docJson).Result;
+                    var response = !string.IsNullOrWhiteSpace(docId)
+                        ? db.SaveDocumentAsync(docId, docJson).Result
+                        : db.SaveDocumentAsync(docJson).Result;
                     Console.WriteLine("Successfully saved document '{0}'. Id: '{1}', Rev: '{2}'.", docId, response.Id, response.Revision);
                 }
                 catch (CouchDBClientException ex)
@@ -159,32 +161,24 @@ namespace CouchDB.ClientDemo
 
         public void SaveObj()
         {
-            Console.WriteLine("Enter Id:");
+            Console.WriteLine("Enter Id (optional):");
             var id = Console.ReadLine();
             Console.WriteLine("Enter Author:");
             var author = Console.ReadLine();
-            Console.WriteLine("Enter revision:");
+            Console.WriteLine("Enter revision (optional):");
             var revision = Console.ReadLine();
+
+            JObject obj = new JObject();
+            if (!string.IsNullOrWhiteSpace(id)) obj["_id"] = id;
+            obj["author"] = author;
+            if (!string.IsNullOrWhiteSpace(revision)) obj["_rev"] = revision;
 
             UsingDatabase(db => 
             {
-                object obj = !string.IsNullOrWhiteSpace(revision)
-                    ? (object)new
-                    {
-                        _id = id,
-                        author = author,
-                        _rev = revision
-                    }
-                    : new
-                    {
-                        _id = id,
-                        author = author
-                    };
-
                 try
                 {
-                    var response = db.SaveDocumentAsync(obj).GetAwaiter().GetResult();
-                    Console.WriteLine("Successfully saved document '{0}'. Id: '{1}', Rev: '{2}'.", id, response.Id, response.Revision);
+                    db.SaveDocumentAsync(obj).GetAwaiter().GetResult();
+                    Console.WriteLine("Successfully saved document '{0}'.", obj.ToString());
                 }
                 catch (CouchDBClientException ex)
                 {
