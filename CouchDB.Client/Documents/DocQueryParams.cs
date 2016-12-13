@@ -6,7 +6,7 @@ namespace CouchDB.Client
     /// <summary>
     /// Represents query string parameters for retrieving document.
     /// </summary>
-    public sealed class DocQueryParams
+    public sealed class DocQueryParams : QueryParams
     {
         /// <summary>
         /// Includes attachments bodies in response. Default is false
@@ -74,7 +74,7 @@ namespace CouchDB.Client
         /// </summary>
         public bool? Revs_Info { get; set; }
 
-        internal string ToQueryString()
+        internal override string ToQueryString()
         {
             var queryParts = new List<string>();
 

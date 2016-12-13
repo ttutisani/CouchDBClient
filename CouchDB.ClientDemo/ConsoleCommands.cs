@@ -404,5 +404,19 @@ namespace CouchDB.ClientDemo
                 Console.WriteLine("End of list.");
             });
         }
+
+        public void DeleteDoc()
+        {
+            Console.WriteLine("Enter doc id:");
+            var docId = Console.ReadLine();
+            Console.WriteLine("Enter revision:");
+            var revision = Console.ReadLine();
+
+            UsingDatabase(db => 
+            {
+                var result = db.DeleteDocumentAsync(docId, revision).GetAwaiter().GetResult();
+                Console.WriteLine("Response: {0}", SerializationHelper.Serialize(result));
+            });
+        }
     }
 }

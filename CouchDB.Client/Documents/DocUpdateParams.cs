@@ -5,7 +5,7 @@ namespace CouchDB.Client
     /// <summary>
     /// Represents query parameters for updating CouchDB document.
     /// </summary>
-    public sealed class DocUpdateParams
+    public sealed class DocUpdateParams : QueryParams
     {
         /// <summary>
         /// Stores document in batch mode. Possible values: ok (when assigned true). Optional.
@@ -20,7 +20,7 @@ namespace CouchDB.Client
         /// </summary>
         public bool? New_Edits { get; set; }
 
-        internal string ToQueryString()
+        internal override string ToQueryString()
         {
             var queryParts = new List<string>();
 

@@ -59,12 +59,12 @@ namespace CouchDB.Client
             var newDocUrl = QueryParams.AppendQueryParams(docId, updateParams);
 
             var newDocResponse = await _http.PutAsync(newDocUrl, new StringContent(documentJsonString));
-            var docResponseDTO = await HttpClientHelper.HandleResponse<DocumentResponseDTO>(newDocResponse);
+            var docResponseDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(newDocResponse);
 
             return new SaveDocResponse(docResponseDTO);
         }
 
-        internal sealed class DocumentResponseDTO
+        internal sealed class SaveDocResponseDTO
         {
             public string Id { get; set; }
 
@@ -129,7 +129,7 @@ namespace CouchDB.Client
             //post instead of put.
             var newDocUrl = QueryParams.AppendQueryParams(string.Empty, updateParams);
             var newDocResponse = await _http.PostAsync(newDocUrl, new StringContent(documentJsonString, Encoding.UTF8, "application/json"));
-            var docResponseDTO = await HttpClientHelper.HandleResponse<DocumentResponseDTO>(newDocResponse);
+            var docResponseDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(newDocResponse);
 
             return new SaveDocResponse(docResponseDTO);
         }
@@ -226,6 +226,41 @@ namespace CouchDB.Client
 
         #endregion
 
+        #region Delete doc
+
+        /// <summary>
+        /// Marks the specified document as deleted by adding a field 
+        /// _deleted with the value true. 
+        /// Documents with this field will not be returned within requests anymore, 
+        /// but stay in the database. 
+        /// You must supply the current (latest) revision, by using the <paramref name="revision"/> parameter.
+        /// </summary>
+        /// <param name="docId">Document ID.</param>
+        /// <param name="revision">Actual document’s revision.</param>
+        /// <param name="batch">Stores document in batch mode Possible values: ok. Optional.</param>
+        /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
+        public async Task<SaveDocResponse> DeleteDocumentAsync(string docId, string revision, bool batch = false)
+        {
+            if (string.IsNullOrWhiteSpace(docId))
+                throw new ArgumentNullException(nameof(docId));
+
+            if (string.IsNullOrWhiteSpace(revision))
+                throw new ArgumentNullException(nameof(revision));
+
+            var deleteQueryParams = new DeleteDocParams
+            {
+                Revision = revision,
+                Batch = batch
+            };
+            var deleteDocUrl = QueryParams.AppendQueryParams(docId, deleteQueryParams);
+
+            var deleteResponse = await _http.DeleteAsync(deleteDocUrl);
+            var saveDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(deleteResponse);
+            return new SaveDocResponse(saveDTO);
+        }
+
+        #endregion
+
         #region Get all docs
 
         private async Task<JObject> GetAllDocumentsObjectAsync(ListQueryParams queryParams)
@@ -246,7 +281,7 @@ namespace CouchDB.Client
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{string}"/> containing list of JSON strings.</returns>
+        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
         public async Task<DocListResponse<string>> GetAllStringDocumentsAsync(ListQueryParams queryParams = null)
         {
             var allDocsJsonObject = await GetAllDocumentsObjectAsync(queryParams);

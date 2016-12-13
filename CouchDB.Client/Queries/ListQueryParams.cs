@@ -7,7 +7,7 @@ namespace CouchDB.Client
     /// <summary>
     /// Represents query parameters to CouchDB server.
     /// </summary>
-    public sealed class ListQueryParams
+    public sealed class ListQueryParams : QueryParams
     {
         /// <summary>
         /// Includes conflicts information in response. Ignored if include_docs isn’t true. Default is false.
@@ -102,7 +102,7 @@ namespace CouchDB.Client
         /// </summary>
         public bool? Update_Seq { get; set; }
 
-        internal string ToQueryString()
+        internal override string ToQueryString()
         {
             var queryParts = new List<string>();
 

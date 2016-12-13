@@ -2,7 +2,7 @@
 
 namespace CouchDB.Client
 {
-    internal abstract class QueryParams
+    public abstract class QueryParams
     {
         internal abstract string ToQueryString();
 
@@ -26,57 +26,6 @@ namespace CouchDB.Client
                 return $"{url}{query}";
 
             return $"{url}&{query}";
-        }
-
-        #region Delegate based
-
-        private static QueryParams FromDelegate(Func<string> toQueryString)
-        {
-            return new DelegateBasedQueryParams(toQueryString);
-        }
-
-        private sealed class DelegateBasedQueryParams : QueryParams
-        {
-            private readonly Func<string> _toQueryString;
-
-            internal DelegateBasedQueryParams(Func<string> toQueryString)
-            {
-                if (toQueryString == null)
-                    throw new ArgumentNullException(nameof(toQueryString));
-
-                _toQueryString = toQueryString;
-            }
-
-            internal override string ToQueryString()
-            {
-                return _toQueryString();
-            }
-        }
-
-        #endregion
-
-        public static implicit operator QueryParams(ListQueryParams from)
-        {
-            if (from == null)
-                return null;
-
-            return FromDelegate(from.ToQueryString);
-        }
-
-        public static implicit operator QueryParams(DocQueryParams from)
-        {
-            if (from == null)
-                return null;
-
-            return FromDelegate(from.ToQueryString);
-        }
-
-        public static implicit operator QueryParams(DocUpdateParams from)
-        {
-            if (from == null)
-                return null;
-
-            return FromDelegate(from.ToQueryString);
         }
     }
 }

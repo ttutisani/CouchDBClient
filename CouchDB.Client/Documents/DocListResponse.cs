@@ -97,7 +97,7 @@ namespace CouchDB.Client
             return new DocListResponse<string>(allDocsJsonObject, obj => obj.ToString());
         }
 
-        internal static DocListResponse<TDocument> FromCustomObjects<TDocument>(JObject allDocsJsonObject, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null)
+        internal static DocListResponse<TDocument> FromCustomObjects(JObject allDocsJsonObject, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null)
         {
             if (deserializer == null)
                 deserializer = jObject => jObject.ToObject<TDocument>();

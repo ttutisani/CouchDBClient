@@ -81,7 +81,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            var sut = DocListResponse<RawDocument>.FromCustomObjects<RawDocument>(JObject.FromObject(responseJson), extractDocumentAsObject: false);
+            var sut = DocListResponse<RawDocument>.FromCustomObjects(JObject.FromObject(responseJson), extractDocumentAsObject: false);
 
             //assert.
             Assert.NotNull(sut);
@@ -119,7 +119,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            var sut = DocListResponse<RawDocument.DocClass>.FromCustomObjects<RawDocument.DocClass>(JObject.FromObject(responseJson), extractDocumentAsObject: true);
+            var sut = DocListResponse<RawDocument.DocClass>.FromCustomObjects(JObject.FromObject(responseJson), extractDocumentAsObject: true);
 
             //assert.
             Assert.NotNull(sut);

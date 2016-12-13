@@ -16,7 +16,7 @@ namespace CouchDB.Client.Tests
         public void Ctor_Initializes_IdAndRev()
         {
             //arrange.
-            var dto = new CouchDBDatabase.DocumentResponseDTO { Id = "some id", Rev = "some rev" };
+            var dto = new CouchDBDatabase.SaveDocResponseDTO { Id = "some id", Rev = "some rev" };
 
             //act.
             var sut = new SaveDocResponse(dto);
