@@ -80,6 +80,20 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 }
 ```
 
+Delete document:
+``` C#
+using (var server = new CouchDBServer("http://localhost:5984"))
+{
+    using (var db = server.SelectDatabase("my-db"))
+    {
+        var response = await db.DeleteDocumentAsync("some-id", "");
+        
+        Console.WriteLine($"Deleted document ID: {response.Id}.");
+        Console.WriteLine($"Deleted document revision number: {response.Revision}.");
+    }
+}
+```
+
 
 ## Building & Running the Code
 
