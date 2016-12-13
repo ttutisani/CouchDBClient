@@ -97,7 +97,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 
 ## Building & Running the Code
 
-I'm currently using Visual Studio 2015 Community Edition.
+I'm currently using Visual Studio 2015 Community Edition. As long as you have that, you will be able to compile and run the code out of the box.
 
 Solution contains a demo project in it, which is a console app.
 Just run that demo, and it will ask you to enter one of the supported commands into the console.
