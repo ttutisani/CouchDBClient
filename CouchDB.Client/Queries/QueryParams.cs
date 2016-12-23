@@ -2,6 +2,9 @@
 
 namespace CouchDB.Client
 {
+    /// <summary>
+    /// Represents base class of query parameters.
+    /// </summary>
     public abstract class QueryParams
     {
         internal abstract string ToQueryString();

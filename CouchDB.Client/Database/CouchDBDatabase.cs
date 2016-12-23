@@ -123,12 +123,16 @@ namespace CouchDB.Client
 
             if (idPropertyValue != null)
             {
-                return await SaveDocumentAsync(idPropertyValue.ToString(), documentJsonString, updateParams);
+                if (!string.IsNullOrWhiteSpace(idPropertyValue.ToString()))
+                    return await SaveDocumentAsync(idPropertyValue.ToString(), documentJsonString, updateParams);
+
+                else
+                    documentJsonObject.Remove(_idPropertyName);
             }
 
             //post instead of put.
             var newDocUrl = QueryParams.AppendQueryParams(string.Empty, updateParams);
-            var newDocResponse = await _http.PostAsync(newDocUrl, new StringContent(documentJsonString, Encoding.UTF8, "application/json"));
+            var newDocResponse = await _http.PostAsync(newDocUrl, new StringContent(documentJsonObject.ToString(), Encoding.UTF8, "application/json"));
             var docResponseDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(newDocResponse, false);
 
             return new SaveDocResponse(docResponseDTO);
@@ -406,7 +410,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
         /// <param name="entityListQueryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+        /// <returns><see cref="DocListResponse{TEntity}"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
         public async Task<DocListResponse<TEntity>> GetAllEntitiesAsync<TEntity>(ListQueryParams entityListQueryParams = null)
             where TEntity: IEntity
         {

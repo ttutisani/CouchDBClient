@@ -34,6 +34,11 @@
         /// <summary>
         /// Data sent to server has invalid content type, i.e. "Content-Type" header has wrong value in it.
         /// </summary>
-        Bad_Content_Type
+        Bad_Content_Type,
+
+        /// <summary>
+        /// Doc ID value supplied by the client is not valid.
+        /// </summary>
+        Illegal_DocId
     }
 }
