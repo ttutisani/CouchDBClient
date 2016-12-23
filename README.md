@@ -32,6 +32,46 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 }
 ```
 
+### Entities (reusable documents)
+
+Documents (discussed below) are fine if you want to deal with ID and Revision values on your own. i.e. if you just saved a new object document, you need to maintain its ID and Revision for consecutive updates; otherwise you need to keep retrieving the document by ID every time you want to apply further changes to it.
+Entities solve the aforementioned problem by updating the ID and Revision in your object, as long as you implement `IEntity` interface.
+
+For example:
+``` C#
+public sealed class SampleEntity : IEntity
+{
+    public string _id { get; set; }
+    public string _rev { get; set; }
+    
+    public string Text { get; set; }
+    public int Number { get; Set; }
+}
+
+using (var server = new CouchDBServer("http://localhost:5984"))
+{
+    using (var db = server.SelectDatabase("my-db"))
+    {
+        // create entity (_id is optional).
+        var entity = new SampleEntity { _id = "Sample-entity-1", Text = "This is text", Number = 123 };
+        
+        // save #1.
+        await db.SaveEntityAsync(entity);
+        
+        //just change entity's properties, no hassle with ID and Revision anymore.
+        entity.Text = "This is AWESOME";
+        entity.Number = 321;
+        
+        // and save #2.
+        await db.SaveEntityAsync(entity);
+        
+        // bored? just delete the entity.
+        await db.DeleteEntityAsync(entity);
+    }
+}
+```
+
+
 ### Documents
 
 You can work with documents as strings, or JObject's (JSON objects), or your own custom objects (generics when loading, System.Object when saving).
