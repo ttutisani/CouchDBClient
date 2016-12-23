@@ -24,18 +24,11 @@ namespace CouchDB.ClientDemo
         {
             UsingServer(server => 
             {
-                try
-                {
-                    Console.WriteLine("Enter new DB name followed by <ENTER>:");
-                    var dbName = Console.ReadLine();
+                Console.WriteLine("Enter new DB name followed by <ENTER>:");
+                var dbName = Console.ReadLine();
 
-                    server.CreateDbAsync(dbName).GetAwaiter().GetResult();
-                    Console.WriteLine("Just created DB named '{0}'.", dbName);
-                }
-                catch (CouchDBClientException ex)
-                {
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                server.CreateDbAsync(dbName).GetAwaiter().GetResult();
+                Console.WriteLine("Just created DB named '{0}'.", dbName);  
             });
         }
 
@@ -75,18 +68,11 @@ namespace CouchDB.ClientDemo
         {
             UsingServer(server => 
             {
-                try
-                {
-                    Console.WriteLine("Enter DB name followed by <ENTER>:");
-                    var dbName = Console.ReadLine();
+                Console.WriteLine("Enter DB name followed by <ENTER>:");
+                var dbName = Console.ReadLine();
 
-                    server.DeleteDbAsync(dbName).GetAwaiter().GetResult();
-                    Console.WriteLine("Just deleted DB '{0}'.", dbName);
-                }
-                catch (CouchDBClientException ex)
-                {
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                server.DeleteDbAsync(dbName).GetAwaiter().GetResult();
+                Console.WriteLine("Just deleted DB '{0}'.", dbName);
             });
         }
 
@@ -94,7 +80,19 @@ namespace CouchDB.ClientDemo
         {
             using (var server = new CouchDBServer(_serverUrl))
             {
-                body(server);
+                try
+                {
+                    body(server);
+                }
+                catch (CouchDBClientException ex)
+                {
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
+                {
+                    var ex = ae.InnerException as CouchDBClientException;
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
             }
         }
 
@@ -145,17 +143,12 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db => 
             {
-                try
-                {
-                    var response = !string.IsNullOrWhiteSpace(docId)
-                        ? db.SaveDocumentAsync(docId, docJson).Result
-                        : db.SaveDocumentAsync(docJson).Result;
-                    Console.WriteLine("Successfully saved document '{0}'. Id: '{1}', Rev: '{2}'.", docId, response.Id, response.Revision);
-                }
-                catch (CouchDBClientException ex)
-                {
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                
+                var response = !string.IsNullOrWhiteSpace(docId)
+                    ? db.SaveDocumentAsync(docId, docJson).Result
+                    : db.SaveDocumentAsync(docJson).Result;
+                Console.WriteLine("Successfully saved document '{0}'. Id: '{1}', Rev: '{2}'.", docId, response.Id, response.Revision);
+                
             });
         }
 
@@ -175,15 +168,9 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db => 
             {
-                try
-                {
-                    db.SaveDocumentAsync(obj).GetAwaiter().GetResult();
-                    Console.WriteLine("Successfully saved document '{0}'.", obj.ToString());
-                }
-                catch (CouchDBClientException ex)
-                {
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                
+                db.SaveDocumentAsync(obj).GetAwaiter().GetResult();
+                Console.WriteLine("Successfully saved document '{0}'.", obj.ToString());
             });
         }
 
@@ -194,18 +181,11 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db => 
             {
-                try
-                {
-                    var doc = db.GetDocumentJsonAsync(docId).Result;
-                    Console.WriteLine("Found document:");
-                    Console.WriteLine(doc);
-                    Console.WriteLine("End of document.");
-                }
-                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
-                {
-                    var ex = ae.InnerException as CouchDBClientException;
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                
+                var doc = db.GetDocumentJsonAsync(docId).Result;
+                Console.WriteLine("Found document:");
+                Console.WriteLine(doc);
+                Console.WriteLine("End of document.");
             });
         }
 
@@ -225,19 +205,11 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db => 
             {
-                try
-                {
-                    var obj = db.GetDocumentAsync<SampleDoc>(docId).Result;
+                var obj = db.GetDocumentAsync<SampleDoc>(docId).Result;
 
-                    Console.WriteLine("Found document:");
-                    Console.WriteLine(SerializationHelper.Serialize(obj));
-                    Console.WriteLine("End of document.");
-                }
-                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
-                {
-                    var ex = ae.InnerException as CouchDBClientException;
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                Console.WriteLine("Found document:");
+                Console.WriteLine(SerializationHelper.Serialize(obj));
+                Console.WriteLine("End of document.");
             });
         }
 
@@ -248,18 +220,10 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db => 
             {
-                try
-                {
-                    var doc = db.GetDocumentAsync(docId, new DocQueryParams { Revs = true, Revs_Info = true }).Result;
-                    Console.WriteLine("Found document:");
-                    Console.WriteLine(doc);
-                    Console.WriteLine("End of document.");
-                }
-                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
-                {
-                    var ex = ae.InnerException as CouchDBClientException;
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                var doc = db.GetDocumentAsync(docId, new DocQueryParams { Revs = true, Revs_Info = true }).Result;
+                Console.WriteLine("Found document:");
+                Console.WriteLine(doc);
+                Console.WriteLine("End of document.");
             });
         }
 
@@ -270,18 +234,10 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db =>
             {
-                try
-                {
-                    var doc = db.GetDocumentAsync(docId, new DocQueryParams { Open_Revs = new DocQueryParams.OpenRevs() }).Result;
-                    Console.WriteLine("Found document:");
-                    Console.WriteLine(doc);
-                    Console.WriteLine("End of document.");
-                }
-                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
-                {
-                    var ex = ae.InnerException as CouchDBClientException;
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                var doc = db.GetDocumentAsync(docId, new DocQueryParams { Open_Revs = new DocQueryParams.OpenRevs() }).Result;
+                Console.WriteLine("Found document:");
+                Console.WriteLine(doc);
+                Console.WriteLine("End of document.");
             });
         }
 
@@ -416,6 +372,136 @@ namespace CouchDB.ClientDemo
             {
                 var result = db.DeleteDocumentAsync(docId, revision).GetAwaiter().GetResult();
                 Console.WriteLine("Response: {0}", SerializationHelper.Serialize(result));
+            });
+        }
+
+        private sealed class SampleEntity : IEntity
+        {
+            public string _id { get; set; }
+
+            public string _rev { get; set; }
+
+            public string Author { get; set; }
+
+            public int Age { get; set; }
+        }
+
+        private static string ReadLineOrDefault(string defaultValue)
+        {
+            var input = Console.ReadLine();
+
+            return !string.IsNullOrWhiteSpace(input)
+                ? input
+                : defaultValue;
+        }
+
+        private static void UpdateEntityFromConsole(SampleEntity entity)
+        {
+            Console.WriteLine("Id:");
+            entity._id = ReadLineOrDefault(entity._id);
+
+            Console.WriteLine("Revision:");
+            entity._rev = ReadLineOrDefault(entity._rev);
+
+            Console.WriteLine("Author:");
+            entity.Author = ReadLineOrDefault(entity.Author);
+
+            Console.WriteLine("Age:");
+            int age; int.TryParse(ReadLineOrDefault(entity.Age.ToString()), out age);
+            entity.Age = age;
+        }
+
+        public void PlayWithNewEntity()
+        {
+            UsingDatabase(db => 
+            {
+                Console.WriteLine("Enter new entity info.");
+                var entity = new SampleEntity();
+                UpdateEntityFromConsole(entity);
+
+                db.SaveEntityAsync(entity).GetAwaiter().GetResult();
+
+                Console.WriteLine("Saved to db:");
+                Console.WriteLine(SerializationHelper.Serialize(entity));
+
+                Console.WriteLine("Update? press <Enter> to skip.");
+                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
+                {
+                    Console.WriteLine("Enter entity info to update.");
+                    UpdateEntityFromConsole(entity);
+
+                    db.SaveEntityAsync(entity).GetAwaiter().GetResult();
+
+                    Console.WriteLine("Saved to db:");
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                }
+
+                Console.WriteLine("Delete? press <Enter> to skip.");
+                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
+                {
+                    db.DeleteEntityAsync(entity).GetAwaiter().GetResult();
+
+                    Console.WriteLine("deleted:");
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                }
+            });
+        }
+
+        public void PlayWithExistingEntity()
+        {
+            UsingDatabase(db => 
+            {
+                Console.WriteLine("Enter entity id:");
+                var id = Console.ReadLine();
+
+                var entity = db.GetEntityAsync<SampleEntity>(id).GetAwaiter().GetResult();
+                Console.WriteLine("Found:");
+                Console.WriteLine(SerializationHelper.Serialize(entity));
+
+                Console.WriteLine("Update? press <Enter> to skip.");
+                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
+                {
+                    Console.WriteLine("Enter entity info to update.");
+                    UpdateEntityFromConsole(entity);
+
+                    db.SaveEntityAsync(entity).GetAwaiter().GetResult();
+
+                    Console.WriteLine("Saved to db:");
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                }
+
+                Console.WriteLine("Delete? press <Enter> to skip.");
+                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
+                {
+                    db.DeleteEntityAsync(entity).GetAwaiter().GetResult();
+
+                    Console.WriteLine("deleted:");
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                }
+            });
+        }
+
+        public void GetAllEntities()
+        {
+            UsingDatabase(db => 
+            {
+                Console.WriteLine("Enter skip (empty for 0):");
+                int skip;
+                int.TryParse(Console.ReadLine(), out skip);
+
+                Console.WriteLine("Enter limit (empty for all):");
+                int limit;
+                if (!int.TryParse(Console.ReadLine(), out limit)) limit = int.MaxValue;
+
+                var allEntities = db.GetAllEntitiesAsync<SampleEntity>(new ListQueryParams { Skip = skip, Limit = limit }).GetAwaiter().GetResult();
+
+                Console.WriteLine($"Found {allEntities.Rows.Count} entities:");
+                foreach (var entity in allEntities.Rows)
+                {
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                    Console.WriteLine("-------------------------------------");
+                }
+                Console.WriteLine("End of list.");
             });
         }
     }

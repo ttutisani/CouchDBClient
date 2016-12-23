@@ -50,7 +50,7 @@ namespace CouchDB.Client
         public async Task<ServerInfo> GetInfoAsync()
         {
             var infoHttpResponse = await _http.GetAsync(string.Empty);
-            var infoDTO = await HttpClientHelper.HandleResponse<ServerInfoDTO>(infoHttpResponse);
+            var infoDTO = await HttpClientHelper.HandleResponse<ServerInfoDTO>(infoHttpResponse, false);
             var serverInfo = new ServerInfo(infoDTO);
 
             return serverInfo;
@@ -81,7 +81,7 @@ namespace CouchDB.Client
             var allDbsQuery = QueryParams.AppendQueryParams("_all_dbs", queryParams);
 
             var dbNamesHttpResponse = await _http.GetAsync(allDbsQuery);
-            var dbNamesArray = await HttpClientHelper.HandleResponse<string[]>(dbNamesHttpResponse);
+            var dbNamesArray = await HttpClientHelper.HandleResponse<string[]>(dbNamesHttpResponse, false);
             
             return dbNamesArray;
         }
@@ -100,7 +100,7 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(dbName));
 
             var createDbHttpResponse = await _http.PutAsync(dbName, null);
-            await HttpClientHelper.HandleResponse(createDbHttpResponse);
+            await HttpClientHelper.HandleResponse(createDbHttpResponse, false);
         }
 
         internal sealed class ServerResponseDTO
@@ -127,7 +127,7 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(dbName));
 
             var deleteHttpResponse = await _http.DeleteAsync(dbName);
-            await HttpClientHelper.HandleResponse(deleteHttpResponse);
+            await HttpClientHelper.HandleResponse(deleteHttpResponse, convertNotFoundIntoNull: true);
         }
 
         /// <summary>

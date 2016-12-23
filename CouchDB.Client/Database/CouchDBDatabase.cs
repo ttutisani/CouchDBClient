@@ -59,7 +59,7 @@ namespace CouchDB.Client
             var newDocUrl = QueryParams.AppendQueryParams(docId, updateParams);
 
             var newDocResponse = await _http.PutAsync(newDocUrl, new StringContent(documentJsonString));
-            var docResponseDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(newDocResponse);
+            var docResponseDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(newDocResponse, false);
 
             return new SaveDocResponse(docResponseDTO);
         }
@@ -129,7 +129,7 @@ namespace CouchDB.Client
             //post instead of put.
             var newDocUrl = QueryParams.AppendQueryParams(string.Empty, updateParams);
             var newDocResponse = await _http.PostAsync(newDocUrl, new StringContent(documentJsonString, Encoding.UTF8, "application/json"));
-            var docResponseDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(newDocResponse);
+            var docResponseDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(newDocResponse, false);
 
             return new SaveDocResponse(docResponseDTO);
         }
@@ -186,7 +186,7 @@ namespace CouchDB.Client
             var docQuery = QueryParams.AppendQueryParams(docId, queryParams);
 
             var docResponse = await _http.GetAsync(docQuery);
-            var documentString = await HttpClientHelper.HandleStringResponse(docResponse);
+            var documentString = await HttpClientHelper.HandleStringResponse(docResponse, true);
 
             return documentString;
         }
@@ -202,7 +202,9 @@ namespace CouchDB.Client
         public async Task<JObject> GetDocumentJsonAsync(string docId, DocQueryParams queryParams = null)
         {
             var jsonString = await GetDocumentAsync(docId, queryParams);
-            var jsonObject = JObject.Parse(jsonString);
+            var jsonObject = jsonString != null
+                ? JObject.Parse(jsonString)
+                : null;
 
             return jsonObject;
         }
@@ -219,7 +221,9 @@ namespace CouchDB.Client
         public async Task<TResult> GetDocumentAsync<TResult>(string docId, DocQueryParams queryParams = null)
         {
             var jsonString = await GetDocumentAsync(docId, queryParams);
-            var resultObject = JsonConvert.DeserializeObject<TResult>(jsonString);
+            var resultObject = jsonString != null
+                ? JsonConvert.DeserializeObject<TResult>(jsonString)
+                : default(TResult);
 
             return resultObject;
         }
@@ -237,7 +241,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="docId">Document ID.</param>
         /// <param name="revision">Actual document’s revision.</param>
-        /// <param name="batch">Stores document in batch mode Possible values: ok. Optional.</param>
+        /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         public async Task<SaveDocResponse> DeleteDocumentAsync(string docId, string revision, bool batch = false)
         {
@@ -255,8 +259,30 @@ namespace CouchDB.Client
             var deleteDocUrl = QueryParams.AppendQueryParams(docId, deleteQueryParams);
 
             var deleteResponse = await _http.DeleteAsync(deleteDocUrl);
-            var saveDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(deleteResponse);
+            var saveDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(deleteResponse, convertNotFoundIntoNull: true)
+                ?? new SaveDocResponseDTO { Id = docId, Rev = revision };
+
             return new SaveDocResponse(saveDTO);
+        }
+
+        /// <summary>
+        /// Marks the specified document as deleted by adding a field 
+        /// _deleted with the value true. 
+        /// Documents with this field will not be returned within requests anymore, 
+        /// but stay in the database. 
+        /// You must supply the current (latest) revision, by using the "_rev" property.
+        /// </summary>
+        /// <param name="document"><see cref="JObject"/> instance representing a document.</param>
+        /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
+        /// <returns>Awaitable task.</returns>
+        public async Task DeleteDocumentAsync(JObject document, bool batch = false)
+        {
+            var docId = document[_idPropertyName]?.ToString();
+            var revision = document[_revisionPropertyName]?.ToString();
+
+            var deletionResponse = await DeleteDocumentAsync(docId, revision, batch);
+            document[_idPropertyName] = deletionResponse.Id;
+            document[_revisionPropertyName] = deletionResponse.Revision;
         }
 
         #endregion
@@ -268,7 +294,7 @@ namespace CouchDB.Client
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
 
             var allDocsResponse = await _http.GetAsync(allDocsUrl);
-            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse);
+            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false);
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
             return allDocsJsonObject;
@@ -332,6 +358,79 @@ namespace CouchDB.Client
 
             var docListResponse = DocListResponse<TDocument>.FromCustomObjects(allDocsJsonObject, extractDocumentAsObject, deserializer);
             return docListResponse;
+        }
+
+        #endregion
+
+        #region Convenience entity operations
+
+        /// <summary>
+        /// Saves entity into the database.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of entity to be saved.</typeparam>
+        /// <param name="entity">Instance of entity to be saved.</param>
+        /// <param name="entityUpdateParams">Additional parameters for saving.</param>
+        /// <returns>Awaitable task.</returns>
+        public async Task SaveEntityAsync<TEntity>(TEntity entity, DocUpdateParams entityUpdateParams = null)
+            where TEntity: IEntity
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            var jsonEntity = JObject.FromObject(entity);
+            if (string.IsNullOrWhiteSpace(entity._rev))
+            {
+                jsonEntity.Remove(_revisionPropertyName);
+            }
+
+            await SaveDocumentAsync(jsonEntity, entityUpdateParams);
+            entity._id = jsonEntity[_idPropertyName]?.ToString();
+            entity._rev = jsonEntity[_revisionPropertyName]?.ToString();
+        }
+
+        /// <summary>
+        /// Retrieves entity from database.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of entity to be retrieved.</typeparam>
+        /// <param name="entityId">ID of entity to be retrieved.</param>
+        /// <param name="entityQueryParams">Additional parameters for retrieving.</param>
+        /// <returns>Entity.</returns>
+        public async Task<TEntity> GetEntityAsync<TEntity>(string entityId, DocQueryParams entityQueryParams = null)
+            where TEntity: IEntity
+        {
+            return await GetDocumentAsync<TEntity>(entityId);
+        }
+
+        /// <summary>
+        /// Gets all entities from database.
+        /// </summary>
+        /// <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
+        /// <param name="entityListQueryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
+        /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+        public async Task<DocListResponse<TEntity>> GetAllEntitiesAsync<TEntity>(ListQueryParams entityListQueryParams = null)
+            where TEntity: IEntity
+        {
+            if (entityListQueryParams == null)
+                entityListQueryParams = new ListQueryParams();
+
+            entityListQueryParams.Include_Docs = true;
+
+            return await GetAllObjectDocumentsAsync<TEntity>(entityListQueryParams, extractDocumentAsObject: true);
+        }
+
+        /// <summary>
+        /// Deletes given entity object.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of entity to be deleted.</typeparam>
+        /// <param name="entity">Entity object to be deleted.</param>
+        /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
+        /// <returns>Awaitable task.</returns>
+        public async Task DeleteEntityAsync<TEntity>(TEntity entity, bool batch = false)
+            where TEntity: IEntity
+        {
+            var deletionResponse = await DeleteDocumentAsync(entity._id, entity._rev, batch);
+            entity._id = deletionResponse.Id;
+            entity._rev = deletionResponse.Revision;
         }
 
         #endregion

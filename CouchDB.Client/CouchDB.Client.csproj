@@ -57,6 +57,7 @@
     <Compile Include="Database\CouchDBDatabase.cs" />
     <Compile Include="Documents\DeleteDocParams.cs" />
     <Compile Include="Documents\DocListResponse.cs" />
+    <Compile Include="Documents\IEntity.cs" />
     <Compile Include="Documents\SaveDocResponse.cs" />
     <Compile Include="Documents\DocUpdateParams.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
