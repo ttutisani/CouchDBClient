@@ -135,24 +135,19 @@ namespace CouchDB.ClientDemo
 
         public void SaveDoc()
         {
-            Console.WriteLine("Enter document id (optional):");
-            var docId = Console.ReadLine();
-
             Console.WriteLine("Enter doc JSON:");
             var docJson = Console.ReadLine();
 
             UsingDatabase(db => 
             {
                 
-                var response = !string.IsNullOrWhiteSpace(docId)
-                    ? db.SaveDocumentAsync(docId, docJson).Result
-                    : db.SaveDocumentAsync(docJson).Result;
-                Console.WriteLine("Successfully saved document '{0}'. Id: '{1}', Rev: '{2}'.", docId, response.Id, response.Revision);
+                var response = db.SaveDocumentAsync(docJson).Result;
+                Console.WriteLine("Successfully saved document. Id: '{0}', Rev: '{1}'.", response.Id, response.Revision);
                 
             });
         }
 
-        public void SaveObj()
+        public void SaveJson()
         {
             Console.WriteLine("Enter Id (optional):");
             var id = Console.ReadLine();
