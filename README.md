@@ -45,7 +45,7 @@ public sealed class SampleEntity : IEntity
     public string _rev { get; set; }
     
     public string Text { get; set; }
-    public int Number { get; Set; }
+    public int Number { get; set; }
 }
 
 using (var server = new CouchDBServer("http://localhost:5984"))
