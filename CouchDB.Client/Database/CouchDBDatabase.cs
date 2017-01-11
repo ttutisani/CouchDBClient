@@ -12,8 +12,8 @@ namespace CouchDB.Client
     /// </summary>
     public sealed class CouchDBDatabase : IDisposable
     {
-        private const string _idPropertyName = "_id";
-        private const string _revisionPropertyName = "_rev";
+        internal const string IdPropertyName = "_id";
+        internal const string RevisionPropertyName = "_rev";
 
         private readonly HttpClient _http;
 
@@ -79,8 +79,8 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(documentJsonObject));
 
             var saveResponse = await SaveDocumentAsync(documentJsonObject.ToString(), updateParams);
-            documentJsonObject[_idPropertyName] = saveResponse.Id;
-            documentJsonObject[_revisionPropertyName] = saveResponse.Revision;
+            documentJsonObject[IdPropertyName] = saveResponse.Id;
+            documentJsonObject[RevisionPropertyName] = saveResponse.Revision;
         }
 
         /// <summary>
@@ -209,60 +209,17 @@ namespace CouchDB.Client
         /// <returns>Awaitable task.</returns>
         public async Task DeleteDocumentAsync(JObject document, bool batch = false)
         {
-            var docId = document[_idPropertyName]?.ToString();
-            var revision = document[_revisionPropertyName]?.ToString();
+            var docId = document[IdPropertyName]?.ToString();
+            var revision = document[RevisionPropertyName]?.ToString();
 
             var deletionResponse = await DeleteDocumentAsync(docId, revision, batch);
-            document[_idPropertyName] = deletionResponse.Id;
-            document[_revisionPropertyName] = deletionResponse.Revision;
+            document[IdPropertyName] = deletionResponse.Id;
+            document[RevisionPropertyName] = deletionResponse.Revision;
         }
 
         #endregion
 
         #region Get all docs
-
-        private async Task<JObject> GetAllDocumentsObjectAsync(ListQueryParams queryParams)
-        {
-            var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
-
-            var allDocsResponse = await _http.GetAsync(allDocsUrl);
-            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false);
-            var allDocsJsonObject = JObject.Parse(allDocsJsonString);
-
-            return allDocsJsonObject;
-        }
-
-        /// <summary>
-        /// Returns a JSON structure of all of the documents in a given database. 
-        /// The information is returned as a JSON structure containing meta information 
-        /// about the return structure, including a list of all documents and basic contents, 
-        /// consisting the ID, revision and key. The key is the from the document’s _id.
-        /// </summary>
-        /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
-        public async Task<DocListResponse<string>> GetAllStringDocumentsAsync(ListQueryParams queryParams = null)
-        {
-            var allDocsJsonObject = await GetAllDocumentsObjectAsync(queryParams);
-
-            var docListResponse = DocListResponse<string>.FromJsonStrings(allDocsJsonObject);
-            return docListResponse;
-        }
-
-        /// <summary>
-        /// Returns a JSON structure of all of the documents in a given database. 
-        /// The information is returned as a JSON structure containing meta information 
-        /// about the return structure, including a list of all documents and basic contents, 
-        /// consisting the ID, revision and key. The key is the from the document’s _id.
-        /// </summary>
-        /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        public async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null)
-        {
-            var allDocsJsonObject = await GetAllDocumentsObjectAsync(queryParams);
-
-            var docListResponse = DocListResponse<JObject>.FromJsonObjects(allDocsJsonObject);
-            return docListResponse;
-        }
 
         /// <summary>
         /// Returns a JSON structure of all of the documents in a given database. 
@@ -286,85 +243,49 @@ namespace CouchDB.Client
             if (extractDocumentAsObject && (queryParams?.Include_Docs != true))
                 throw new ArgumentException($"'{nameof(extractDocumentAsObject)}' can be {true} only when '{nameof(queryParams.Include_Docs)}' is {true} within {nameof(queryParams)}.");
 
-            var allDocsJsonObject = await GetAllDocumentsObjectAsync(queryParams);
+            var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
+
+            var allDocsResponse = await _http.GetAsync(allDocsUrl);
+            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false);
+            var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
             var docListResponse = DocListResponse<TDocument>.FromCustomObjects(allDocsJsonObject, extractDocumentAsObject, deserializer);
             return docListResponse;
         }
 
-        #endregion
-
-        #region Convenience entity operations
 
         /// <summary>
-        /// Saves entity into the database.
+        /// Returns a JSON structure of all of the documents in a given database. 
+        /// The information is returned as a JSON structure containing meta information 
+        /// about the return structure, including a list of all documents and basic contents, 
+        /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
-        /// <typeparam name="TEntity">Type of entity to be saved.</typeparam>
-        /// <param name="entity">Instance of entity to be saved.</param>
-        /// <param name="entityUpdateParams">Additional parameters for saving.</param>
-        /// <returns>Awaitable task.</returns>
-        public async Task SaveEntityAsync<TEntity>(TEntity entity, DocUpdateParams entityUpdateParams = null)
-            where TEntity: IEntity
+        /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
+        /// <param name="extractDocumentAsObject">Boolean indicating whether to extract document portion of the 
+        /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
+        /// document portion only.</param>
+        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
+        public async Task<DocListResponse<string>> GetAllStringDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
         {
-            if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
-
-            var jsonEntity = JObject.FromObject(entity);
-            if (string.IsNullOrWhiteSpace(entity._rev))
-            {
-                jsonEntity.Remove(_revisionPropertyName);
-            }
-
-            await SaveDocumentAsync(jsonEntity, entityUpdateParams);
-            entity._id = jsonEntity[_idPropertyName]?.ToString();
-            entity._rev = jsonEntity[_revisionPropertyName]?.ToString();
+            return await GetAllObjectDocumentsAsync(queryParams, extractDocumentAsObject, deserializer: json => json.ToString());
         }
 
         /// <summary>
-        /// Retrieves entity from database.
+        /// Returns a JSON structure of all of the documents in a given database. 
+        /// The information is returned as a JSON structure containing meta information 
+        /// about the return structure, including a list of all documents and basic contents, 
+        /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
-        /// <typeparam name="TEntity">Type of entity to be retrieved.</typeparam>
-        /// <param name="entityId">ID of entity to be retrieved.</param>
-        /// <param name="entityQueryParams">Additional parameters for retrieving.</param>
-        /// <returns>Entity.</returns>
-        public async Task<TEntity> GetEntityAsync<TEntity>(string entityId, DocQueryParams entityQueryParams = null)
-            where TEntity: IEntity
+        /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
+        /// <param name="extractDocumentAsObject">Boolean indicating whether to extract document portion of the 
+        /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
+        /// document portion only.</param>
+        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
+        public async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
         {
-            return await GetDocumentAsync<TEntity>(entityId);
+            return await GetAllObjectDocumentsAsync(queryParams, extractDocumentAsObject, deserializer: json => json);
         }
-
-        /// <summary>
-        /// Gets all entities from database.
-        /// </summary>
-        /// <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
-        /// <param name="entityListQueryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{TEntity}"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
-        public async Task<DocListResponse<TEntity>> GetAllEntitiesAsync<TEntity>(ListQueryParams entityListQueryParams = null)
-            where TEntity: IEntity
-        {
-            if (entityListQueryParams == null)
-                entityListQueryParams = new ListQueryParams();
-
-            entityListQueryParams.Include_Docs = true;
-
-            return await GetAllObjectDocumentsAsync<TEntity>(entityListQueryParams, extractDocumentAsObject: true);
-        }
-
-        /// <summary>
-        /// Deletes given entity object.
-        /// </summary>
-        /// <typeparam name="TEntity">Type of entity to be deleted.</typeparam>
-        /// <param name="entity">Entity object to be deleted.</param>
-        /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
-        /// <returns>Awaitable task.</returns>
-        public async Task DeleteEntityAsync<TEntity>(TEntity entity, bool batch = false)
-            where TEntity: IEntity
-        {
-            var deletionResponse = await DeleteDocumentAsync(entity._id, entity._rev, batch);
-            entity._id = deletionResponse.Id;
-            entity._rev = deletionResponse.Revision;
-        }
-
+        
         #endregion
     }
 }

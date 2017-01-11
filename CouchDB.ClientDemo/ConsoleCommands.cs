@@ -120,6 +120,15 @@ namespace CouchDB.ClientDemo
             });
         }
 
+        private void UsingEntityStore(Action<EntityStore> body)
+        {
+            UsingDatabase(db => 
+            {
+                var store = new EntityStore(db);
+                body(store);
+            });
+        }
+
         private string _dbName = "my-db";
 
         public void SetDb()
@@ -240,7 +249,11 @@ namespace CouchDB.ClientDemo
         {
             UsingDatabase(db => 
             {
-                var allDocs = db.GetAllStringDocumentsAsync().Result;
+                Console.WriteLine("Extract document as object? press <ENTER> for NO.");
+                bool extract = !string.IsNullOrWhiteSpace(Console.ReadLine());
+                ListQueryParams qParams = extract ? new ListQueryParams { Include_Docs = true } : null;
+
+                var allDocs = db.GetAllStringDocumentsAsync(qParams, extract).Result;
                 Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
                 foreach (var doc in allDocs.Rows)
@@ -257,7 +270,11 @@ namespace CouchDB.ClientDemo
         {
             UsingDatabase(db =>
             {
-                var allDocs = db.GetAllJsonDocumentsAsync().Result;
+                Console.WriteLine("Extract document as object?");
+                bool extract = !string.IsNullOrWhiteSpace(Console.ReadLine());
+                ListQueryParams qParams = extract ? new ListQueryParams { Include_Docs = true } : null;
+
+                var allDocs = db.GetAllJsonDocumentsAsync(qParams, extract).Result;
                 Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
                 foreach (var doc in allDocs.Rows)
@@ -408,7 +425,7 @@ namespace CouchDB.ClientDemo
 
         public void PlayWithNewEntity()
         {
-            UsingDatabase(db => 
+            UsingEntityStore(db => 
             {
                 Console.WriteLine("Enter new entity info.");
                 var entity = new SampleEntity();
@@ -444,7 +461,7 @@ namespace CouchDB.ClientDemo
 
         public void PlayWithExistingEntity()
         {
-            UsingDatabase(db => 
+            UsingEntityStore(db => 
             {
                 Console.WriteLine("Enter entity id:");
                 var id = Console.ReadLine();
@@ -478,7 +495,7 @@ namespace CouchDB.ClientDemo
 
         public void GetAllEntities()
         {
-            UsingDatabase(db => 
+            UsingEntityStore(db => 
             {
                 Console.WriteLine("Enter skip (empty for 0):");
                 int skip;
