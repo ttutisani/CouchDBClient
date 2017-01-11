@@ -52,21 +52,24 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 {
     using (var db = server.SelectDatabase("my-db"))
     {
+        //Treat database as Entity store.
+        var store = new EntityStore(db);
+    
         // create entity (_id is optional).
         var entity = new SampleEntity { _id = "Sample-entity-1", Text = "This is text", Number = 123 };
         
         // save #1.
-        await db.SaveEntityAsync(entity);
+        await store.SaveEntityAsync(entity);
         
         //just change entity's properties, no hassle with ID and Revision anymore.
         entity.Text = "This is AWESOME";
         entity.Number = 321;
         
         // and save #2.
-        await db.SaveEntityAsync(entity);
+        await store.SaveEntityAsync(entity);
         
         // bored? just delete the entity.
-        await db.DeleteEntityAsync(entity);
+        await store.DeleteEntityAsync(entity);
     }
 }
 ```
