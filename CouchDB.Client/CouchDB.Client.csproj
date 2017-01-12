@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CouchDBClientException.cs" />
+    <Compile Include="Database\AbstractCuchDBDatabase.cs" />
     <Compile Include="Database\CouchDBDatabase.cs" />
     <Compile Include="Database\EntityStore.cs" />
     <Compile Include="Documents\DeleteDocParams.cs" />
