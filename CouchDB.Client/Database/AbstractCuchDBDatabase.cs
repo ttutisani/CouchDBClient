@@ -35,10 +35,7 @@ namespace CouchDB.Client
         {
             if (documentJsonObject == null)
                 throw new ArgumentNullException(nameof(documentJsonObject));
-
-            if (string.IsNullOrWhiteSpace(documentJsonObject[IdPropertyName]?.ToString()))
-                documentJsonObject.Remove(IdPropertyName);
-
+            
             var saveResponse = await SaveDocumentAsync(documentJsonObject.ToString(), updateParams);
             documentJsonObject[IdPropertyName] = saveResponse.Id;
             documentJsonObject[RevisionPropertyName] = saveResponse.Revision;
@@ -56,7 +53,11 @@ namespace CouchDB.Client
             if (documentObject == null)
                 throw new ArgumentNullException(nameof(documentObject));
 
-            return await SaveDocumentAsync(JsonConvert.SerializeObject(documentObject), updateParams);
+            var documentJsonObject = JObject.FromObject(documentObject);
+            if (string.IsNullOrWhiteSpace(documentJsonObject[IdPropertyName]?.ToString()))
+                documentJsonObject.Remove(IdPropertyName);
+
+            return await SaveDocumentAsync(documentJsonObject.ToString(), updateParams);
         }
 
         #endregion
