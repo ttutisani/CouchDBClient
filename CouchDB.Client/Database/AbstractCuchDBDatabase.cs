@@ -84,6 +84,9 @@ namespace CouchDB.Client
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public async Task<JObject> GetDocumentJsonAsync(string docId, DocQueryParams queryParams = null)
         {
+            if (string.IsNullOrWhiteSpace(docId))
+                throw new ArgumentNullException(nameof(docId));
+
             var jsonString = await GetDocumentAsync(docId, queryParams);
             var jsonObject = jsonString != null
                 ? JObject.Parse(jsonString)
