@@ -21,7 +21,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public void SaveJsonDocumentAsync_Requires_Json_Document()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentAsync((JObject)null)).GetAwaiter().GetResult();
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentAsync((JObject)null, new DocUpdateParams())).GetAwaiter().GetResult();
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public void SaveObjectDocumentAsync_Requires_Object_Document()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentAsync((object)null)).GetAwaiter().GetResult();
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentAsync((object)null, new DocUpdateParams())).GetAwaiter().GetResult();
         }
 
         [Fact]
@@ -147,7 +147,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public void GetDocumentJsonAsync_Requires_DocId()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetDocumentJsonAsync(null)).GetAwaiter().GetResult();
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetDocumentJsonAsync(null, new DocQueryParams())).GetAwaiter().GetResult();
         }
 
         [Fact]
@@ -181,6 +181,58 @@ namespace CouchDB.Client.Tests
             //assert.
             Assert.NotNull(jsonDoc);
             Assert.True(StringIsJsonObject(docString, jsonDoc));
+        }
+
+        #endregion
+
+        #region Get Generic doc
+
+        private sealed class SampleDoc
+        {
+            public string Name { get; set; }
+
+            public int Name2 { get; set; }
+        }
+
+        [Fact]
+        public void GetGenericDoc_Requires_DocId()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetDocumentAsync<SampleDoc>(null, new DocQueryParams()))
+                .GetAwaiter().GetResult();
+        }
+
+        [Fact]
+        public void GetGenericDoc_Passes_ID_and_QueryParams()
+        {
+            //arrange.
+            _sut.Setup(db => db.GetDocumentAsync(It.IsAny<string>(), It.IsAny<DocQueryParams>()))
+                .Returns(Task.FromResult("{ }"));
+
+            var docId = "some id 123";
+            var queryParams = new DocQueryParams();
+
+            //act.
+            _sut.Object.GetDocumentAsync<SampleDoc>(docId, queryParams).GetAwaiter().GetResult();
+
+            //assert.
+            _sut.Verify(db => db.GetDocumentAsync(docId, queryParams), Times.Once());
+        }
+
+        [Fact]
+        public void GetGenericDoc_Retrieves_Document()
+        {
+            //arrange.
+            var docString = JsonConvert.SerializeObject(new SampleDoc { Name = "value1", Name2 = 12321 });
+            _sut.Setup(db => db.GetDocumentAsync(It.IsAny<string>(), It.IsAny<DocQueryParams>()))
+                .Returns(Task.FromResult(docString));
+
+            //act.
+            var result = _sut.Object.GetDocumentAsync<SampleDoc>("id").GetAwaiter().GetResult();
+
+            //assert.
+            Assert.NotNull(result);
+            var jsonResult = JObject.FromObject(result);
+            Assert.True(StringIsJsonObject(docString, jsonResult));
         }
 
         #endregion
