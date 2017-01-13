@@ -236,5 +236,80 @@ namespace CouchDB.Client.Tests
         }
 
         #endregion
+
+        #region Delete JSON doc
+
+        [Fact]
+        public void DeleteJSONDoc_Requires_Document()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.DeleteDocumentAsync(null))
+                .GetAwaiter().GetResult();
+        }
+
+        [Fact]
+        public void DeleteJSONDoc_Requires_ID()
+        {
+            //arrange.
+            var jsonDoc = JObject.FromObject(new { _id = "", _rev = "not empty" });
+
+            //act / assert.
+            Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.DeleteDocumentAsync(jsonDoc))
+                .GetAwaiter().GetResult();
+        }
+
+        [Fact]
+        public void DeleteJSONDoc_Requires_Revision()
+        {
+            //arrange.
+            var jsonDoc = JObject.FromObject(new { _id = "not empty", _rev = "" });
+
+            //act / assert.
+            Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.DeleteDocumentAsync(jsonDoc))
+                .GetAwaiter().GetResult();
+        }
+
+        [Fact]
+        public void DeleteJSONDoc_Passes_ID_and_Revision_and_Batch()
+        {
+            //arrange.
+            var expectedId = "some id 182";
+            var expecttedRev = "some rev 12";
+            var expectedBatch = true;
+            var jsonDoc = JObject.FromObject(new { _id = expectedId, _rev = expecttedRev });
+
+            _sut.Setup(db => db.DeleteDocumentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO { Id = "id123", Rev = "rev123" })));
+
+            //act.
+            _sut.Object.DeleteDocumentAsync(jsonDoc, expectedBatch)
+                .GetAwaiter().GetResult();
+
+            //assert.
+            _sut.Verify(db => db.DeleteDocumentAsync(expectedId, expecttedRev, expectedBatch), Times.Once());
+        }
+
+        [Fact]
+        public void DeleteJSONDoc_UpdatesJSON_With_New_ID_and_Revision()
+        {
+            //arrange.
+            var expectedId = "id 128";
+            var expectedRev = "rev 129";
+
+            _sut.Setup(db => db.DeleteDocumentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(new SaveDocResponse(
+                    new CouchDBDatabase.SaveDocResponseDTO { Id = expectedId, Rev = expectedRev })));
+
+            var jsonDoc = JObject.FromObject(new { _id = "old id", _rev = "old rev" });
+
+            //act.
+            _sut.Object.DeleteDocumentAsync(jsonDoc)
+                .GetAwaiter().GetResult();
+
+            //assert.
+            Assert.Equal(expectedId, jsonDoc[AbstractCuchDBDatabase.IdPropertyName]);
+            Assert.Equal(expectedRev, jsonDoc[AbstractCuchDBDatabase.RevisionPropertyName]);
+        }
+
+        #endregion
     }
 }

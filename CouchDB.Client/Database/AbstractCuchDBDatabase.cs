@@ -146,8 +146,16 @@ namespace CouchDB.Client
         /// <returns>Awaitable task.</returns>
         public async Task DeleteDocumentAsync(JObject document, bool batch = false)
         {
+            if (document == null)
+                throw new ArgumentNullException(nameof(document));
+
             var docId = document[IdPropertyName]?.ToString();
+            if (string.IsNullOrWhiteSpace(docId))
+                throw new ArgumentException("Document should have _id.", nameof(document));
+
             var revision = document[RevisionPropertyName]?.ToString();
+            if (string.IsNullOrWhiteSpace(revision))
+                throw new ArgumentException("Document shoudl have _rev.", nameof(document));
 
             var deletionResponse = await DeleteDocumentAsync(docId, revision, batch);
             document[IdPropertyName] = deletionResponse.Id;
