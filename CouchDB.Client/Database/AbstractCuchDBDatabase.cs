@@ -183,7 +183,12 @@ namespace CouchDB.Client
         /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
         /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
         /// <exception cref="ArgumentException"><paramref name="extractDocumentAsObject"/> can be true only when Include_Docs is true within <paramref name="queryParams"/>.</exception>
-        public abstract Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(ListQueryParams queryParams = null, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null);
+        public async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(ListQueryParams queryParams = null, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null)
+        {
+            var jsonDocs = await GetAllJsonDocumentsAsync(queryParams, extractDocumentAsObject);
+
+            return jsonDocs.Cast(deserializer ?? new Func<JObject, TDocument>(json => json.ToObject<TDocument>()));
+        }
 
         /// <summary>
         /// Returns a JSON structure of all of the documents in a given database. 
@@ -198,7 +203,9 @@ namespace CouchDB.Client
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
         public async Task<DocListResponse<string>> GetAllStringDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
         {
-            return await GetAllObjectDocumentsAsync(queryParams, extractDocumentAsObject, deserializer: json => json.ToString());
+            var jsonDocs = await GetAllJsonDocumentsAsync(queryParams, extractDocumentAsObject);
+
+            return jsonDocs.Cast(json => json.ToString());
         }
 
         /// <summary>
@@ -212,10 +219,7 @@ namespace CouchDB.Client
         /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
         /// document portion only.</param>
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        public async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
-        {
-            return await GetAllObjectDocumentsAsync(queryParams, extractDocumentAsObject, deserializer: json => json);
-        }
+        public abstract Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false);
 
         #endregion
     }

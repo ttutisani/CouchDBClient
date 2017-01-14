@@ -135,18 +135,12 @@ namespace CouchDB.Client
         /// about the return structure, including a list of all documents and basic contents, 
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
-        /// <typeparam name="TDocument">Specifies resulting document object type.</typeparam>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <param name="extractDocumentAsObject">Boolean indicating whether to extract document portion of the 
         /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
         /// document portion only.</param>
-        /// <param name="deserializer">Provide your own deserializer if you prefer. 
-        /// By default, it will deserialize by using NewtonSoft.Json methods.
-        /// NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
-        /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
-        /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
-        /// <exception cref="ArgumentException"><paramref name="extractDocumentAsObject"/> can be true only when Include_Docs is true within <paramref name="queryParams"/>.</exception>
-        public override async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(ListQueryParams queryParams = null, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null)
+        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
+        public override async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
         {
             if (extractDocumentAsObject && (queryParams?.Include_Docs != true))
                 throw new ArgumentException($"'{nameof(extractDocumentAsObject)}' can be {true} only when '{nameof(queryParams.Include_Docs)}' is {true} within {nameof(queryParams)}.");
@@ -157,10 +151,10 @@ namespace CouchDB.Client
             var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false);
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
-            var docListResponse = DocListResponse<TDocument>.FromCustomObjects(allDocsJsonObject, extractDocumentAsObject, deserializer);
+            var docListResponse = DocListResponse<JObject>.FromAllDocsJson(allDocsJsonObject, extractDocumentAsObject);
             return docListResponse;
         }
-        
+
         #endregion
     }
 }

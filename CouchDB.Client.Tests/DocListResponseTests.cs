@@ -6,46 +6,6 @@ namespace CouchDB.Client.Tests
 {
     public sealed class DocListResponseTests
     {
-        [Fact]
-        public void Ctor_Requires_JsonObject()
-        {
-            //arrange / act / assert.
-            Assert.Throws<ArgumentNullException>(() => DocListResponse<JObject>.FromJsonObjects(null));
-        }
-
-        [Fact]
-        public void Ctor_InitializesSimpleProperties_FromResponseJson()
-        {
-            //arrange.
-            var responseJson = new { offset = 12, total_rows = 23, update_seq = 34 };
-
-            //act.
-            var sut = DocListResponse<JObject>.FromJsonObjects(JObject.FromObject(responseJson));
-
-            //assert.
-            Assert.Equal(responseJson.offset, sut.Offset);
-            Assert.Equal(responseJson.total_rows, sut.TotalRows);
-            Assert.Equal(responseJson.update_seq, sut.UpdateSeq);
-        }
-
-        [Fact]
-        public void Ctor_PutsRowsArray_AsPassed()
-        {
-            //arrange.
-            var responseJson = new { rows = new[] { new { a = 123 }, new { a = 321 } } };
-
-            //act.
-            var sut = DocListResponse<JObject>.FromJsonObjects(JObject.FromObject(responseJson));
-
-            //assert.
-            Assert.NotNull(sut.Rows);
-            Assert.Equal(responseJson.rows.Length, sut.Rows.Count);
-            Assert.NotNull(sut.Rows[0]);
-            Assert.Equal(responseJson.rows[0].a, sut.Rows[0]["a"].Value<int>());
-            Assert.NotNull(sut.Rows[1]);
-            Assert.Equal(responseJson.rows[1].a, sut.Rows[1]["a"].Value<int>());
-        }
-
         private sealed class RawDocument
         {
             public string Id { get; set; }
@@ -68,7 +28,7 @@ namespace CouchDB.Client.Tests
         }
 
         [Fact]
-        public void FromCustomObjects_ConvertsEachItemAsIs_WhenNotExtractingDocuments()
+        public void FromAllDocsJson_ConvertsEachItemAsIs_WhenNotExtractingDocuments()
         {
             //arrange.
             var responseJson = new
@@ -81,28 +41,28 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            var sut = DocListResponse<RawDocument>.FromCustomObjects(JObject.FromObject(responseJson), extractDocumentAsObject: false);
+            var sut = DocListResponse<RawDocument>.FromAllDocsJson(JObject.FromObject(responseJson), extractDocumentAsObject: false);
 
             //assert.
             Assert.NotNull(sut);
             Assert.NotNull(sut.Rows);
-            Assert.Equal(responseJson.rows.Length, sut.Rows.Count);
+            Assert.Equal(responseJson.rows.Length, sut.Rows.Length);
 
             Assert.NotNull(sut.Rows[0]);
-            Assert.Equal(responseJson.rows[0].id, sut.Rows[0].Id);
-            Assert.Equal(responseJson.rows[0].key, sut.Rows[0].Key);
-            Assert.NotNull(sut.Rows[0].Value);
-            Assert.Equal(responseJson.rows[0].value.rev, sut.Rows[0].Value.Rev);
-            Assert.NotNull(sut.Rows[0].Doc);
-            Assert.Equal(responseJson.rows[0].doc.someProp, sut.Rows[0].Doc.SomeProp);
+            Assert.Equal(responseJson.rows[0].id, sut.Rows[0]["id"]);
+            Assert.Equal(responseJson.rows[0].key, sut.Rows[0]["key"]);
+            Assert.NotNull(sut.Rows[0]["value"]);
+            Assert.Equal(responseJson.rows[0].value.rev, sut.Rows[0]["value"]["rev"]);
+            Assert.NotNull(sut.Rows[0]["doc"]);
+            Assert.Equal(responseJson.rows[0].doc.someProp, sut.Rows[0]["doc"]["someProp"]);
 
             Assert.NotNull(sut.Rows[1]);
-            Assert.Equal(responseJson.rows[1].id, sut.Rows[1].Id);
-            Assert.Equal(responseJson.rows[1].key, sut.Rows[1].Key);
-            Assert.NotNull(sut.Rows[1].Value);
-            Assert.Equal(responseJson.rows[1].value.rev, sut.Rows[1].Value.Rev);
-            Assert.NotNull(sut.Rows[1].Doc);
-            Assert.Equal(responseJson.rows[1].doc.someProp, sut.Rows[1].Doc.SomeProp);
+            Assert.Equal(responseJson.rows[1].id, sut.Rows[1]["id"]);
+            Assert.Equal(responseJson.rows[1].key, sut.Rows[1]["key"]);
+            Assert.NotNull(sut.Rows[1]["value"]);
+            Assert.Equal(responseJson.rows[1].value.rev, sut.Rows[1]["value"]["rev"]);
+            Assert.NotNull(sut.Rows[1]["doc"]);
+            Assert.Equal(responseJson.rows[1].doc.someProp, sut.Rows[1]["doc"]["someProp"]);
         }
 
         [Fact]
@@ -119,18 +79,18 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            var sut = DocListResponse<RawDocument.DocClass>.FromCustomObjects(JObject.FromObject(responseJson), extractDocumentAsObject: true);
+            var sut = DocListResponse<RawDocument.DocClass>.FromAllDocsJson(JObject.FromObject(responseJson), extractDocumentAsObject: true);
 
             //assert.
             Assert.NotNull(sut);
             Assert.NotNull(sut.Rows);
-            Assert.Equal(responseJson.rows.Length, sut.Rows.Count);
+            Assert.Equal(responseJson.rows.Length, sut.Rows.Length);
 
             Assert.NotNull(sut.Rows[0]);
-            Assert.Equal(responseJson.rows[0].doc.someProp, sut.Rows[0].SomeProp);
+            Assert.Equal(responseJson.rows[0].doc.someProp, sut.Rows[0]["someProp"]);
 
             Assert.NotNull(sut.Rows[1]);
-            Assert.Equal(responseJson.rows[1].doc.someProp, sut.Rows[1].SomeProp);
+            Assert.Equal(responseJson.rows[1].doc.someProp, sut.Rows[1]["someProp"]);
         }
     }
 }

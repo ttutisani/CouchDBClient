@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CouchDB.Client
 {
@@ -27,9 +28,9 @@ namespace CouchDB.Client
             return arrayValue ?? new JArray();
         }
 
-        private static List<TDocument> JArrayMap(JArray array, Func<JObject, TDocument> itemConverter)
+        private static List<JObject> JArrayMap(JArray array, Func<JObject, JObject> itrmExtractor)
         {
-            var result = new List<TDocument>();
+            var result = new List<JObject>();
 
             for (int index = 0; index < array.Count; index++)
             {
@@ -37,7 +38,7 @@ namespace CouchDB.Client
                 if (currentItem == null)
                     throw new InvalidOperationException($"Cannot retrieve list of objects as item at index '{index}' is null or not '{nameof(JObject)}'.");
 
-                var convertedItem = itemConverter(currentItem);
+                var convertedItem = itrmExtractor(currentItem);
                 
                 result.Add(convertedItem);
             }
@@ -54,17 +55,16 @@ namespace CouchDB.Client
             return propValue;
         }
 
-        private DocListResponse(JObject allDocsJsonObject, Func<JObject, TDocument> itemConverter)
+        internal DocListResponse(int offset, int totalRows, int updateSeq, IEnumerable<TDocument> rows)
         {
-            if (allDocsJsonObject == null)
-                throw new ArgumentNullException(nameof(allDocsJsonObject));
+            if (rows == null)
+                throw new ArgumentNullException(nameof(rows));
 
-            Offset = GetIntOrDefault(allDocsJsonObject, "offset");
-            TotalRows = GetIntOrDefault(allDocsJsonObject, "total_rows");
-            UpdateSeq = GetIntOrDefault(allDocsJsonObject, "update_seq");
+            Offset = offset;
+            TotalRows = totalRows;
+            UpdateSeq = updateSeq;
 
-            var rowsArray = GetArrayOrEmpty(allDocsJsonObject, "rows");
-            Rows.AddRange(JArrayMap(rowsArray, itemConverter));
+            Rows = rows.ToArray();
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace CouchDB.Client
         /// <summary>
         /// Array of view row objects. By default the information returned contains only the document ID and revision.
         /// </summary>
-        public List<TDocument> Rows { get; } = new List<TDocument>();
+        public TDocument[] Rows { get; }
 
         /// <summary>
         /// Number of documents in the database/view. Note that this is not the number of rows returned in the actual query.
@@ -87,28 +87,28 @@ namespace CouchDB.Client
         /// </summary>
         public int UpdateSeq { get; }
 
-        internal static DocListResponse<JObject> FromJsonObjects(JObject allDocsJsonObject)
+        internal static DocListResponse<JObject> FromAllDocsJson(JObject allDocsJsonObject, bool extractDocumentAsObject = false)
         {
-            return new DocListResponse<JObject>(allDocsJsonObject, obj => obj);
-        }
-
-        internal static DocListResponse<string> FromJsonStrings(JObject allDocsJsonObject)
-        {
-            return new DocListResponse<string>(allDocsJsonObject, obj => obj.ToString());
-        }
-
-        internal static DocListResponse<TDocument> FromCustomObjects(JObject allDocsJsonObject, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null)
-        {
-            if (deserializer == null)
-                deserializer = jObject => jObject.ToObject<TDocument>();
-
-            Func<JObject, TDocument> itemConverter;
+            Func<JObject, JObject> itemExtractor;
             if (extractDocumentAsObject)
-                itemConverter = jObject => deserializer(GetObjectOrThrow(jObject, "doc"));
+                itemExtractor = jObject => GetObjectOrThrow(jObject, "doc");
             else
-                itemConverter = jObject => deserializer(jObject);
+                itemExtractor = jObject => jObject;
 
-            return new DocListResponse<TDocument>(allDocsJsonObject, itemConverter);
+            var offset = GetIntOrDefault(allDocsJsonObject, "offset");
+            var totalRows = GetIntOrDefault(allDocsJsonObject, "total_rows");
+            var updateSeq = GetIntOrDefault(allDocsJsonObject, "update_seq");
+            var rows = JArrayMap(GetArrayOrEmpty(allDocsJsonObject, "rows"), itemExtractor);
+
+            return new DocListResponse<JObject>(offset, totalRows, updateSeq, rows);
+        }
+
+        internal DocListResponse<TResult> Cast<TResult>(Func<TDocument, TResult> converter)
+        {
+            if (converter == null)
+                throw new ArgumentNullException(nameof(converter));
+
+            return new DocListResponse<TResult>(Offset, TotalRows, UpdateSeq, Rows.Select(doc => converter(doc)));
         }
     }
 }

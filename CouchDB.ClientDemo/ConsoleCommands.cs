@@ -254,7 +254,7 @@ namespace CouchDB.ClientDemo
                 ListQueryParams qParams = extract ? new ListQueryParams { Include_Docs = true } : null;
 
                 var allDocs = db.GetAllStringDocumentsAsync(qParams, extract).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
 
                 foreach (var doc in allDocs.Rows)
                 {
@@ -275,7 +275,7 @@ namespace CouchDB.ClientDemo
                 ListQueryParams qParams = extract ? new ListQueryParams { Include_Docs = true } : null;
 
                 var allDocs = db.GetAllJsonDocumentsAsync(qParams, extract).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
 
                 foreach (var doc in allDocs.Rows)
                 {
@@ -301,7 +301,7 @@ namespace CouchDB.ClientDemo
             UsingDatabase(db =>
             {
                 var allDocs = db.GetAllObjectDocumentsAsync<AuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true }).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
 
                 foreach (var doc in allDocs.Rows)
                 {
@@ -328,7 +328,7 @@ namespace CouchDB.ClientDemo
             UsingDatabase(db =>
             {
                 var allDocs = db.GetAllObjectDocumentsAsync<AuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true, Skip = skip, Limit = limit }).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
 
                 foreach (var doc in allDocs.Rows)
                 {
@@ -360,7 +360,7 @@ namespace CouchDB.ClientDemo
             UsingDatabase(db =>
             {
                 var allDocs = db.GetAllObjectDocumentsAsync<NiceAuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true }, deserializer: jObject => new NiceAuthorInfo(jObject)).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
 
                 foreach (var doc in allDocs.Rows)
                 {
@@ -507,7 +507,7 @@ namespace CouchDB.ClientDemo
 
                 var allEntities = db.GetAllEntitiesAsync<SampleEntity>(new ListQueryParams { Skip = skip, Limit = limit }).GetAwaiter().GetResult();
 
-                Console.WriteLine($"Found {allEntities.Rows.Count} entities:");
+                Console.WriteLine($"Found {allEntities.Rows.Length} entities:");
                 foreach (var entity in allEntities.Rows)
                 {
                     Console.WriteLine(SerializationHelper.Serialize(entity));
