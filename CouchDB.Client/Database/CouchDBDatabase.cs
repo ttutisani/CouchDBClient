@@ -10,8 +10,11 @@ namespace CouchDB.Client
     /// <summary>
     /// Represents signle database within CouchDB server instance.
     /// </summary>
-    public sealed class CouchDBDatabase : AbstractCuchDBDatabase, IDisposable
+    public sealed class CouchDBDatabase : ICouchDBDatabase, IDisposable
     {
+        internal const string IdPropertyName = "_id";
+        internal const string RevisionPropertyName = "_rev";
+
         private readonly HttpClient _http;
 
         internal CouchDBDatabase(string baseUrl)
@@ -51,7 +54,7 @@ namespace CouchDB.Client
         /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public override async Task<SaveDocResponse> SaveDocumentAsync(string documentJsonString, DocUpdateParams updateParams = null)
+        public async Task<SaveDocResponse> SaveDocumentAsync(string documentJsonString, DocUpdateParams updateParams = null)
         {
             if (string.IsNullOrWhiteSpace(documentJsonString))
                 throw new ArgumentNullException(nameof(documentJsonString));
@@ -75,7 +78,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Additional query parameters for retrieving document.</param>
         /// <returns><see cref="string"/> containing document JSON.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public override async Task<string> GetDocumentAsync(string docId, DocQueryParams queryParams = null)
+        public async Task<string> GetDocumentAsync(string docId, DocQueryParams queryParams = null)
         {
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
@@ -103,7 +106,7 @@ namespace CouchDB.Client
         /// <param name="revision">Actual document’s revision.</param>
         /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
-        public override async Task<SaveDocResponse> DeleteDocumentAsync(string docId, string revision, bool batch = false)
+        public async Task<SaveDocResponse> DeleteDocumentAsync(string docId, string revision, bool batch = false)
         {
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
@@ -140,7 +143,7 @@ namespace CouchDB.Client
         /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
         /// document portion only.</param>
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        public override async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
+        public async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
         {
             if (extractDocumentAsObject && (queryParams?.Include_Docs != true))
                 throw new ArgumentException($"'{nameof(extractDocumentAsObject)}' can be {true} only when '{nameof(queryParams.Include_Docs)}' is {true} within {nameof(queryParams)}.");

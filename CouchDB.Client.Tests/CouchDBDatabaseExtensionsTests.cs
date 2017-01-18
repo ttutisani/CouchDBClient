@@ -8,13 +8,13 @@ using System.Linq;
 
 namespace CouchDB.Client.Tests
 {
-    public sealed class AbstractCouchDBDatabaseTests
+    public sealed class CouchDBDatabaseExtensionsTests
     {
-        private readonly Mock<AbstractCuchDBDatabase> _sut;
+        private readonly Mock<ICouchDBDatabase> _sut;
 
-        public AbstractCouchDBDatabaseTests()
+        public CouchDBDatabaseExtensionsTests()
         {
-            _sut = new Mock<AbstractCuchDBDatabase>(); 
+            _sut = new Mock<ICouchDBDatabase>(); 
         }
 
         #region Save JSON doc
@@ -59,8 +59,8 @@ namespace CouchDB.Client.Tests
             _sut.Object.SaveDocumentAsync(jsonDoc).GetAwaiter().GetResult();
 
             //assert.
-            Assert.Equal(saveResponse.Id, jsonDoc[AbstractCuchDBDatabase.IdPropertyName]);
-            Assert.Equal(saveResponse.Revision, jsonDoc[AbstractCuchDBDatabase.RevisionPropertyName]);
+            Assert.Equal(saveResponse.Id, jsonDoc[CouchDBDatabase.IdPropertyName]);
+            Assert.Equal(saveResponse.Revision, jsonDoc[CouchDBDatabase.RevisionPropertyName]);
         }
 
         private static bool StringIsJsonObject(string value, JObject json)
@@ -307,8 +307,8 @@ namespace CouchDB.Client.Tests
                 .GetAwaiter().GetResult();
 
             //assert.
-            Assert.Equal(expectedId, jsonDoc[AbstractCuchDBDatabase.IdPropertyName]);
-            Assert.Equal(expectedRev, jsonDoc[AbstractCuchDBDatabase.RevisionPropertyName]);
+            Assert.Equal(expectedId, jsonDoc[CouchDBDatabase.IdPropertyName]);
+            Assert.Equal(expectedRev, jsonDoc[CouchDBDatabase.RevisionPropertyName]);
         }
 
         #endregion

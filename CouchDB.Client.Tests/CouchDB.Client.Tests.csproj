@@ -83,7 +83,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="AbstractCouchDBDatabaseTests.cs" />
+    <Compile Include="CouchDBDatabaseExtensionsTests.cs" />
     <Compile Include="DbResponseTests.cs" />
     <Compile Include="DeleteDocParamsTests.cs" />
     <Compile Include="DocListResponseTests.cs" />
