@@ -10,13 +10,13 @@ namespace CouchDB.Client
     /// </summary>
     public sealed class EntityStore
     {
-        private readonly CouchDBDatabase _db;
+        private readonly ICouchDBDatabase _db;
 
         /// <summary>
         /// Initializes new instance of <see cref="EntityStore"/> class.
         /// </summary>
         /// <param name="db"></param>
-        public EntityStore(CouchDBDatabase db)
+        public EntityStore(ICouchDBDatabase db)
         {
             if (db == null)
                 throw new ArgumentNullException(nameof(db));
