@@ -58,7 +58,7 @@ namespace CouchDB.Client
         public async Task<TEntity> GetEntityAsync<TEntity>(string entityId, DocQueryParams entityQueryParams = null)
             where TEntity : IEntity
         {
-            return await _db.GetDocumentAsync<TEntity>(entityId);
+            return await _db.GetDocumentAsync<TEntity>(entityId, entityQueryParams);
         }
 
         /// <summary>

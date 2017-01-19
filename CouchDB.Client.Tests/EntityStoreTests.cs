@@ -107,7 +107,42 @@ namespace CouchDB.Client.Tests
             Assert.Equal(expectedId, entity._id);
             Assert.Equal(expectedRev, entity._rev);
         }
-        
+
+        [Fact]
+        public void GetEntityAsync_Requires_ID()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetEntityAsync<SampleEntity>(null, new DocQueryParams()));
+        }
+
+        [Fact]
+        public void GetEntityAsync_Passes_ID_And_Query_Params()
+        {
+            //arrange.
+            var id = "entity id";
+            var queryParams = new DocQueryParams();
+
+            //act.
+            _sut.GetEntityAsync<SampleEntity>(id, queryParams).GetAwaiter().GetResult();
+
+            //assert.
+            _db.Verify(db => db.GetDocumentAsync(id, queryParams), Times.Once());
+        }
+
+        [Fact]
+        public void GetEntityAsync_Returns_Document_As_Entity()
+        {
+            //arrange.
+            var expectedJson = JsonConvert.SerializeObject(new SampleEntity { _id = "what", _rev = "ever", Name = "name", Name2 = 123 });
+            _db.Setup(db => db.GetDocumentAsync(It.IsAny<string>(), It.IsAny<DocQueryParams>()))
+                .Returns(Task.FromResult(expectedJson));
+
+            //act.
+            var entity = _sut.GetEntityAsync<SampleEntity>("someid").GetAwaiter().GetResult();
+
+            //assert.
+            Assert.True(StringIsJsonObject(expectedJson, JObject.FromObject(entity)));
+        }
+
         private static bool StringIsJsonObject(string value, JObject json)
         {
             if (value == null && json == null)
