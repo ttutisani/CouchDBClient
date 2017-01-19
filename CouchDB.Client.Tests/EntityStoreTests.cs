@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -141,6 +143,111 @@ namespace CouchDB.Client.Tests
 
             //assert.
             Assert.True(StringIsJsonObject(expectedJson, JObject.FromObject(entity)));
+        }
+
+        [Fact]
+        public void GetAllEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
+        {
+            //arrange.
+            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<JObject>())));
+
+            //act.
+            _sut.GetAllEntitiesAsync<SampleEntity>(null).GetAwaiter().GetResult();
+
+            //assert.
+            _db.Verify(db => db.GetAllJsonDocumentsAsync(It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault()), true), Times.Once());
+        }
+
+        [Fact]
+        public void GetAllEntitiesAsync_Passes_QueryParams_And_Extracts_Docs()
+        {
+            //arrange.
+            var queryParams = new ListQueryParams();
+
+            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<JObject>())));
+
+            //act.
+            _sut.GetAllEntitiesAsync<SampleEntity>(queryParams).GetAwaiter().GetResult();
+
+            //assert.
+            _db.Verify(db => db.GetAllJsonDocumentsAsync(It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault()), true), Times.Once());
+        }
+
+        [Fact]
+        public void GetAllEntitiesAsync_Returns_Docs_As_Entities()
+        {
+            //arrange.
+            var expectedDocs = new[] 
+            {
+                new SampleEntity { _id = "id1", _rev = "rev1", Name = "name1", Name2 = 1 },
+                new SampleEntity { _id = "id2", _rev = "rev2", Name = "name2", Name2 = 2 }
+            };
+
+            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, new List<JObject>
+                {
+                    JObject.FromObject(expectedDocs[0]),
+                    JObject.FromObject(expectedDocs[1])
+                })));
+
+            //act.
+            var entities = _sut.GetAllEntitiesAsync<SampleEntity>(null).GetAwaiter().GetResult();
+
+            //assert.
+            Assert.Equal(2, entities.Rows.Length);
+
+            Assert.NotNull(entities.Rows[0]);
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[0]), JObject.FromObject(entities.Rows[0])));
+
+            Assert.NotNull(entities.Rows[1]);
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[1]), JObject.FromObject(entities.Rows[1])));
+        }
+
+        [Fact]
+        public void DeleteEntityAsync_Requires_Entity()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.DeleteEntityAsync<SampleEntity>(null));
+        }
+
+        [Fact]
+        public void DeleteEntityAsync_Passes_Entity_And_Batch_Flag()
+        {
+            //arrange.
+            var id = "some id 123";
+            var rev = "some rev 123";
+            var entity = new SampleEntity { _id = id, _rev = rev };
+            var batch = true;
+
+            _db.Setup(db => db.DeleteDocumentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO())));
+
+            //act.
+            _sut.DeleteEntityAsync(entity, batch).GetAwaiter().GetResult();
+
+            //assert.
+            _db.Verify(db => db.DeleteDocumentAsync(id, rev, batch), Times.Once());
+        }
+
+        [Fact]
+        public void DeleteEntityAsync_Updates_ID_And_Rev_After_Deletion()
+        {
+            //arrange.
+            var expectedId = "id 1212";
+            var expectedRev = "rev 18u2";
+
+            _db.Setup(db => db.DeleteDocumentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO { Id = expectedId, Rev = expectedRev })));
+
+            var entity = new SampleEntity();
+
+            //act.
+            _sut.DeleteEntityAsync(entity).GetAwaiter().GetResult();
+
+            //assert.
+            Assert.Equal(expectedId, entity._id);
+            Assert.Equal(expectedRev, entity._rev);
         }
 
         private static bool StringIsJsonObject(string value, JObject json)
