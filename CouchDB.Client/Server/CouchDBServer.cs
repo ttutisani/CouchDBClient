@@ -107,7 +107,7 @@ namespace CouchDB.Client
         {
             public bool OK { get; set; }
 
-            public ServerResponseError Error { get; set; }
+            public string Error { get; set; }
 
             public string Reason { get; set; }
         }

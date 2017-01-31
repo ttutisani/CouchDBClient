@@ -24,7 +24,7 @@ namespace CouchDB.Client
                 }
 
                 var responseObject = JsonConvert.DeserializeObject<CouchDBServer.ServerResponseDTO>(responseJson);
-                if (convertNotFoundIntoNull && responseObject.Error == ServerResponseError.Not_Found)
+                if (convertNotFoundIntoNull && CommonError.Not_Found.EqualsErrorString(responseObject.Error))
                 {
                     return default(TResult);
                 }

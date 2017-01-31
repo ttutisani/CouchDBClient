@@ -28,7 +28,7 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(serverResponseDTO));
 
             OK = serverResponseDTO.OK;
-            Error = serverResponseDTO.Error;
+            Error = serverResponseDTO.Error == null ? null : new ServerResponseError(serverResponseDTO.Error);
             Reason = serverResponseDTO.Reason;
         }
     }

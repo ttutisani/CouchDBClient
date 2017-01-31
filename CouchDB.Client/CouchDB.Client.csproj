@@ -66,13 +66,14 @@
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Documents\DocQueryParams.cs" />
     <Compile Include="Queries\QueryParams.cs" />
+    <Compile Include="Response\ServerResponseError.cs" />
     <Compile Include="Server\CouchDBServer.cs" />
     <Compile Include="Helpers\HttpClientHelper.cs" />
     <Compile Include="Queries\ListQueryParams.cs" />
     <Compile Include="Server\ServerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerResponse.cs" />
-    <Compile Include="ServerResponseError.cs" />
+    <Compile Include="Response\ServerResponse.cs" />
+    <Compile Include="Response\CommonError.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
