@@ -47,7 +47,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public void SaveEntityAsync_Requires_Entity()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveEntityAsync<SampleEntity>(null));
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveEntityAsync(null));
         }
 
         [Fact]
@@ -208,7 +208,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public void DeleteEntityAsync_Requires_Entity()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.DeleteEntityAsync<SampleEntity>(null));
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.DeleteEntityAsync(null));
         }
 
         [Fact]

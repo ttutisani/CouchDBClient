@@ -27,12 +27,10 @@ namespace CouchDB.Client
         /// <summary>
         /// Saves entity into the database.
         /// </summary>
-        /// <typeparam name="TEntity">Type of entity to be saved.</typeparam>
         /// <param name="entity">Instance of entity to be saved.</param>
         /// <param name="entityUpdateParams">Additional parameters for saving.</param>
         /// <returns>Awaitable task.</returns>
-        public async Task SaveEntityAsync<TEntity>(TEntity entity, DocUpdateParams entityUpdateParams = null)
-            where TEntity : IEntity
+        public async Task SaveEntityAsync(IEntity entity, DocUpdateParams entityUpdateParams = null)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
@@ -81,12 +79,10 @@ namespace CouchDB.Client
         /// <summary>
         /// Deletes given entity object.
         /// </summary>
-        /// <typeparam name="TEntity">Type of entity to be deleted.</typeparam>
         /// <param name="entity">Entity object to be deleted.</param>
         /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns>Awaitable task.</returns>
-        public async Task DeleteEntityAsync<TEntity>(TEntity entity, bool batch = false)
-            where TEntity : IEntity
+        public async Task DeleteEntityAsync(IEntity entity, bool batch = false)
         {
             var deletionResponse = await _db.DeleteDocumentAsync(entity._id, entity._rev, batch);
             entity._id = deletionResponse.Id;
