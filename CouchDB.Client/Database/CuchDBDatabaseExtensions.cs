@@ -25,7 +25,7 @@ namespace CouchDB.Client
             if (documentJsonObject == null)
                 throw new ArgumentNullException(nameof(documentJsonObject));
             
-            var saveResponse = await @this.SaveDocumentAsync(documentJsonObject.ToString(), updateParams);
+            var saveResponse = await @this.SaveDocumentAsync(documentJsonObject.ToString(), updateParams).Safe();
             documentJsonObject[CouchDBDatabase.IdPropertyName] = saveResponse.Id;
             documentJsonObject[CouchDBDatabase.RevisionPropertyName] = saveResponse.Revision;
         }
@@ -47,7 +47,7 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(documentJsonObject[CouchDBDatabase.IdPropertyName]?.ToString()))
                 documentJsonObject.Remove(CouchDBDatabase.IdPropertyName);
 
-            return await @this.SaveDocumentAsync(documentJsonObject.ToString(), updateParams);
+            return await @this.SaveDocumentAsync(documentJsonObject.ToString(), updateParams).Safe();
         }
 
         #endregion
@@ -68,7 +68,7 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
 
-            var jsonString = await @this.GetDocumentAsync(docId, queryParams);
+            var jsonString = await @this.GetDocumentAsync(docId, queryParams).Safe();
             var jsonObject = jsonString != null
                 ? JObject.Parse(jsonString)
                 : null;
@@ -91,7 +91,7 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
 
-            var jsonString = await @this.GetDocumentAsync(docId, queryParams);
+            var jsonString = await @this.GetDocumentAsync(docId, queryParams).Safe();
             var resultObject = jsonString != null
                 ? JsonConvert.DeserializeObject<TResult>(jsonString)
                 : default(TResult);
@@ -127,7 +127,7 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(revision))
                 throw new ArgumentException("Document shoudl have _rev.", nameof(document));
 
-            var deletionResponse = await @this.DeleteDocumentAsync(docId, revision, batch);
+            var deletionResponse = await @this.DeleteDocumentAsync(docId, revision, batch).Safe();
             document[CouchDBDatabase.IdPropertyName] = deletionResponse.Id;
             document[CouchDBDatabase.RevisionPropertyName] = deletionResponse.Revision;
         }
@@ -156,7 +156,7 @@ namespace CouchDB.Client
         /// <exception cref="ArgumentException"><paramref name="extractDocumentAsObject"/> can be true only when Include_Docs is true within <paramref name="queryParams"/>.</exception>
         public static async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, ListQueryParams queryParams = null, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null)
         {
-            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams, extractDocumentAsObject);
+            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams, extractDocumentAsObject).Safe();
 
             return jsonDocs.Cast(deserializer ?? new Func<JObject, TDocument>(json => json.ToObject<TDocument>()));
         }
@@ -175,7 +175,7 @@ namespace CouchDB.Client
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
         public static async Task<DocListResponse<string>> GetAllStringDocumentsAsync(this ICouchDBDatabase @this, ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
         {
-            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams, extractDocumentAsObject);
+            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams, extractDocumentAsObject).Safe();
 
             return jsonDocs.Cast(json => json.ToString());
         }

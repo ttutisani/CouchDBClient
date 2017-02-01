@@ -49,8 +49,8 @@ namespace CouchDB.Client
         /// <returns><see cref="ServerInfo"/> object containing server metadata information.</returns>
         public async Task<ServerInfo> GetInfoAsync()
         {
-            var infoHttpResponse = await _http.GetAsync(string.Empty);
-            var infoDTO = await HttpClientHelper.HandleResponse<ServerInfoDTO>(infoHttpResponse, false);
+            var infoHttpResponse = await _http.GetAsync(string.Empty).Safe();
+            var infoDTO = await HttpClientHelper.HandleResponse<ServerInfoDTO>(infoHttpResponse, false).Safe();
             var serverInfo = new ServerInfo(infoDTO);
 
             return serverInfo;
@@ -80,8 +80,8 @@ namespace CouchDB.Client
         {
             var allDbsQuery = QueryParams.AppendQueryParams("_all_dbs", queryParams);
 
-            var dbNamesHttpResponse = await _http.GetAsync(allDbsQuery);
-            var dbNamesArray = await HttpClientHelper.HandleResponse<string[]>(dbNamesHttpResponse, false);
+            var dbNamesHttpResponse = await _http.GetAsync(allDbsQuery).Safe();
+            var dbNamesArray = await HttpClientHelper.HandleResponse<string[]>(dbNamesHttpResponse, false).Safe();
             
             return dbNamesArray;
         }
@@ -99,8 +99,8 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
 
-            var createDbHttpResponse = await _http.PutAsync(dbName, null);
-            await HttpClientHelper.HandleResponse(createDbHttpResponse, false);
+            var createDbHttpResponse = await _http.PutAsync(dbName, null).Safe();
+            await HttpClientHelper.HandleResponse(createDbHttpResponse, false).Safe();
         }
 
         internal sealed class ServerResponseDTO
@@ -126,8 +126,8 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
 
-            var deleteHttpResponse = await _http.DeleteAsync(dbName);
-            await HttpClientHelper.HandleResponse(deleteHttpResponse, convertNotFoundIntoNull: true);
+            var deleteHttpResponse = await _http.DeleteAsync(dbName).Safe();
+            await HttpClientHelper.HandleResponse(deleteHttpResponse, convertNotFoundIntoNull: true).Safe();
         }
 
         /// <summary>

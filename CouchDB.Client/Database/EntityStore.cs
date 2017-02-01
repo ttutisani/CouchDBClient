@@ -41,7 +41,7 @@ namespace CouchDB.Client
                 jsonEntity.Remove(CouchDBDatabase.RevisionPropertyName);
             }
 
-            await _db.SaveDocumentAsync(jsonEntity, entityUpdateParams);
+            await _db.SaveDocumentAsync(jsonEntity, entityUpdateParams).Safe();
             entity._id = jsonEntity[CouchDBDatabase.IdPropertyName]?.ToString();
             entity._rev = jsonEntity[CouchDBDatabase.RevisionPropertyName]?.ToString();
         }
@@ -56,7 +56,7 @@ namespace CouchDB.Client
         public async Task<TEntity> GetEntityAsync<TEntity>(string entityId, DocQueryParams entityQueryParams = null)
             where TEntity : IEntity
         {
-            return await _db.GetDocumentAsync<TEntity>(entityId, entityQueryParams);
+            return await _db.GetDocumentAsync<TEntity>(entityId, entityQueryParams).Safe();
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace CouchDB.Client
 
             entityListQueryParams.Include_Docs = true;
 
-            return await _db.GetAllObjectDocumentsAsync<TEntity>(entityListQueryParams, extractDocumentAsObject: true);
+            return await _db.GetAllObjectDocumentsAsync<TEntity>(entityListQueryParams, extractDocumentAsObject: true).Safe();
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace CouchDB.Client
         /// <returns>Awaitable task.</returns>
         public async Task DeleteEntityAsync(IEntity entity, bool batch = false)
         {
-            var deletionResponse = await _db.DeleteDocumentAsync(entity._id, entity._rev, batch);
+            var deletionResponse = await _db.DeleteDocumentAsync(entity._id, entity._rev, batch).Safe();
             entity._id = deletionResponse.Id;
             entity._rev = deletionResponse.Revision;
         }

@@ -9,12 +9,12 @@ namespace CouchDB.Client
     {
         internal async static Task HandleResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            await HandleResponse<CouchDBServer.ServerResponseDTO>(httpResponse, convertNotFoundIntoNull);
+            await HandleResponse<CouchDBServer.ServerResponseDTO>(httpResponse, convertNotFoundIntoNull).Safe();
         }
 
         internal async static Task<TResult> HandleResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer, bool convertNotFoundIntoNull)
         {
-            var responseJson = await httpResponse.Content.ReadAsStringAsync();
+            var responseJson = await httpResponse.Content.ReadAsStringAsync().Safe();
             if (!httpResponse.IsSuccessStatusCode)
             {
                 var errorMessage = $"Http status code '{httpResponse.StatusCode}', Http reason phrase '{httpResponse.ReasonPhrase}'.";
@@ -37,12 +37,12 @@ namespace CouchDB.Client
 
         internal async static Task<TResult> HandleResponse<TResult>(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            return await HandleResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson), convertNotFoundIntoNull);
+            return await HandleResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson), convertNotFoundIntoNull).Safe();
         }
 
         internal async static Task<string> HandleStringResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            return await HandleResponse(httpResponse, strJson => strJson, convertNotFoundIntoNull);
+            return await HandleResponse(httpResponse, strJson => strJson, convertNotFoundIntoNull).Safe();
         }
     }
 }
