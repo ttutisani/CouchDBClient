@@ -52,6 +52,6 @@ namespace CouchDB.Client
         /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
         /// document portion only.</param>
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false);
+        Task<DocListResponse2<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null);
     }
 }

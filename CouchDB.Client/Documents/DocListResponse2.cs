@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace CouchDB.Client
@@ -9,7 +10,7 @@ namespace CouchDB.Client
     /// Represents response object for retrieving list of documents.
     /// </summary>
     /// <typeparam name="TDocument">Type of document object.</typeparam>
-    public sealed class DocListResponse<TDocument>
+    public sealed class DocListResponse2<TDocument>
     {
         private static int GetIntOrDefault(JObject source, string propertyName)
         {
@@ -28,7 +29,7 @@ namespace CouchDB.Client
             return arrayValue ?? new JArray();
         }
 
-        private static List<JObject> JArrayMap(JArray array, Func<JObject, JObject> itrmExtractor)
+        private static List<JObject> JArrayMap(JArray array)
         {
             var result = new List<JObject>();
 
@@ -38,9 +39,7 @@ namespace CouchDB.Client
                 if (currentItem == null)
                     throw new InvalidOperationException($"Cannot retrieve list of objects as item at index '{index}' is null or not '{nameof(JObject)}'.");
 
-                var convertedItem = itrmExtractor(currentItem);
-                
-                result.Add(convertedItem);
+                result.Add(currentItem);
             }
 
             return result;
@@ -55,7 +54,7 @@ namespace CouchDB.Client
             return propValue;
         }
 
-        internal DocListResponse(int offset, int totalRows, int updateSeq, IEnumerable<TDocument> rows)
+        internal DocListResponse2(int offset, int totalRows, int updateSeq, IEnumerable<DocListResponseRow<TDocument>> rows)
         {
             if (rows == null)
                 throw new ArgumentNullException(nameof(rows));
@@ -64,7 +63,7 @@ namespace CouchDB.Client
             TotalRows = totalRows;
             UpdateSeq = updateSeq;
 
-            Rows = rows.ToArray();
+            Rows = new ReadOnlyCollection<DocListResponseRow<TDocument>>(rows.ToList());
         }
 
         /// <summary>
@@ -75,7 +74,7 @@ namespace CouchDB.Client
         /// <summary>
         /// Array of view row objects. By default the information returned contains only the document ID and revision.
         /// </summary>
-        public TDocument[] Rows { get; }
+        public ReadOnlyCollection<DocListResponseRow<TDocument>> Rows { get; }
 
         /// <summary>
         /// Number of documents in the database/view. Note that this is not the number of rows returned in the actual query.
@@ -87,28 +86,25 @@ namespace CouchDB.Client
         /// </summary>
         public int UpdateSeq { get; }
 
-        internal static DocListResponse<JObject> FromAllDocsJson(JObject allDocsJsonObject, bool extractDocumentAsObject = false)
+        internal static DocListResponse2<JObject> FromAllDocsJson(JObject allDocsJsonObject)
         {
             Func<JObject, JObject> itemExtractor;
-            if (extractDocumentAsObject)
-                itemExtractor = jObject => GetObjectOrThrow(jObject, "doc");
-            else
-                itemExtractor = jObject => jObject;
-
+            
             var offset = GetIntOrDefault(allDocsJsonObject, "offset");
             var totalRows = GetIntOrDefault(allDocsJsonObject, "total_rows");
             var updateSeq = GetIntOrDefault(allDocsJsonObject, "update_seq");
-            var rows = JArrayMap(GetArrayOrEmpty(allDocsJsonObject, "rows"), itemExtractor);
+            var jsonRows = JArrayMap(GetArrayOrEmpty(allDocsJsonObject, "rows"));
+            var responseRows = jsonRows.Select(json => DocListResponseRow<JObject>.FromJson(json));
 
-            return new DocListResponse<JObject>(offset, totalRows, updateSeq, rows);
+            return new DocListResponse2<JObject>(offset, totalRows, updateSeq, responseRows);
         }
 
-        internal DocListResponse<TResult> Cast<TResult>(Func<TDocument, TResult> converter)
+        internal DocListResponse2<TResult> Cast<TResult>(Func<TDocument, TResult> converter)
         {
             if (converter == null)
                 throw new ArgumentNullException(nameof(converter));
 
-            return new DocListResponse<TResult>(Offset, TotalRows, UpdateSeq, Rows.Select(doc => converter(doc)));
+            return new DocListResponse2<TResult>(Offset, TotalRows, UpdateSeq, Rows.Select(row => row.Cast(converter)));
         }
     }
 }

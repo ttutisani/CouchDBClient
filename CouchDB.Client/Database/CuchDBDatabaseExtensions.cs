@@ -154,11 +154,11 @@ namespace CouchDB.Client
         /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
         /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
         /// <exception cref="ArgumentException"><paramref name="extractDocumentAsObject"/> can be true only when Include_Docs is true within <paramref name="queryParams"/>.</exception>
-        public static async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, ListQueryParams queryParams = null, bool extractDocumentAsObject = false, Func<JObject, TDocument> deserializer = null)
+        public static async Task<DocListResponse2<TDocument>> GetAllObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, ListQueryParams queryParams = null, Func<JObject, TDocument> deserializer = null)
         {
-            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams, extractDocumentAsObject).Safe();
+            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams).Safe();
 
-            return jsonDocs.Cast(deserializer ?? new Func<JObject, TDocument>(json => json.ToObject<TDocument>()));
+            return jsonDocs.Cast(deserializer ?? new Func<JObject, TDocument>(json => json != null ? json.ToObject<TDocument>() : default(TDocument)));
         }
 
         /// <summary>
@@ -173,9 +173,9 @@ namespace CouchDB.Client
         /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
         /// document portion only.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
-        public static async Task<DocListResponse<string>> GetAllStringDocumentsAsync(this ICouchDBDatabase @this, ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
+        public static async Task<DocListResponse2<string>> GetAllStringDocumentsAsync(this ICouchDBDatabase @this, ListQueryParams queryParams = null)
         {
-            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams, extractDocumentAsObject).Safe();
+            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams).Safe();
 
             return jsonDocs.Cast(json => json.ToString());
         }

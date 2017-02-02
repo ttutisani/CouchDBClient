@@ -149,14 +149,14 @@ namespace CouchDB.Client.Tests
         public void GetAllEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
         {
             //arrange.
-            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<JObject>())));
+            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
             _sut.GetAllEntitiesAsync<SampleEntity>(null).GetAwaiter().GetResult();
 
             //assert.
-            _db.Verify(db => db.GetAllJsonDocumentsAsync(It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault()), true), Times.Once());
+            _db.Verify(db => db.GetAllJsonDocumentsAsync(It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
@@ -165,14 +165,14 @@ namespace CouchDB.Client.Tests
             //arrange.
             var queryParams = new ListQueryParams();
 
-            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<JObject>())));
+            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
             _sut.GetAllEntitiesAsync<SampleEntity>(queryParams).GetAwaiter().GetResult();
 
             //assert.
-            _db.Verify(db => db.GetAllJsonDocumentsAsync(It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault()), true), Times.Once());
+            _db.Verify(db => db.GetAllJsonDocumentsAsync(It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
@@ -185,24 +185,26 @@ namespace CouchDB.Client.Tests
                 new SampleEntity { _id = "id2", _rev = "rev2", Name = "name2", Name2 = 2 }
             };
 
-            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, new List<JObject>
+            _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, new List<DocListResponseRow<JObject>>
                 {
-                    JObject.FromObject(expectedDocs[0]),
-                    JObject.FromObject(expectedDocs[1])
+                    new DocListResponseRow<JObject>("id1", "id1", new DocListResponseRowValue("rev1"), JObject.FromObject(expectedDocs[0]), null),
+                    new DocListResponseRow<JObject>("id2", "id2", new DocListResponseRowValue("rev2"), JObject.FromObject(expectedDocs[1]), null)
                 })));
 
             //act.
             var entities = _sut.GetAllEntitiesAsync<SampleEntity>(null).GetAwaiter().GetResult();
 
             //assert.
-            Assert.Equal(2, entities.Rows.Length);
+            Assert.Equal(2, entities.Rows.Count);
 
             Assert.NotNull(entities.Rows[0]);
-            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[0]), JObject.FromObject(entities.Rows[0])));
+            Assert.NotNull(entities.Rows[0].Document);
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[0]), JObject.FromObject(entities.Rows[0].Document)));
 
             Assert.NotNull(entities.Rows[1]);
-            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[1]), JObject.FromObject(entities.Rows[1])));
+            Assert.NotNull(entities.Rows[1].Document);
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[1]), JObject.FromObject(entities.Rows[1].Document)));
         }
 
         [Fact]
