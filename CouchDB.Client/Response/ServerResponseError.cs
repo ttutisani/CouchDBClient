@@ -28,5 +28,10 @@ namespace CouchDB.Client
         /// Gets raw error string.
         /// </summary>
         public string RawError { get; }
+
+        internal static ServerResponseError FromString(string error)
+        {
+            return string.IsNullOrWhiteSpace(error) ? null : new ServerResponseError(error);
+        }
     }
 }

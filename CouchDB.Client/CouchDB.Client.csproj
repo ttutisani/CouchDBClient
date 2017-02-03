@@ -59,12 +59,14 @@
     <Compile Include="Database\EntityStore.cs" />
     <Compile Include="Database\ICouchDBDatabase.cs" />
     <Compile Include="Documents\DeleteDocParams.cs" />
-    <Compile Include="Documents\DocListResponse2.cs" />
-    <Compile Include="Documents\DocListResponseRow.cs" />
+    <Compile Include="Documents\Response\DocListResponse.cs" />
+    <Compile Include="Documents\Response\DocListResponseRow.cs" />
     <Compile Include="Documents\IEntity.cs" />
+    <Compile Include="Documents\Response\DocListResponseRowValue.cs" />
     <Compile Include="Documents\SaveDocResponse.cs" />
     <Compile Include="Documents\DocUpdateParams.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Documents\DocQueryParams.cs" />
     <Compile Include="Queries\QueryParams.cs" />

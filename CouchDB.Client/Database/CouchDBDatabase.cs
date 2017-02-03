@@ -138,11 +138,8 @@ namespace CouchDB.Client
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <param name="extractDocumentAsObject">Boolean indicating whether to extract document portion of the 
-        /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
-        /// document portion only.</param>
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        public async Task<DocListResponse2<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null)
+        public async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null)
         {
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
 
@@ -150,7 +147,7 @@ namespace CouchDB.Client
             var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
-            var docListResponse = DocListResponse2<JObject>.FromAllDocsJson(allDocsJsonObject);
+            var docListResponse = DocListResponse<JObject>.FromJson(allDocsJsonObject);
             return docListResponse;
         }
 

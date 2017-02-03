@@ -150,7 +150,7 @@ namespace CouchDB.Client.Tests
         {
             //arrange.
             _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
             _sut.GetAllEntitiesAsync<SampleEntity>(null).GetAwaiter().GetResult();
@@ -166,7 +166,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
             _sut.GetAllEntitiesAsync<SampleEntity>(queryParams).GetAwaiter().GetResult();
@@ -186,7 +186,7 @@ namespace CouchDB.Client.Tests
             };
 
             _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, new List<DocListResponseRow<JObject>>
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, new List<DocListResponseRow<JObject>>
                 {
                     new DocListResponseRow<JObject>("id1", "id1", new DocListResponseRowValue("rev1"), JObject.FromObject(expectedDocs[0]), null),
                     new DocListResponseRow<JObject>("id2", "id2", new DocListResponseRowValue("rev2"), JObject.FromObject(expectedDocs[1]), null)

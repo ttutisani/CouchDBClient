@@ -254,9 +254,9 @@ namespace CouchDB.ClientDemo
                 var allDocs = db.GetAllStringDocumentsAsync(qParams).Result;
                 Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
-                foreach (var doc in allDocs.Rows)
+                foreach (var row in allDocs.Rows)
                 {
-                    Console.WriteLine(doc);
+                    Console.WriteLine(row.Document);
                     Console.WriteLine("----------");
                 }
 
@@ -268,15 +268,14 @@ namespace CouchDB.ClientDemo
         {
             UsingDatabase(db =>
             {
-                Console.WriteLine("Extract document as object?");
                 ListQueryParams qParams = new ListQueryParams { Include_Docs = true };
 
                 var allDocs = db.GetAllJsonDocumentsAsync(qParams).Result;
                 Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
-                foreach (var doc in allDocs.Rows)
+                foreach (var row in allDocs.Rows)
                 {
-                    Console.WriteLine(doc.ToString());
+                    Console.WriteLine(row.Document.ToString());
                     Console.WriteLine("----------");
                 }
 

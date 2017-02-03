@@ -65,7 +65,7 @@ namespace CouchDB.Client
         /// <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
         /// <param name="entityListQueryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{TEntity}"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
-        public async Task<DocListResponse2<TEntity>> GetAllEntitiesAsync<TEntity>(ListQueryParams entityListQueryParams = null)
+        public async Task<DocListResponse<TEntity>> GetAllEntitiesAsync<TEntity>(ListQueryParams entityListQueryParams = null)
             where TEntity : IEntity
         {
             if (entityListQueryParams == null)

@@ -322,7 +322,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
             _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(queryParams).GetAwaiter().GetResult();
@@ -340,7 +340,7 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 222 }
             };
             _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
 
             //act.
             var docs = _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, null)
@@ -368,7 +368,7 @@ namespace CouchDB.Client.Tests
                 new { what = "some value", that = 222 }
             };
             _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
 
             Func<JObject, SampleDoc> deserializer = doc => new SampleDoc { Name = doc["what"].ToString(), Name2 = doc["that"].Value<int>() };
 
@@ -400,7 +400,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
             _sut.Object.GetAllStringDocumentsAsync(queryParams)
@@ -419,7 +419,7 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 222 }
             };
             _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse2<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
 
             //act.
             var docs = _sut.Object.GetAllStringDocumentsAsync(null)
