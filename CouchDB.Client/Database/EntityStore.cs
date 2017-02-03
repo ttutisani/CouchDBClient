@@ -73,7 +73,7 @@ namespace CouchDB.Client
 
             entityListQueryParams.Include_Docs = true;
 
-            return await _db.GetAllObjectDocumentsAsync<TEntity>(entityListQueryParams, extractDocumentAsObject: true).Safe();
+            return await _db.GetAllObjectDocumentsAsync<TEntity>(entityListQueryParams).Safe();
         }
 
         /// <summary>

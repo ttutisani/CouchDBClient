@@ -249,16 +249,14 @@ namespace CouchDB.ClientDemo
         {
             UsingDatabase(db => 
             {
-                Console.WriteLine("Extract document as object? press <ENTER> for NO.");
-                bool extract = !string.IsNullOrWhiteSpace(Console.ReadLine());
-                ListQueryParams qParams = extract ? new ListQueryParams { Include_Docs = true } : null;
+                ListQueryParams qParams = new ListQueryParams { Include_Docs = true };
 
-                var allDocs = db.GetAllStringDocumentsAsync(qParams, extract).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
+                var allDocs = db.GetAllStringDocumentsAsync(qParams).Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
-                foreach (var doc in allDocs.Rows)
+                foreach (var row in allDocs.Rows)
                 {
-                    Console.WriteLine(doc);
+                    Console.WriteLine(row.Document);
                     Console.WriteLine("----------");
                 }
 
@@ -270,16 +268,14 @@ namespace CouchDB.ClientDemo
         {
             UsingDatabase(db =>
             {
-                Console.WriteLine("Extract document as object?");
-                bool extract = !string.IsNullOrWhiteSpace(Console.ReadLine());
-                ListQueryParams qParams = extract ? new ListQueryParams { Include_Docs = true } : null;
+                ListQueryParams qParams = new ListQueryParams { Include_Docs = true };
 
-                var allDocs = db.GetAllJsonDocumentsAsync(qParams, extract).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
+                var allDocs = db.GetAllJsonDocumentsAsync(qParams).Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
-                foreach (var doc in allDocs.Rows)
+                foreach (var row in allDocs.Rows)
                 {
-                    Console.WriteLine(doc.ToString());
+                    Console.WriteLine(row.Document.ToString());
                     Console.WriteLine("----------");
                 }
 
@@ -300,14 +296,14 @@ namespace CouchDB.ClientDemo
         {
             UsingDatabase(db =>
             {
-                var allDocs = db.GetAllObjectDocumentsAsync<AuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true }).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
+                var allDocs = db.GetAllObjectDocumentsAsync<AuthorInfo>(queryParams: new ListQueryParams { Include_Docs = true }).Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
-                foreach (var doc in allDocs.Rows)
+                foreach (var row in allDocs.Rows)
                 {
-                    Console.WriteLine("ID: {0}", doc._Id);
-                    Console.WriteLine("Rev: {0}", doc._Rev);
-                    Console.WriteLine("Author: {0}", doc.Author);
+                    Console.WriteLine("ID: {0}", row.Document._Id);
+                    Console.WriteLine("Rev: {0}", row.Document._Rev);
+                    Console.WriteLine("Author: {0}", row.Document.Author);
                     Console.WriteLine("----------");
                 }
 
@@ -327,14 +323,14 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db =>
             {
-                var allDocs = db.GetAllObjectDocumentsAsync<AuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true, Skip = skip, Limit = limit }).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
+                var allDocs = db.GetAllObjectDocumentsAsync<AuthorInfo>(queryParams: new ListQueryParams { Include_Docs = true, Skip = skip, Limit = limit }).Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
-                foreach (var doc in allDocs.Rows)
+                foreach (var row in allDocs.Rows)
                 {
-                    Console.WriteLine("ID: {0}", doc._Id);
-                    Console.WriteLine("Rev: {0}", doc._Rev);
-                    Console.WriteLine("Author: {0}", doc.Author);
+                    Console.WriteLine("ID: {0}", row.Document._Id);
+                    Console.WriteLine("Rev: {0}", row.Document._Rev);
+                    Console.WriteLine("Author: {0}", row.Document.Author);
                     Console.WriteLine("----------");
                 }
 
@@ -359,13 +355,13 @@ namespace CouchDB.ClientDemo
         {
             UsingDatabase(db =>
             {
-                var allDocs = db.GetAllObjectDocumentsAsync<NiceAuthorInfo>(extractDocumentAsObject: true, queryParams: new ListQueryParams { Include_Docs = true }, deserializer: jObject => new NiceAuthorInfo(jObject)).Result;
-                Console.WriteLine("Found {0} docs:", allDocs.Rows.Length);
+                var allDocs = db.GetAllObjectDocumentsAsync<NiceAuthorInfo>(queryParams: new ListQueryParams { Include_Docs = true }, deserializer: jObject => new NiceAuthorInfo(jObject)).Result;
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
-                foreach (var doc in allDocs.Rows)
+                foreach (var row in allDocs.Rows)
                 {
-                    Console.WriteLine("ID: {0}", doc.Id);
-                    Console.WriteLine("Author: {0}", doc.Author);
+                    Console.WriteLine("ID: {0}", row.Document.Id);
+                    Console.WriteLine("Author: {0}", row.Document.Author);
                     Console.WriteLine("----------");
                 }
 
@@ -507,7 +503,7 @@ namespace CouchDB.ClientDemo
 
                 var allEntities = db.GetAllEntitiesAsync<SampleEntity>(new ListQueryParams { Skip = skip, Limit = limit }).GetAwaiter().GetResult();
 
-                Console.WriteLine($"Found {allEntities.Rows.Length} entities:");
+                Console.WriteLine($"Found {allEntities.Rows.Count} entities:");
                 foreach (var entity in allEntities.Rows)
                 {
                     Console.WriteLine(SerializationHelper.Serialize(entity));

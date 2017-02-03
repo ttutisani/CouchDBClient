@@ -316,20 +316,19 @@ namespace CouchDB.Client.Tests
         #region Get All Object Docs
 
         [Fact]
-        public void GetAllObjectDocumentsAsync_Passes_QueryParams_And_Extract_AsReceived()
+        public void GetAllObjectDocumentsAsync_Passes_QueryParams_AsReceived()
         {
             //arrange.
             var queryParams = new ListQueryParams();
-            var extractDoc = true;
 
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<JObject>())));
+            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
-            _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(queryParams, extractDoc).GetAwaiter().GetResult();
+            _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(queryParams).GetAwaiter().GetResult();
 
             //assert.
-            _sut.Verify(db => db.GetAllJsonDocumentsAsync(queryParams, extractDoc), Times.Once());
+            _sut.Verify(db => db.GetAllJsonDocumentsAsync(queryParams), Times.Once());
         }
 
         [Fact]
@@ -340,24 +339,24 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 111 },
                 new { name = "some value", name2 = 222 }
             };
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => JObject.FromObject(doc)))));
+            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
 
             //act.
-            var docs = _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, false, null)
+            var docs = _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, null)
                 .GetAwaiter().GetResult();
 
             //assert.
             Assert.NotNull(docs);
-            Assert.Equal(2, docs.Rows.Length);
+            Assert.Equal(2, docs.Rows.Count);
 
             Assert.NotNull(docs.Rows[0]);
-            Assert.Equal(jsonDocs[0].name, docs.Rows[0].Name);
-            Assert.Equal(jsonDocs[0].name2, docs.Rows[0].Name2);
+            Assert.Equal(jsonDocs[0].name, docs.Rows[0].Document.Name);
+            Assert.Equal(jsonDocs[0].name2, docs.Rows[0].Document.Name2);
 
             Assert.NotNull(docs.Rows[0]);
-            Assert.Equal(jsonDocs[0].name, docs.Rows[0].Name);
-            Assert.Equal(jsonDocs[0].name2, docs.Rows[0].Name2);
+            Assert.Equal(jsonDocs[0].name, docs.Rows[0].Document.Name);
+            Assert.Equal(jsonDocs[0].name2, docs.Rows[0].Document.Name2);
         }
 
         [Fact]
@@ -368,26 +367,26 @@ namespace CouchDB.Client.Tests
                 new { what = "some value", that = 111 },
                 new { what = "some value", that = 222 }
             };
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => JObject.FromObject(doc)))));
+            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
 
             Func<JObject, SampleDoc> deserializer = doc => new SampleDoc { Name = doc["what"].ToString(), Name2 = doc["that"].Value<int>() };
 
             //act.
-            var docs = _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, false, deserializer)
+            var docs = _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, deserializer)
                 .GetAwaiter().GetResult();
 
             //assert.
             Assert.NotNull(docs);
-            Assert.Equal(2, docs.Rows.Length);
+            Assert.Equal(2, docs.Rows.Count);
 
             Assert.NotNull(docs.Rows[0]);
-            Assert.Equal(jsonDocs[0].what, docs.Rows[0].Name);
-            Assert.Equal(jsonDocs[0].that, docs.Rows[0].Name2);
+            Assert.Equal(jsonDocs[0].what, docs.Rows[0].Document.Name);
+            Assert.Equal(jsonDocs[0].that, docs.Rows[0].Document.Name2);
 
             Assert.NotNull(docs.Rows[0]);
-            Assert.Equal(jsonDocs[0].what, docs.Rows[0].Name);
-            Assert.Equal(jsonDocs[0].that, docs.Rows[0].Name2);
+            Assert.Equal(jsonDocs[0].what, docs.Rows[0].Document.Name);
+            Assert.Equal(jsonDocs[0].that, docs.Rows[0].Document.Name2);
         }
 
         #endregion
@@ -399,17 +398,16 @@ namespace CouchDB.Client.Tests
         {
             //arrange
             var queryParams = new ListQueryParams();
-            var extractDoc = true;
 
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<JObject>())));
+            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
-            _sut.Object.GetAllStringDocumentsAsync(queryParams, extractDoc)
+            _sut.Object.GetAllStringDocumentsAsync(queryParams)
                 .GetAwaiter().GetResult();
 
             //assert.
-            _sut.Verify(db => db.GetAllJsonDocumentsAsync(queryParams, extractDoc), Times.Once());
+            _sut.Verify(db => db.GetAllJsonDocumentsAsync(queryParams), Times.Once());
         }
 
         [Fact]
@@ -420,19 +418,19 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 111 },
                 new { name = "some value", name2 = 222 }
             };
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>(), It.IsAny<bool>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => JObject.FromObject(doc)))));
+            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
 
             //act.
-            var docs = _sut.Object.GetAllStringDocumentsAsync(null, false)
+            var docs = _sut.Object.GetAllStringDocumentsAsync(null)
                 .GetAwaiter().GetResult();
 
             //assert.
             Assert.NotNull(docs);
-            Assert.Equal(2, docs.Rows.Length);
+            Assert.Equal(2, docs.Rows.Count);
 
-            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[0]), JObject.Parse(docs.Rows[0])));
-            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[1]), JObject.Parse(docs.Rows[1])));
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[0]), JObject.Parse(docs.Rows[0].Document)));
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[1]), JObject.Parse(docs.Rows[1].Document)));
         }
 
         #endregion

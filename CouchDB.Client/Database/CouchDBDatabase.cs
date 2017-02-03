@@ -138,22 +138,16 @@ namespace CouchDB.Client
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <param name="extractDocumentAsObject">Boolean indicating whether to extract document portion of the 
-        /// JSON as object. If False, then the whole JSON is deserialized as object, instead of extracting the 
-        /// document portion only.</param>
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        public async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null, bool extractDocumentAsObject = false)
+        public async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null)
         {
-            if (extractDocumentAsObject && (queryParams?.Include_Docs != true))
-                throw new ArgumentException($"'{nameof(extractDocumentAsObject)}' can be {true} only when '{nameof(queryParams.Include_Docs)}' is {true} within {nameof(queryParams)}.");
-
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
 
             var allDocsResponse = await _http.GetAsync(allDocsUrl).Safe();
             var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
-            var docListResponse = DocListResponse<JObject>.FromAllDocsJson(allDocsJsonObject, extractDocumentAsObject);
+            var docListResponse = DocListResponse<JObject>.FromJson(allDocsJsonObject);
             return docListResponse;
         }
 
