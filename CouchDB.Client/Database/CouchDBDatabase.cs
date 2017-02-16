@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
 using System.Text;
@@ -144,6 +145,36 @@ namespace CouchDB.Client
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
 
             var allDocsResponse = await _http.GetAsync(allDocsUrl).Safe();
+            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
+            var allDocsJsonObject = JObject.Parse(allDocsJsonString);
+
+            var docListResponse = DocListResponse<JObject>.FromJson(allDocsJsonObject);
+            return docListResponse;
+        }
+
+        #endregion
+
+        #region Get Docs
+
+        /// <summary>
+        /// Returns a JSON structure of documents in a given database, by multiple IDs.
+        /// </summary>
+        /// <param name="docIdList">Array of document IDs for retrieving documents.</param>
+        /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
+        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
+        public async Task<DocListResponse<JObject>> GetJsonDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null)
+        {
+            if (docIdList == null)
+                throw new ArgumentNullException(nameof(docIdList));
+
+            if (docIdList.Length == 0)
+                throw new ArgumentException($"{nameof(docIdList)} should not be empty.", nameof(docIdList));
+
+            var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
+            var allDocsRequest = new { keys = docIdList };
+            var allDocsJsonRequest = JsonConvert.SerializeObject(allDocsRequest);
+
+            var allDocsResponse = await _http.PostAsync(allDocsUrl, new StringContent(allDocsJsonRequest, Encoding.UTF8, "application/json")).Safe();
             var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 

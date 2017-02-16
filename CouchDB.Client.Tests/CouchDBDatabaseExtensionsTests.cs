@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace CouchDB.Client.Tests
 {
@@ -394,7 +395,7 @@ namespace CouchDB.Client.Tests
         #region Get All String Docs
 
         [Fact]
-        public void GetAllStringDocumentsAsync_Passes_QueryParams_And_Extract_AsReceived()
+        public void GetAllStringDocumentsAsync_Passes_QueryParams_AsReceived()
         {
             //arrange
             var queryParams = new ListQueryParams();
@@ -431,6 +432,190 @@ namespace CouchDB.Client.Tests
 
             Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[0]), JObject.Parse(docs.Rows[0].Document)));
             Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[1]), JObject.Parse(docs.Rows[1].Document)));
+        }
+
+        #endregion
+
+        #region Get Object Docs
+
+        [Fact]
+        public void GetObjectDocumentsAsync_Requires_NotEmpty_IdList()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetObjectDocumentsAsync<SampleDoc>(null)).GetAwaiter().GetResult();
+            Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { })).GetAwaiter().GetResult();
+        }
+
+        [Fact]
+        public void GetObjectDocumentsAsync_Passes_Params_AsReceived()
+        {
+            //arrange.
+            var docIdList = new string[] { "id-1" };
+            var queryParams = new ListQueryParams();
+
+            _sut.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+
+            //act.
+            _sut.Object.GetObjectDocumentsAsync<SampleDoc>(docIdList, queryParams).GetAwaiter().GetResult();
+
+            //assert.
+            _sut.Verify(db => db.GetJsonDocumentsAsync(docIdList, queryParams), Times.Once());
+        }
+
+        [Fact]
+        public void GetObjectDocumentsAsync_Returns_Deserialized_Documents_ByDefault()
+        {
+            //arrange.
+            var jsonDocs = new[] {
+                new { name = "some value", name2 = 111 },
+                new { name = "some value", name2 = 222 }
+            };
+            _sut.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+
+            //act.
+            var docs = _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { "id-1" }, null)
+                .GetAwaiter().GetResult();
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(2, docs.Rows.Count);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Equal(jsonDocs[0].name, docs.Rows[0].Document.Name);
+            Assert.Equal(jsonDocs[0].name2, docs.Rows[0].Document.Name2);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Equal(jsonDocs[0].name, docs.Rows[0].Document.Name);
+            Assert.Equal(jsonDocs[0].name2, docs.Rows[0].Document.Name2);
+        }
+
+        [Fact]
+        public void GetObjectDocumentsAsync_Deserializes_Using_Deserializer_If_Provided()
+        {
+            //arrange.
+            var jsonDocs = new[] {
+                new { what = "some value", that = 111 },
+                new { what = "some value", that = 222 }
+            };
+            _sut.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+
+            Func<JObject, SampleDoc> deserializer = doc => new SampleDoc { Name = doc["what"].ToString(), Name2 = doc["that"].Value<int>() };
+
+            //act.
+            var docs = _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { "id-1" }, null, deserializer)
+                .GetAwaiter().GetResult();
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(2, docs.Rows.Count);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Equal(jsonDocs[0].what, docs.Rows[0].Document.Name);
+            Assert.Equal(jsonDocs[0].that, docs.Rows[0].Document.Name2);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Equal(jsonDocs[0].what, docs.Rows[0].Document.Name);
+            Assert.Equal(jsonDocs[0].that, docs.Rows[0].Document.Name2);
+        }
+
+        [Fact]
+        public void GetObjectDocumentsAsync_Returns_Null_Document_For_Error_Row()
+        {
+            //arrange.
+            var expectedError = new List<DocListResponseRow<JObject>>() { new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("revision"), null, new ServerResponseError("some_error")) };
+
+            _sut.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, expectedError)));
+
+            //act.
+            var docs = _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { "id-1" }, null)
+                .GetAwaiter().GetResult();
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(1, docs.Rows.Count);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Null(docs.Rows[0].Document);
+            Assert.NotNull(docs.Rows[0].Error);
+            Assert.Same(expectedError[0].Error, docs.Rows[0].Error);
+        }
+
+        #endregion
+
+        #region Get String Docs
+
+        [Fact]
+        public void GetStringDocumentsAsync_Requires_NotEmpty_IdList()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetStringDocumentsAsync(null)).GetAwaiter().GetResult();
+            Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.GetStringDocumentsAsync(new string[] { })).GetAwaiter().GetResult();
+        }
+
+        [Fact]
+        public void GetStringDocumentsAsync_Passes_Params_AsReceived()
+        {
+            //arrange
+            var docIdList = new string[] { "id1" };
+            var queryParams = new ListQueryParams();
+
+            _sut.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+
+            //act.
+            _sut.Object.GetStringDocumentsAsync(docIdList, queryParams)
+                .GetAwaiter().GetResult();
+
+            //assert.
+            _sut.Verify(db => db.GetJsonDocumentsAsync(docIdList, queryParams), Times.Once());
+        }
+
+        [Fact]
+        public void GetStringDocumentsAsync_Returns_StringRepresentation_OfObjects()
+        {
+            //arrange.
+            var jsonDocs = new[] {
+                new { name = "some value", name2 = 111 },
+                new { name = "some value", name2 = 222 }
+            };
+            _sut.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+
+            //act.
+            var docs = _sut.Object.GetStringDocumentsAsync(new string[] { "id-1" }, null)
+                .GetAwaiter().GetResult();
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(2, docs.Rows.Count);
+
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[0]), JObject.Parse(docs.Rows[0].Document)));
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[1]), JObject.Parse(docs.Rows[1].Document)));
+        }
+
+        [Fact]
+        public void GetStringDocumentsAsync_Returns_Null_Document_For_Error_Row()
+        {
+            //arrange.
+            var expectedError = new List<DocListResponseRow<JObject>>() { new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("revision"), null, new ServerResponseError("some_error")) };
+
+            _sut.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, expectedError)));
+
+            //act.
+            var docs = _sut.Object.GetStringDocumentsAsync(new string[] { "id-1" }, null)
+                .GetAwaiter().GetResult();
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(1, docs.Rows.Count);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Null(docs.Rows[0].Document);
+            Assert.NotNull(docs.Rows[0].Error);
+            Assert.Same(expectedError[0].Error, docs.Rows[0].Error);
         }
 
         #endregion

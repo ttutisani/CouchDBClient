@@ -1,6 +1,7 @@
 ﻿using CouchDB.Client;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace CouchDB.ClientDemo
 {
@@ -380,6 +381,38 @@ namespace CouchDB.ClientDemo
             {
                 var result = db.DeleteDocumentAsync(docId, revision).GetAwaiter().GetResult();
                 Console.WriteLine("Response: {0}", SerializationHelper.Serialize(result));
+            });
+        }
+
+        public void GetDocsJson()
+        {
+            Console.WriteLine("Enter doc IDs, one at a time. Press <Enter> when done:");
+            var docIdList = new List<string>();
+            do
+            {
+                var id = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(id))
+                    docIdList.Add(id);
+                else
+                    break;
+
+            } while (true);
+
+            UsingDatabase(db => 
+            {
+                ListQueryParams qParams = new ListQueryParams { Include_Docs = true };
+
+                var allDocs = db.GetJsonDocumentsAsync(docIdList.ToArray(), qParams).GetAwaiter().GetResult();
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+
+                foreach (var row in allDocs.Rows)
+                {
+                    Console.WriteLine(SerializationHelper.Serialize(row));
+                    Console.WriteLine("----------");
+                }
+
+                Console.WriteLine("End of list.");
             });
         }
 

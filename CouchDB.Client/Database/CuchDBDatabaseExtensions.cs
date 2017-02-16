@@ -170,7 +170,61 @@ namespace CouchDB.Client
         {
             var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams).Safe();
 
-            return jsonDocs.Cast(json => json.ToString());
+            return jsonDocs.Cast(json => json?.ToString());
+        }
+
+        #endregion
+
+        #region Get docs
+
+        /// <summary>
+        /// Returns a JSON structure of the documents in a given database, found by ID list. 
+        /// The information is returned as a JSON structure containing meta information 
+        /// about the return structure, including a list of all documents and basic contents, 
+        /// consisting the ID, revision and key. The key is the from the document’s _id.
+        /// </summary>
+        /// <typeparam name="TDocument">Specifies resulting document object type.</typeparam>
+        /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
+        /// <param name="docIdList">Array of document IDs to be retrieved.</param>
+        /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
+        /// <param name="deserializer">Provide your own deserializer if you prefer. 
+        /// By default, it will deserialize by using NewtonSoft.Json methods.
+        /// NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
+        /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
+        /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+        public static async Task<DocListResponse<TDocument>> GetObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, string[] docIdList, ListQueryParams queryParams = null, Func<JObject, TDocument> deserializer = null)
+        {
+            if (docIdList == null)
+                throw new ArgumentNullException(nameof(docIdList));
+
+            if (docIdList.Length == 0)
+                throw new ArgumentException($"{nameof(docIdList)} should not be empty.", nameof(docIdList));
+
+            var jsonDocs = await @this.GetJsonDocumentsAsync(docIdList, queryParams).Safe();
+            return jsonDocs.Cast(deserializer ?? new Func<JObject, TDocument>(json => json != null ? json.ToObject<TDocument>() : default(TDocument)));
+        }
+
+        /// <summary>
+        /// Returns a JSON structure of the documents in a given database, found by ID list. 
+        /// The information is returned as a JSON structure containing meta information 
+        /// about the return structure, including a list of all documents and basic contents, 
+        /// consisting the ID, revision and key. The key is the from the document’s _id.
+        /// </summary>
+        /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
+        /// <param name="docIdList">Array of document IDs to be retrieved.</param>
+        /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
+        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
+        public static async Task<DocListResponse<string>> GetStringDocumentsAsync(this ICouchDBDatabase @this, string[] docIdList, ListQueryParams queryParams = null)
+        {
+            if (docIdList == null)
+                throw new ArgumentNullException(nameof(docIdList));
+
+            if (docIdList.Length == 0)
+                throw new ArgumentException($"{nameof(docIdList)} should not be empty.", nameof(docIdList));
+
+            var jsonDocs = await @this.GetJsonDocumentsAsync(docIdList, queryParams).Safe();
+
+            return jsonDocs.Cast(json => json?.ToString());
         }
 
         #endregion
