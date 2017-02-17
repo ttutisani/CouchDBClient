@@ -10,29 +10,29 @@ Caution: work in progress! don't use in production code.
   * List all databases (`CouchDBServer.GetAllDbNamesAsync`)
   * Create database (`CouchDBServer.CreateDbAsync`)
   * Delete database (`CouchDBServer.DeleteDbAsync`)
-  * Get database object [to work with documents in it] (`CouchDBServer.SelectDatabase`)
+  * Get database object to work with documents in it (`CouchDBServer.SelectDatabase`)
 * Documents
   * Create new or update existing document
     * As string (`CouchDBDatabase.SaveDocumentAsync`)
-    * As JObject [JSON object] (`CouchDBDatabase.SaveDocumentAsync` overload)
-    * As object [System.Object] (`CouchDBDatabase.SaveDocumentAsync` overload)
+    * As JObject (JSON object) (`CouchDBDatabase.SaveDocumentAsync` overload)
+    * As object (System.Object) (`CouchDBDatabase.SaveDocumentAsync` overload)
   * Retrieve document by ID
     * As string (`CouchDBDatabase.GetDocumentAsync`)
-    * As JObject [JSON object] (`CouchDBDatabase.GetDocumentJsonAsync`)
-    * As generic TDocument [any type] (`CouchDBDatabase.GetDocumentAsync<>`)
+    * As JObject (JSON object) (`CouchDBDatabase.GetDocumentJsonAsync`)
+    * As generic TDocument (any type) (`CouchDBDatabase.GetDocumentAsync<>`)
   * Retrieve multiple documents by ID list
     * As string documents (`CouchDBDatabase.GetStringDocumentAsync`)
-    * As JObject documents [JSON object] (`CouchDBDatabase.GetJsonDocumentsAsync`)
-    * As generic TDocument [any type] (`CouchDBDatabase.GetObjectDocumentsAsync<>`)
+    * As JObject documents (JSON object) (`CouchDBDatabase.GetJsonDocumentsAsync`)
+    * As generic TDocument (any type) (`CouchDBDatabase.GetObjectDocumentsAsync<>`)
   * Retrieve all documents
     * As string documents (`CouchDBDatabase.GetAllStringDocumentAsync`)
-    * As JObject documents [JSON object] (`CouchDBDatabase.GetAllJsonDocumentsAsync`)
-    * As generic TDocument [any type] (`CouchDBDatabase.GetAllObjectDocumentsAsync<>`)
+    * As JObject documents (JSON object) (`CouchDBDatabase.GetAllJsonDocumentsAsync`)
+    * As generic TDocument (any type) (`CouchDBDatabase.GetAllObjectDocumentsAsync<>`)
   * Delete document
     * By ID and Revision (`CouchDBDatabase.DeleteDocumentAsync`)
-    * Given Document as JObject [JSON object] (`CouchDBDatabase.DeleteDocumentAsync` overload)
+    * Given Document as JObject (JSON object) (`CouchDBDatabase.DeleteDocumentAsync` overload)
 * Entitites (reusable documents) - any type implementing `IEntity`
-  * Convert database object into Entity store [for working with entities] (`EntityStore` constructor)
+  * Convert database object into Entity store for working with entities (`EntityStore` constructor)
   * Create new or update existing entity (`EntityStore.SaveEntityAsync`)
   * Retrieve entity by ID (`EntityStore.GetEntityAsync<>`)
   * Retrieve multiple entities by ID list (`EntityStore.GetEntitiesAsync<>`)
