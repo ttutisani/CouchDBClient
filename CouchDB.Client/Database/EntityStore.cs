@@ -77,6 +77,29 @@ namespace CouchDB.Client
         }
 
         /// <summary>
+        /// Gets entities from database by list of IDs.
+        /// </summary>
+        /// <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
+        /// <param name="entityIdList">List if IDs for finding entities.</param>
+        /// <param name="entityListQueryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
+        /// <returns><see cref="DocListResponse{TEntity}"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
+        public async Task<DocListResponse<TEntity>> GetEntitiesAsync<TEntity>(string[] entityIdList, ListQueryParams entityListQueryParams = null)
+        {
+            if (entityIdList == null)
+                throw new ArgumentNullException(nameof(entityIdList));
+
+            if (entityIdList.Length == 0)
+                throw new ArgumentException($"{nameof(entityIdList)} should not be empty.", nameof(entityIdList));
+
+            if (entityListQueryParams == null)
+                entityListQueryParams = new ListQueryParams();
+
+            entityListQueryParams.Include_Docs = true;
+
+            return await _db.GetObjectDocumentsAsync<TEntity>(entityIdList, entityListQueryParams).Safe();
+        }
+
+        /// <summary>
         /// Deletes given entity object.
         /// </summary>
         /// <param name="entity">Entity object to be deleted.</param>

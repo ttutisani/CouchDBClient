@@ -545,5 +545,42 @@ namespace CouchDB.ClientDemo
                 Console.WriteLine("End of list.");
             });
         }
+
+        public void GetEntities()
+        {
+            Console.WriteLine("Enter entity IDs, one at a time. Press <Enter> when done:");
+            var entityIdList = new List<string>();
+            do
+            {
+                var id = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(id))
+                    entityIdList.Add(id);
+                else
+                    break;
+
+            } while (true);
+
+            UsingEntityStore(db =>
+            {
+                Console.WriteLine("Enter skip (empty for 0):");
+                int skip;
+                int.TryParse(Console.ReadLine(), out skip);
+
+                Console.WriteLine("Enter limit (empty for all):");
+                int limit;
+                if (!int.TryParse(Console.ReadLine(), out limit)) limit = int.MaxValue;
+
+                var entities = db.GetEntitiesAsync<SampleEntity>(entityIdList.ToArray(), new ListQueryParams { Skip = skip, Limit = limit }).GetAwaiter().GetResult();
+
+                Console.WriteLine($"Found {entities.Rows.Count} entities:");
+                foreach (var entity in entities.Rows)
+                {
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                    Console.WriteLine("-------------------------------------");
+                }
+                Console.WriteLine("End of list.");
+            });
+        }
     }
 }

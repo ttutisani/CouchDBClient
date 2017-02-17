@@ -252,6 +252,77 @@ namespace CouchDB.Client.Tests
             Assert.Equal(expectedRev, entity._rev);
         }
 
+        [Fact]
+        public void GetEntitiesAsync_Requires_Not_Empty_Entity_Id_List()
+        {
+            //assert.
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetEntitiesAsync<SampleEntity>(null)).GetAwaiter().GetResult();
+            Assert.ThrowsAsync<ArgumentException>(() => _sut.GetEntitiesAsync<SampleEntity>(new string[] { })).GetAwaiter().GetResult();
+        }
+
+        [Fact]
+        public void GetEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
+        {
+            //arrange.
+            _db.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+
+            //act.
+            _sut.GetEntitiesAsync<SampleEntity>(new string[] { "id-1" }).GetAwaiter().GetResult();
+
+            //assert.
+            _db.Verify(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault())), Times.Once());
+        }
+
+        [Fact]
+        public void GetEntitiesAsync_Passes_IDList_And_QueryParams_And_Extracts_Docs()
+        {
+            //arrange.
+            var idList = new string[] { "id-1" };
+            var queryParams = new ListQueryParams();
+
+            _db.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+
+            //act.
+            _sut.GetEntitiesAsync<SampleEntity>(idList, queryParams).GetAwaiter().GetResult();
+
+            //assert.
+            _db.Verify(db => db.GetJsonDocumentsAsync(idList, It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault())), Times.Once());
+        }
+
+        [Fact]
+        public void GetEntitiesAsync_Returns_Docs_As_Entities()
+        {
+            //arrange.
+            var expectedDocs = new[]
+            {
+                new SampleEntity { _id = "id1", _rev = "rev1", Name = "name1", Name2 = 1 },
+                new SampleEntity { _id = "id2", _rev = "rev2", Name = "name2", Name2 = 2 }
+            };
+
+            _db.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, new List<DocListResponseRow<JObject>>
+                {
+                    new DocListResponseRow<JObject>("id1", "id1", new DocListResponseRowValue("rev1"), JObject.FromObject(expectedDocs[0]), null),
+                    new DocListResponseRow<JObject>("id2", "id2", new DocListResponseRowValue("rev2"), JObject.FromObject(expectedDocs[1]), null)
+                })));
+
+            //act.
+            var entities = _sut.GetEntitiesAsync<SampleEntity>(new string[] { "id-1" }, null).GetAwaiter().GetResult();
+
+            //assert.
+            Assert.Equal(2, entities.Rows.Count);
+
+            Assert.NotNull(entities.Rows[0]);
+            Assert.NotNull(entities.Rows[0].Document);
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[0]), JObject.FromObject(entities.Rows[0].Document)));
+
+            Assert.NotNull(entities.Rows[1]);
+            Assert.NotNull(entities.Rows[1].Document);
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[1]), JObject.FromObject(entities.Rows[1].Document)));
+        }
+
         private static bool StringIsJsonObject(string value, JObject json)
         {
             if (value == null && json == null)
