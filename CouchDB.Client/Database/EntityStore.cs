@@ -107,6 +107,9 @@ namespace CouchDB.Client
         /// <returns>Awaitable task.</returns>
         public async Task DeleteEntityAsync(IEntity entity, bool batch = false)
         {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
             var deletionResponse = await _db.DeleteDocumentAsync(entity._id, entity._rev, batch).Safe();
             entity._id = deletionResponse.Id;
             entity._rev = deletionResponse.Revision;

@@ -45,13 +45,13 @@ namespace CouchDB.Client.Tests
         }
 
         [Fact]
-        public void SaveEntityAsync_Requires_Entity()
+        public async void SaveEntityAsync_Requires_Entity()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveEntityAsync(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveEntityAsync(null));
         }
 
         [Fact]
-        public void SaveEntityAsync_Removes_Rev_If_Empty()
+        public async void SaveEntityAsync_Removes_Rev_If_Empty()
         {
             //arrange.
             var entity = new SampleEntity {
@@ -67,14 +67,14 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO())));
 
             //act.
-            _sut.SaveEntityAsync(entity).GetAwaiter().GetResult();
+            await _sut.SaveEntityAsync(entity);
 
             //assert.
             _db.Verify(db => db.SaveDocumentAsync(It.Is<string>(str => StringIsJsonObject(str, JObject.FromObject(entityWithoutRev))), It.IsAny<DocUpdateParams>()), Times.Once());
         }
 
         [Fact]
-        public void SaveEntityAsync_Passes_Entity_And_Params()
+        public async void SaveEntityAsync_Passes_Entity_And_Params()
         {
             //arrange.
             var entity = new SampleEntity { _id = "id123", _rev = "rev123", Name = "somename", Name2 = 213 };
@@ -85,14 +85,14 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO())));
 
             //act.
-            _sut.SaveEntityAsync(entity, updateParams).GetAwaiter().GetResult();
+            await _sut.SaveEntityAsync(entity, updateParams);
 
             //assert.
             _db.Verify(db => db.SaveDocumentAsync(It.Is<string>(str => StringIsJsonObject(str, JObject.Parse(entityJson))), updateParams), Times.Once());
         }
 
         [Fact]
-        public void SaveEntityAsync_Sets_ID_And_Rev_After_Save()
+        public async void SaveEntityAsync_Sets_ID_And_Rev_After_Save()
         {
             //arrange.
             var entity = new SampleEntity();
@@ -103,7 +103,7 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO { Id = expectedId, Rev = expectedRev })));
 
             //act.
-            _sut.SaveEntityAsync(entity, null).GetAwaiter().GetResult();
+            await _sut.SaveEntityAsync(entity, null);
 
             //assert.
             Assert.Equal(expectedId, entity._id);
@@ -111,27 +111,27 @@ namespace CouchDB.Client.Tests
         }
 
         [Fact]
-        public void GetEntityAsync_Requires_ID()
+        public async void GetEntityAsync_Requires_ID()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetEntityAsync<SampleEntity>(null, new DocQueryParams()));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetEntityAsync<SampleEntity>(null, new DocQueryParams()));
         }
 
         [Fact]
-        public void GetEntityAsync_Passes_ID_And_Query_Params()
+        public async void GetEntityAsync_Passes_ID_And_Query_Params()
         {
             //arrange.
             var id = "entity id";
             var queryParams = new DocQueryParams();
 
             //act.
-            _sut.GetEntityAsync<SampleEntity>(id, queryParams).GetAwaiter().GetResult();
+            await _sut.GetEntityAsync<SampleEntity>(id, queryParams);
 
             //assert.
             _db.Verify(db => db.GetDocumentAsync(id, queryParams), Times.Once());
         }
 
         [Fact]
-        public void GetEntityAsync_Returns_Document_As_Entity()
+        public async void GetEntityAsync_Returns_Document_As_Entity()
         {
             //arrange.
             var expectedJson = JsonConvert.SerializeObject(new SampleEntity { _id = "what", _rev = "ever", Name = "name", Name2 = 123 });
@@ -139,28 +139,28 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(expectedJson));
 
             //act.
-            var entity = _sut.GetEntityAsync<SampleEntity>("someid").GetAwaiter().GetResult();
+            var entity = await _sut.GetEntityAsync<SampleEntity>("someid");
 
             //assert.
             Assert.True(StringIsJsonObject(expectedJson, JObject.FromObject(entity)));
         }
 
         [Fact]
-        public void GetAllEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
+        public async void GetAllEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
         {
             //arrange.
             _db.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
                 .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
-            _sut.GetAllEntitiesAsync<SampleEntity>(null).GetAwaiter().GetResult();
+            await _sut.GetAllEntitiesAsync<SampleEntity>(null);
 
             //assert.
             _db.Verify(db => db.GetAllJsonDocumentsAsync(It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
-        public void GetAllEntitiesAsync_Passes_QueryParams_And_Extracts_Docs()
+        public async void GetAllEntitiesAsync_Passes_QueryParams_And_Extracts_Docs()
         {
             //arrange.
             var queryParams = new ListQueryParams();
@@ -169,14 +169,14 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
-            _sut.GetAllEntitiesAsync<SampleEntity>(queryParams).GetAwaiter().GetResult();
+            await _sut.GetAllEntitiesAsync<SampleEntity>(queryParams);
 
             //assert.
             _db.Verify(db => db.GetAllJsonDocumentsAsync(It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
-        public void GetAllEntitiesAsync_Returns_Docs_As_Entities()
+        public async void GetAllEntitiesAsync_Returns_Docs_As_Entities()
         {
             //arrange.
             var expectedDocs = new[] 
@@ -193,7 +193,7 @@ namespace CouchDB.Client.Tests
                 })));
 
             //act.
-            var entities = _sut.GetAllEntitiesAsync<SampleEntity>(null).GetAwaiter().GetResult();
+            var entities = await _sut.GetAllEntitiesAsync<SampleEntity>(null);
 
             //assert.
             Assert.Equal(2, entities.Rows.Count);
@@ -208,13 +208,13 @@ namespace CouchDB.Client.Tests
         }
 
         [Fact]
-        public void DeleteEntityAsync_Requires_Entity()
+        public async void DeleteEntityAsync_Requires_Entity()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.DeleteEntityAsync(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.DeleteEntityAsync(null));
         }
 
         [Fact]
-        public void DeleteEntityAsync_Passes_Entity_And_Batch_Flag()
+        public async void DeleteEntityAsync_Passes_Entity_And_Batch_Flag()
         {
             //arrange.
             var id = "some id 123";
@@ -226,14 +226,14 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO())));
 
             //act.
-            _sut.DeleteEntityAsync(entity, batch).GetAwaiter().GetResult();
+            await _sut.DeleteEntityAsync(entity, batch);
 
             //assert.
             _db.Verify(db => db.DeleteDocumentAsync(id, rev, batch), Times.Once());
         }
 
         [Fact]
-        public void DeleteEntityAsync_Updates_ID_And_Rev_After_Deletion()
+        public async void DeleteEntityAsync_Updates_ID_And_Rev_After_Deletion()
         {
             //arrange.
             var expectedId = "id 1212";
@@ -245,7 +245,7 @@ namespace CouchDB.Client.Tests
             var entity = new SampleEntity();
 
             //act.
-            _sut.DeleteEntityAsync(entity).GetAwaiter().GetResult();
+            await _sut.DeleteEntityAsync(entity);
 
             //assert.
             Assert.Equal(expectedId, entity._id);
@@ -253,29 +253,29 @@ namespace CouchDB.Client.Tests
         }
 
         [Fact]
-        public void GetEntitiesAsync_Requires_Not_Empty_Entity_Id_List()
+        public async void GetEntitiesAsync_Requires_Not_Empty_Entity_Id_List()
         {
             //assert.
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetEntitiesAsync<SampleEntity>(null)).GetAwaiter().GetResult();
-            Assert.ThrowsAsync<ArgumentException>(() => _sut.GetEntitiesAsync<SampleEntity>(new string[] { })).GetAwaiter().GetResult();
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetEntitiesAsync<SampleEntity>(null));
+            await Assert.ThrowsAsync<ArgumentException>(() => _sut.GetEntitiesAsync<SampleEntity>(new string[] { }));
         }
 
         [Fact]
-        public void GetEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
+        public async void GetEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
         {
             //arrange.
             _db.Setup(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
                 .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
-            _sut.GetEntitiesAsync<SampleEntity>(new string[] { "id-1" }).GetAwaiter().GetResult();
+            await _sut.GetEntitiesAsync<SampleEntity>(new string[] { "id-1" });
 
             //assert.
             _db.Verify(db => db.GetJsonDocumentsAsync(It.IsAny<string[]>(), It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
-        public void GetEntitiesAsync_Passes_IDList_And_QueryParams_And_Extracts_Docs()
+        public async void GetEntitiesAsync_Passes_IDList_And_QueryParams_And_Extracts_Docs()
         {
             //arrange.
             var idList = new string[] { "id-1" };
@@ -285,14 +285,14 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
 
             //act.
-            _sut.GetEntitiesAsync<SampleEntity>(idList, queryParams).GetAwaiter().GetResult();
+            await _sut.GetEntitiesAsync<SampleEntity>(idList, queryParams);
 
             //assert.
             _db.Verify(db => db.GetJsonDocumentsAsync(idList, It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
-        public void GetEntitiesAsync_Returns_Docs_As_Entities()
+        public async void GetEntitiesAsync_Returns_Docs_As_Entities()
         {
             //arrange.
             var expectedDocs = new[]
@@ -309,7 +309,7 @@ namespace CouchDB.Client.Tests
                 })));
 
             //act.
-            var entities = _sut.GetEntitiesAsync<SampleEntity>(new string[] { "id-1" }, null).GetAwaiter().GetResult();
+            var entities = await _sut.GetEntitiesAsync<SampleEntity>(new string[] { "id-1" }, null);
 
             //assert.
             Assert.Equal(2, entities.Rows.Count);
