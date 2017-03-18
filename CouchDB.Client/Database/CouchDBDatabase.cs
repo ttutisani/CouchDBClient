@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,6 +46,10 @@ namespace CouchDB.Client
             public string Id { get; set; }
 
             public string Rev { get; set; }
+
+            public string Error { get; set; }
+
+            public string Reason { get; set; }
         }
 
         /// <summary>
@@ -180,6 +185,39 @@ namespace CouchDB.Client
 
             var docListResponse = DocListResponse<JObject>.FromJson(allDocsJsonObject);
             return docListResponse;
+        }
+
+        #endregion
+
+        #region Save Docs
+
+        internal sealed class SaveDocListResponseDTO : List<SaveDocResponseDTO>
+        {
+        }
+
+        /// <summary>
+        /// Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+        /// When creating new documents the document ID(_id) is optional.
+        /// For updating existing documents, you must provide the document ID, revision information(_rev), and new document values.
+        /// In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+        /// </summary>
+        /// <param name="documents">List of documents strings.</param>
+        /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+        /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task<SaveDocListResponse> SaveDocumentsAsync(string[] documents, bool newEdits = true)
+        {
+            if (documents == null || documents.Length == 0)
+                throw new ArgumentNullException(nameof(documents));
+
+            var saveDocListRequest = new SaveDocListRequest(newEdits);
+            saveDocListRequest.AddDocuments(documents);
+            var saveDocListRequestJson = saveDocListRequest.ToJson().ToString();
+
+            var saveDocListResponse = await _http.PostAsync("_bulk_docs", new StringContent(saveDocListRequestJson, Encoding.UTF8, "application/json")).Safe();
+            var saveDocListResponseDTO = await HttpClientHelper.HandleResponse<SaveDocListResponseDTO>(saveDocListResponse, false).Safe();
+
+            return new SaveDocListResponse(saveDocListResponseDTO);
         }
 
         #endregion

@@ -1,4 +1,5 @@
 ﻿using CouchDB.Client;
+using DotNetExtensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,107 @@ namespace CouchDB.ClientDemo
 {
     public sealed class ConsoleCommands
     {
+        private void UsingServer(Action<CouchDBServer> body)
+        {
+            using (var server = new CouchDBServer(_serverUrl))
+            {
+                try
+                {
+                    body(server);
+                }
+                catch (CouchDBClientException ex)
+                {
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
+                {
+                    var ex = ae.InnerException as CouchDBClientException;
+                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+                }
+            }
+        }
+
+        private string _serverUrl = "http://localhost:5984/";
+
+        private void UsingDatabase(Action<CouchDBDatabase> body)
+        {
+            UsingServer(server =>
+            {
+                using (var db = server.SelectDatabase(_dbName))
+                {
+                    body(db);
+                }
+            });
+        }
+
+        private void UsingEntityStore(Action<EntityStore> body)
+        {
+            UsingDatabase(db =>
+            {
+                var store = new EntityStore(db);
+                body(store);
+            });
+        }
+
+        private string _dbName = "my-db";
+
+        private sealed class SampleDoc
+        {
+            public string _id { get; set; }
+
+            public string author { get; set; }
+
+            public string _rev { get; set; }
+        }
+
+        private sealed class AuthorInfo
+        {
+            public string _Id { get; set; }
+
+            public string Author { get; set; }
+
+            public string _Rev { get; set; }
+        }
+
+        private sealed class NiceAuthorInfo
+        {
+            public string Id { get; }
+
+            public string Author { get; }
+
+            public NiceAuthorInfo(JObject from)
+            {
+                Id = from["_id"].ToString();
+                Author = from["author"].ToString();
+            }
+        }
+
+        private sealed class SampleEntity : IEntity
+        {
+            public string _id { get; set; }
+
+            public string _rev { get; set; }
+
+            public string Author { get; set; }
+
+            public int Age { get; set; }
+
+            public void UpdateFromConsole()
+            {
+                Console.WriteLine("Id:");
+                _id = Console.ReadLine().IfNull(_id);
+
+                Console.WriteLine("Revision:");
+                _rev = Console.ReadLine().IfNull(_rev);
+
+                Console.WriteLine("Author:");
+                Author = Console.ReadLine().IfNull(Author);
+
+                Console.WriteLine("Age:");
+                Age = Console.ReadLine().ToInt();
+            }
+        }
+
         public void info()
         {
             UsingServer(server =>
@@ -77,28 +179,6 @@ namespace CouchDB.ClientDemo
             });
         }
 
-        private void UsingServer(Action<CouchDBServer> body)
-        {
-            using (var server = new CouchDBServer(_serverUrl))
-            {
-                try
-                {
-                    body(server);
-                }
-                catch (CouchDBClientException ex)
-                {
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
-                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
-                {
-                    var ex = ae.InnerException as CouchDBClientException;
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
-            }
-        }
-
-        private string _serverUrl = "http://localhost:5984/";
-
         public void SetServer()
         {
             Console.WriteLine("Enter server url:");
@@ -109,28 +189,6 @@ namespace CouchDB.ClientDemo
             _serverUrl = serverUrl;
             Console.WriteLine("Server url was set to '{0}'.", _serverUrl);
         }
-
-        private void UsingDatabase(Action<CouchDBDatabase> body)
-        {
-            UsingServer(server => 
-            {
-                using (var db = server.SelectDatabase(_dbName))
-                {
-                    body(db);
-                }
-            });
-        }
-
-        private void UsingEntityStore(Action<EntityStore> body)
-        {
-            UsingDatabase(db => 
-            {
-                var store = new EntityStore(db);
-                body(store);
-            });
-        }
-
-        private string _dbName = "my-db";
 
         public void SetDb()
         {
@@ -192,15 +250,6 @@ namespace CouchDB.ClientDemo
                 Console.WriteLine(doc);
                 Console.WriteLine("End of document.");
             });
-        }
-
-        private sealed class SampleDoc
-        {
-            public string _id { get; set; }
-
-            public string author { get; set; }
-
-            public string _rev { get; set; }
         }
 
         public void GetObj()
@@ -284,15 +333,6 @@ namespace CouchDB.ClientDemo
             });
         }
 
-        private sealed class AuthorInfo
-        {
-            public string _Id { get; set; }
-
-            public string Author { get; set; }
-
-            public string _Rev { get; set; }
-        }
-
         public void GetAllDocsObj()
         {
             UsingDatabase(db =>
@@ -337,19 +377,6 @@ namespace CouchDB.ClientDemo
 
                 Console.WriteLine("End of list.");
             });
-        }
-
-        private sealed class NiceAuthorInfo
-        {
-            public string Id { get; }
-
-            public string Author { get; }
-
-            public NiceAuthorInfo(JObject from)
-            {
-                Id = from["_id"].ToString();
-                Author = from["author"].ToString();
-            }
         }
 
         public void GetAllDocsNice()
@@ -416,41 +443,7 @@ namespace CouchDB.ClientDemo
             });
         }
 
-        private sealed class SampleEntity : IEntity
-        {
-            public string _id { get; set; }
-
-            public string _rev { get; set; }
-
-            public string Author { get; set; }
-
-            public int Age { get; set; }
-        }
-
-        private static string ReadLineOrDefault(string defaultValue)
-        {
-            var input = Console.ReadLine();
-
-            return !string.IsNullOrWhiteSpace(input)
-                ? input
-                : defaultValue;
-        }
-
-        private static void UpdateEntityFromConsole(SampleEntity entity)
-        {
-            Console.WriteLine("Id:");
-            entity._id = ReadLineOrDefault(entity._id);
-
-            Console.WriteLine("Revision:");
-            entity._rev = ReadLineOrDefault(entity._rev);
-
-            Console.WriteLine("Author:");
-            entity.Author = ReadLineOrDefault(entity.Author);
-
-            Console.WriteLine("Age:");
-            int age; int.TryParse(ReadLineOrDefault(entity.Age.ToString()), out age);
-            entity.Age = age;
-        }
+        
 
         public void PlayWithNewEntity()
         {
@@ -458,7 +451,7 @@ namespace CouchDB.ClientDemo
             {
                 Console.WriteLine("Enter new entity info.");
                 var entity = new SampleEntity();
-                UpdateEntityFromConsole(entity);
+                entity.UpdateFromConsole();
 
                 db.SaveEntityAsync(entity).GetAwaiter().GetResult();
 
@@ -469,7 +462,7 @@ namespace CouchDB.ClientDemo
                 if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
                 {
                     Console.WriteLine("Enter entity info to update.");
-                    UpdateEntityFromConsole(entity);
+                    entity.UpdateFromConsole();
 
                     db.SaveEntityAsync(entity).GetAwaiter().GetResult();
 
@@ -503,7 +496,7 @@ namespace CouchDB.ClientDemo
                 if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
                 {
                     Console.WriteLine("Enter entity info to update.");
-                    UpdateEntityFromConsole(entity);
+                    entity.UpdateFromConsole();
 
                     db.SaveEntityAsync(entity).GetAwaiter().GetResult();
 
@@ -580,6 +573,34 @@ namespace CouchDB.ClientDemo
                     Console.WriteLine("-------------------------------------");
                 }
                 Console.WriteLine("End of list.");
+            });
+        }
+
+        public void SaveDocs()
+        {
+            var docs = new List<string>();
+
+            Console.WriteLine("Enter docs, one at a time. Empty to finish.");
+            do
+            {
+                var doc = Console.ReadLine();
+                if (doc.IsNullOrWhiteSpace())
+                    break;
+
+                docs.Add(doc);
+
+            } while (true);
+
+            if (docs.Count == 0)
+                return;
+
+            Console.WriteLine("New edits? true/false");
+            var newEdits = Console.ReadLine().ToBool();
+
+            UsingDatabase(db => 
+            {
+                var response = db.SaveDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
+                Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
             });
         }
     }

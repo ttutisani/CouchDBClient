@@ -7,7 +7,7 @@ namespace CouchDB.Client
     /// </summary>
     public sealed class ServerResponseError
     {
-        internal ServerResponseError(string errorString)
+        internal ServerResponseError(string errorString, string reason = null)
         {
             if (errorString == null)
                 throw new ArgumentNullException(nameof(errorString));
@@ -17,6 +17,8 @@ namespace CouchDB.Client
             CommonError parsedCommonError;
             if (Enum.TryParse(errorString, true, out parsedCommonError))
                 CommonError = parsedCommonError;
+
+            Reason = reason;
         }
 
         /// <summary>
@@ -29,9 +31,14 @@ namespace CouchDB.Client
         /// </summary>
         public string RawError { get; }
 
-        internal static ServerResponseError FromString(string error)
+        /// <summary>
+        /// Gets reason phrase.
+        /// </summary>
+        public string Reason { get; }
+
+        internal static ServerResponseError FromString(string error, string reason = null)
         {
-            return string.IsNullOrWhiteSpace(error) ? null : new ServerResponseError(error);
+            return string.IsNullOrWhiteSpace(error) ? null : new ServerResponseError(error, reason);
         }
     }
 }

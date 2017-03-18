@@ -17,14 +17,16 @@ namespace CouchDB.Client.Tests
             //arrange.
             var expectedError = CommonError.Illegal_DocId;
             var errorString = expectedError.ToErrorString();
+            var expectedReason = "some reason 123";
 
             //act.
-            var sut = new ServerResponseError(errorString);
+            var sut = new ServerResponseError(errorString, expectedReason);
 
             //assert.
             Assert.Equal(errorString, sut.RawError);
             Assert.True(sut.CommonError.HasValue);
             Assert.Equal(expectedError, sut.CommonError);
+            Assert.Equal(expectedReason, sut.Reason);
         }
 
         [Fact]
@@ -32,13 +34,41 @@ namespace CouchDB.Client.Tests
         {
             //arrange.
             var errorString = "unknown_error_121212";
+            var reason = "reason something 123";
 
             //act.
-            var sut = new ServerResponseError(errorString);
+            var sut = new ServerResponseError(errorString, reason);
 
             //assert.
             Assert.Equal(errorString, sut.RawError);
             Assert.False(sut.CommonError.HasValue);
+            Assert.Equal(reason, sut.Reason);
+        }
+
+        [Fact]
+        public void FromString_Returns_Null_For_Null_ErrorString()
+        {
+            //act.
+            var sut = ServerResponseError.FromString(null, "reason does not matter");
+
+            //assert.
+            Assert.Null(sut);
+        }
+
+        [Fact]
+        public void FromString_Constructs_SUT_For_NotNull_ErrorString()
+        {
+            //arrange.
+            var expectedError = "some error ajs";
+            var expectedReason = "some reason asjh";
+
+            //act.
+            var sut = ServerResponseError.FromString(expectedError, expectedReason);
+
+            //assert.
+            Assert.NotNull(sut);
+            Assert.Equal(expectedError, sut.RawError);
+            Assert.Equal(expectedReason, sut.Reason);
         }
     }
 }

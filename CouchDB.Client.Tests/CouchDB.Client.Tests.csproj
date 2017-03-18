@@ -42,6 +42,7 @@
       <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Moq, Version=4.5.30.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.5.30\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
@@ -85,14 +86,17 @@
   <ItemGroup>
     <Compile Include="CommonErrorTests.cs" />
     <Compile Include="CouchDBDatabaseExtensionsTests.cs" />
-    <Compile Include="DbResponseTests.cs" />
+    <Compile Include="SaveDocResponseTests.cs" />
     <Compile Include="DeleteDocParamsTests.cs" />
     <Compile Include="DocListResponseTests.cs" />
     <Compile Include="DocQueryParamsTests.cs" />
     <Compile Include="DocUpdateParamsTests.cs" />
     <Compile Include="EntityStoreTests.cs" />
+    <Compile Include="Helpers\AssertHelper.cs" />
     <Compile Include="ListQueryParamsTests.cs" />
     <Compile Include="QueryParamsTests.cs" />
+    <Compile Include="SaveDocListRequestTests.cs" />
+    <Compile Include="SaveDocListResponseTests.cs" />
     <Compile Include="ServerInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CouchDBClientExceptionTests.cs" />

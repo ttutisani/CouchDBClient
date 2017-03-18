@@ -58,5 +58,17 @@ namespace CouchDB.Client
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
         Task<DocListResponse<JObject>> GetJsonDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null);
+
+        /// <summary>
+        /// Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+        /// When creating new documents the document ID(_id) is optional.
+        /// For updating existing documents, you must provide the document ID, revision information(_rev), and new document values.
+        /// In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+        /// </summary>
+        /// <param name="documents">List of documents strings.</param>
+        /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+        /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        Task<SaveDocListResponse> SaveDocumentsAsync(string[] documents, bool newEdits = true);
     }
 }

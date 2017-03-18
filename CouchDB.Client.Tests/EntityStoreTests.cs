@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using static CouchDB.Client.Tests.AssertHelper;
 
 namespace CouchDB.Client.Tests
 {
@@ -321,19 +322,6 @@ namespace CouchDB.Client.Tests
             Assert.NotNull(entities.Rows[1]);
             Assert.NotNull(entities.Rows[1].Document);
             Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[1]), JObject.FromObject(entities.Rows[1].Document)));
-        }
-
-        private static bool StringIsJsonObject(string value, JObject json)
-        {
-            if (value == null && json == null)
-                return true;
-
-            if (value == null || json == null)
-                return false;
-
-            var valueJson = JObject.Parse(value);
-
-            return JToken.DeepEquals(json, valueJson);
         }
     }
 }

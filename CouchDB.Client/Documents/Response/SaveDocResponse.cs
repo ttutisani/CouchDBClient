@@ -14,6 +14,8 @@ namespace CouchDB.Client
 
             Id = docResponseDTO.Id;
             Revision = docResponseDTO.Rev;
+
+            Error = ServerResponseError.FromString(docResponseDTO.Error, docResponseDTO.Reason);
         }
 
         /// <summary>
@@ -25,5 +27,10 @@ namespace CouchDB.Client
         /// Gets document revision.
         /// </summary>
         public string Revision { get; }
+
+        /// <summary>
+        /// Error related information, if any.
+        /// </summary>
+        public ServerResponseError Error { get; }
     }
 }

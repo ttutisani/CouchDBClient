@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.Generic;
+using static CouchDB.Client.Tests.AssertHelper;
 
 namespace CouchDB.Client.Tests
 {
@@ -62,19 +63,6 @@ namespace CouchDB.Client.Tests
             //assert.
             Assert.Equal(saveResponse.Id, jsonDoc[CouchDBDatabase.IdPropertyName]);
             Assert.Equal(saveResponse.Revision, jsonDoc[CouchDBDatabase.RevisionPropertyName]);
-        }
-
-        private static bool StringIsJsonObject(string value, JObject json)
-        {
-            if (value == null && json == null)
-                return true;
-
-            if (value == null || json == null)
-                return false;
-
-            var valueJson = JObject.Parse(value);
-
-            return JToken.DeepEquals(json, valueJson);
         }
 
         #endregion
