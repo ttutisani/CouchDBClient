@@ -57,7 +57,7 @@ namespace CouchDB.Client.Tests
             //assert.
             Assert.NotNull(json);
             var request = new SaveDocListRequestJSON(json);
-            Assert.Equal(_sut.NewEdits, (bool)request.new_edits);
+            Assert.Equal(_sut.NewEdits, request.new_edits);
             Assert.Equal(0, request.docs.Length);
         }
 

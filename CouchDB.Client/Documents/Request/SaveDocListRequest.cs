@@ -16,7 +16,7 @@ namespace CouchDB.Client
 
         public bool NewEdits { get; }
 
-        internal void AddDocuments(string[] documents)
+        public void AddDocuments(string[] documents)
         {
             if (documents == null)
                 throw new ArgumentNullException(nameof(documents));
@@ -24,7 +24,7 @@ namespace CouchDB.Client
             _documents.AddRange(documents.Select(doc => JObject.Parse(doc)));
         }
 
-        internal JObject ToJson()
+        public JObject ToJson()
         {
             var json = JObject.FromObject(
                 new

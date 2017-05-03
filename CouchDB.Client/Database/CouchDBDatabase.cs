@@ -197,8 +197,8 @@ namespace CouchDB.Client
 
         /// <summary>
         /// Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
-        /// When creating new documents the document ID(_id) is optional.
-        /// For updating existing documents, you must provide the document ID, revision information(_rev), and new document values.
+        /// When creating new documents the document ID (_id) is optional.
+        /// For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
         /// In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
         /// </summary>
         /// <param name="documents">List of documents strings.</param>
