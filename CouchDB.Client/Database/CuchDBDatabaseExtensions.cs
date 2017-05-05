@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace CouchDB.Client
 {
@@ -225,6 +226,50 @@ namespace CouchDB.Client
             var jsonDocs = await @this.GetJsonDocumentsAsync(docIdList, queryParams).Safe();
 
             return jsonDocs.Cast(json => json?.ToString());
+        }
+
+        #endregion
+
+        #region Save Docs
+
+        /// <summary>
+        /// Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+        /// When creating new documents the document ID (_id) is optional.
+        /// For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
+        /// In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+        /// </summary>
+        /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
+        /// <param name="documents">List of documents JSON objects (JObject).</param>
+        /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+        /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public static async Task<SaveDocListResponse> SaveDocumentsAsync(this ICouchDBDatabase @this, JObject[] documents, bool newEdits = true)
+        {
+            if (documents == null || documents.Length == 0)
+                throw new ArgumentNullException(nameof(documents));
+
+            var stringDocs = documents.Select(doc => doc.ToString()).ToArray();
+            var saveResponse = await @this.SaveDocumentsAsync(stringDocs, newEdits);
+            if (saveResponse != null)
+            {
+                for (int index = 0; index < saveResponse.DocumentResponses.Count; index++)
+                {
+                    if (index >= documents.Length)
+                        break;
+
+                    var docResponse = saveResponse.DocumentResponses[index];
+
+                    if (docResponse.Error != null)
+                        continue;
+
+                    var jsonDoc = documents[index];
+
+                    jsonDoc[CouchDBDatabase.IdPropertyName] = docResponse.Id;
+                    jsonDoc[CouchDBDatabase.RevisionPropertyName] = docResponse.Revision;
+                }
+            }
+
+            return saveResponse;
         }
 
         #endregion

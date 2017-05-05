@@ -591,5 +591,103 @@ namespace CouchDB.Client.Tests
         }
 
         #endregion
+
+        #region Save JSON Docs
+
+        [Fact]
+        public async void SaveDocumentsAsync_Requires_Documents()
+        {
+            //act / assert.
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentsAsync((JObject[])null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentsAsync(new JObject[] { }));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async void SaveDocumentsAsync_Passes_Documents_AsStrings_And_NewEditsFlag(bool newEdits)
+        {
+            //arrange.
+            var docs = new JObject[]
+            {
+                JObject.FromObject(new { id = 123, name = "name 123" }),
+                JObject.FromObject(new { id2 = 1232, name2 = "name 123 2" })
+            };
+
+            //act.
+            await _sut.Object.SaveDocumentsAsync(docs, newEdits);
+
+            //assert.
+            Predicate<string[]> areDocsFromJson = stringDocs => stringDocs.All(s => docs.Any(d => StringIsJsonObject(s, d)));
+
+            _sut.Verify(db => db.SaveDocumentsAsync(It.Is<string[]>(strDocs => areDocsFromJson(strDocs)), newEdits), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async void SaveDocumentsAsync_Returns_Same_Result_As_DB_Object(bool newEdits)
+        {
+            //arrange.
+            var expectedResponse = new SaveDocListResponse(new CouchDBDatabase.SaveDocListResponseDTO());
+
+            _sut.Setup(db => db.SaveDocumentsAsync(It.IsAny<string[]>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(expectedResponse));
+
+            //act.
+            var result = await _sut.Object.SaveDocumentsAsync(new JObject[] { JObject.FromObject(new { id = 123 }) }, newEdits);
+
+            //assert.
+            Assert.Same(expectedResponse, result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async void SaveDocumentsAsync_Updates_ID_And_Rev_Of_Documents_With_Success(bool newEdits)
+        {
+            //arrange.
+            var objectDocs = new [] 
+            {
+                new { _id = "1", _rev = "1", name = "name 1" },
+                new { _id = "2", _rev = "2", name = "name 2" }
+            };
+
+            var docs = new JObject[]
+            {
+                JObject.FromObject(objectDocs[0]),
+                JObject.FromObject(objectDocs[1])
+            };
+
+            var expectedResponse = new SaveDocListResponse(new CouchDBDatabase.SaveDocListResponseDTO
+            {
+                new CouchDBDatabase.SaveDocResponseDTO
+                {
+                    Id = "id 1", Rev = "rev 1", Error = "some error", Reason = "some reason"
+                },
+                new CouchDBDatabase.SaveDocResponseDTO
+                {
+                    Id = "id 2", Rev = "rev 2"
+                }
+            });
+
+            _sut.Setup(db => db.SaveDocumentsAsync(It.IsAny<string[]>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(expectedResponse));
+
+            //act.
+            await _sut.Object.SaveDocumentsAsync(docs, newEdits);
+
+            //assert.
+
+            //first doc did not change due to error.
+            Assert.Equal(objectDocs[0]._id, docs[0]["_id"]);
+            Assert.Equal(objectDocs[0]._rev, docs[0]["_rev"]);
+
+            //second doc changed (no error).
+            Assert.Equal(expectedResponse.DocumentResponses[1].Id, docs[1]["_id"].ToString());
+            Assert.Equal(expectedResponse.DocumentResponses[1].Revision, docs[1]["_rev"].ToString());
+        }
+
+        #endregion
     }
 }

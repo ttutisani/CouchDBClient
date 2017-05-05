@@ -576,7 +576,7 @@ namespace CouchDB.ClientDemo
             });
         }
 
-        public void SaveDocs()
+        public void SaveStringDocs()
         {
             var docs = new List<string>();
 
@@ -598,6 +598,34 @@ namespace CouchDB.ClientDemo
             var newEdits = Console.ReadLine().ToBool();
 
             UsingDatabase(db => 
+            {
+                var response = db.SaveDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
+                Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
+            });
+        }
+
+        public void SaveJSONDocs()
+        {
+            var docs = new List<JObject>();
+
+            Console.WriteLine("Enter docs, one at a time. Empty to finish.");
+            do
+            {
+                var doc = Console.ReadLine();
+                if (doc.IsNullOrWhiteSpace())
+                    break;
+
+                docs.Add(JObject.Parse(doc));
+
+            } while (true);
+
+            if (docs.Count == 0)
+                return;
+
+            Console.WriteLine("New edits? true/false");
+            var newEdits = Console.ReadLine().ToBool();
+
+            UsingDatabase(db =>
             {
                 var response = db.SaveDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
                 Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
