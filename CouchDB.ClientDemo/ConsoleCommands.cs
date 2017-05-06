@@ -1,5 +1,6 @@
 ﻿using CouchDB.Client;
 using DotNetExtensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -616,6 +617,36 @@ namespace CouchDB.ClientDemo
                     break;
 
                 docs.Add(JObject.Parse(doc));
+
+            } while (true);
+
+            if (docs.Count == 0)
+                return;
+
+            Console.WriteLine("New edits? true/false");
+            var newEdits = Console.ReadLine().ToBool();
+
+            UsingDatabase(db =>
+            {
+                var response = db.SaveDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
+                Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
+            });
+        }
+
+        public void SaveObjectDocs()
+        {
+            var docs = new List<object>();
+
+            Console.WriteLine("Enter docs, one at a time. Empty to finish.");
+            do
+            {
+                var doc = Console.ReadLine();
+                if (doc.IsNullOrWhiteSpace())
+                    break;
+
+                var authorInfo = JsonConvert.DeserializeObject<AuthorInfo>(doc);
+
+                docs.Add(new { _id = authorInfo._Id, _rev = authorInfo._Rev, author = authorInfo.Author });
 
             } while (true);
 

@@ -34,7 +34,12 @@
         /// <summary>
         /// Doc ID value supplied by the client is not valid.
         /// </summary>
-        Illegal_DocId
+        Illegal_DocId,
+
+        /// <summary>
+        /// Document format validation failed. e.g. if _id is passed with upper case property name, such as _Id.
+        /// </summary>
+        Doc_Validation
     }
 
     /// <summary>
