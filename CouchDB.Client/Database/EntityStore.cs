@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CouchDB.Client
@@ -35,11 +36,7 @@ namespace CouchDB.Client
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
-            var jsonEntity = JObject.FromObject(entity);
-            if (string.IsNullOrWhiteSpace(entity._rev))
-            {
-                jsonEntity.Remove(CouchDBDatabase.RevisionPropertyName);
-            }
+            var jsonEntity = EntityHelper.ConvertEntityToJSON(entity);
 
             await _db.SaveDocumentAsync(jsonEntity, entityUpdateParams).Safe();
             entity._id = jsonEntity[CouchDBDatabase.IdPropertyName]?.ToString();
@@ -113,6 +110,43 @@ namespace CouchDB.Client
             var deletionResponse = await _db.DeleteDocumentAsync(entity._id, entity._rev, batch).Safe();
             entity._id = deletionResponse.Id;
             entity._rev = deletionResponse.Revision;
+        }
+
+        /// <summary>
+        /// Allows you to create and update multiple entities at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+        /// When creating new documents the document ID (_id) is optional.
+        /// For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
+        /// In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+        /// </summary>
+        /// <param name="entities">List of documents objects.</param>
+        /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+        /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task<SaveDocListResponse> SaveEntitiesAsync(IEntity[] entities, bool newEdits = true)
+        {
+            var entityJsonObjects = entities.Select(entity => EntityHelper.ConvertEntityToJSON(entity)).ToArray();
+
+            var saveResponse = await _db.SaveDocumentsAsync(entityJsonObjects, newEdits).Safe();
+            if (saveResponse != null)
+            {
+                for (int index = 0; index < saveResponse.DocumentResponses.Count; index++)
+                {
+                    if (index >= entities.Length)
+                        break;
+
+                    var docResponse = saveResponse.DocumentResponses[index];
+
+                    if (docResponse.Error != null)
+                        continue;
+
+                    var entity = entities[index];
+
+                    entity._id = docResponse.Id;
+                    entity._rev = docResponse.Revision;
+                }
+            }
+
+            return saveResponse;
         }
     }
 }

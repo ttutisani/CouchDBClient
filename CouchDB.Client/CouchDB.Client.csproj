@@ -68,6 +68,7 @@
     <Compile Include="Documents\Response\SaveDocResponse.cs" />
     <Compile Include="Documents\DocUpdateParams.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Helpers\EntityHelper.cs" />
     <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Documents\DocQueryParams.cs" />

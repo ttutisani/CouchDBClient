@@ -444,139 +444,6 @@ namespace CouchDB.ClientDemo
             });
         }
 
-        
-
-        public void PlayWithNewEntity()
-        {
-            UsingEntityStore(db => 
-            {
-                Console.WriteLine("Enter new entity info.");
-                var entity = new SampleEntity();
-                entity.UpdateFromConsole();
-
-                db.SaveEntityAsync(entity).GetAwaiter().GetResult();
-
-                Console.WriteLine("Saved to db:");
-                Console.WriteLine(SerializationHelper.Serialize(entity));
-
-                Console.WriteLine("Update? press <Enter> to skip.");
-                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
-                {
-                    Console.WriteLine("Enter entity info to update.");
-                    entity.UpdateFromConsole();
-
-                    db.SaveEntityAsync(entity).GetAwaiter().GetResult();
-
-                    Console.WriteLine("Saved to db:");
-                    Console.WriteLine(SerializationHelper.Serialize(entity));
-                }
-
-                Console.WriteLine("Delete? press <Enter> to skip.");
-                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
-                {
-                    db.DeleteEntityAsync(entity).GetAwaiter().GetResult();
-
-                    Console.WriteLine("deleted:");
-                    Console.WriteLine(SerializationHelper.Serialize(entity));
-                }
-            });
-        }
-
-        public void PlayWithExistingEntity()
-        {
-            UsingEntityStore(db => 
-            {
-                Console.WriteLine("Enter entity id:");
-                var id = Console.ReadLine();
-
-                var entity = db.GetEntityAsync<SampleEntity>(id).GetAwaiter().GetResult();
-                Console.WriteLine("Found:");
-                Console.WriteLine(SerializationHelper.Serialize(entity));
-
-                Console.WriteLine("Update? press <Enter> to skip.");
-                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
-                {
-                    Console.WriteLine("Enter entity info to update.");
-                    entity.UpdateFromConsole();
-
-                    db.SaveEntityAsync(entity).GetAwaiter().GetResult();
-
-                    Console.WriteLine("Saved to db:");
-                    Console.WriteLine(SerializationHelper.Serialize(entity));
-                }
-
-                Console.WriteLine("Delete? press <Enter> to skip.");
-                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
-                {
-                    db.DeleteEntityAsync(entity).GetAwaiter().GetResult();
-
-                    Console.WriteLine("deleted:");
-                    Console.WriteLine(SerializationHelper.Serialize(entity));
-                }
-            });
-        }
-
-        public void GetAllEntities()
-        {
-            UsingEntityStore(db => 
-            {
-                Console.WriteLine("Enter skip (empty for 0):");
-                int skip;
-                int.TryParse(Console.ReadLine(), out skip);
-
-                Console.WriteLine("Enter limit (empty for all):");
-                int limit;
-                if (!int.TryParse(Console.ReadLine(), out limit)) limit = int.MaxValue;
-
-                var allEntities = db.GetAllEntitiesAsync<SampleEntity>(new ListQueryParams { Skip = skip, Limit = limit }).GetAwaiter().GetResult();
-
-                Console.WriteLine($"Found {allEntities.Rows.Count} entities:");
-                foreach (var entity in allEntities.Rows)
-                {
-                    Console.WriteLine(SerializationHelper.Serialize(entity));
-                    Console.WriteLine("-------------------------------------");
-                }
-                Console.WriteLine("End of list.");
-            });
-        }
-
-        public void GetEntities()
-        {
-            Console.WriteLine("Enter entity IDs, one at a time. Press <Enter> when done:");
-            var entityIdList = new List<string>();
-            do
-            {
-                var id = Console.ReadLine();
-
-                if (!string.IsNullOrWhiteSpace(id))
-                    entityIdList.Add(id);
-                else
-                    break;
-
-            } while (true);
-
-            UsingEntityStore(db =>
-            {
-                Console.WriteLine("Enter skip (empty for 0):");
-                int skip;
-                int.TryParse(Console.ReadLine(), out skip);
-
-                Console.WriteLine("Enter limit (empty for all):");
-                int limit;
-                if (!int.TryParse(Console.ReadLine(), out limit)) limit = int.MaxValue;
-
-                var entities = db.GetEntitiesAsync<SampleEntity>(entityIdList.ToArray(), new ListQueryParams { Skip = skip, Limit = limit }).GetAwaiter().GetResult();
-
-                Console.WriteLine($"Found {entities.Rows.Count} entities:");
-                foreach (var entity in entities.Rows)
-                {
-                    Console.WriteLine(SerializationHelper.Serialize(entity));
-                    Console.WriteLine("-------------------------------------");
-                }
-                Console.WriteLine("End of list.");
-            });
-        }
-
         public void SaveStringDocs()
         {
             var docs = new List<string>();
@@ -659,6 +526,169 @@ namespace CouchDB.ClientDemo
             UsingDatabase(db =>
             {
                 var response = db.SaveDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
+                Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
+            });
+        }
+
+        //=============== ENTITIES =================================
+
+        public void PlayWithNewEntity()
+        {
+            UsingEntityStore(db =>
+            {
+                Console.WriteLine("Enter new entity info.");
+                var entity = new SampleEntity();
+                entity.UpdateFromConsole();
+
+                db.SaveEntityAsync(entity).GetAwaiter().GetResult();
+
+                Console.WriteLine("Saved to db:");
+                Console.WriteLine(SerializationHelper.Serialize(entity));
+
+                Console.WriteLine("Update? press <Enter> to skip.");
+                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
+                {
+                    Console.WriteLine("Enter entity info to update.");
+                    entity.UpdateFromConsole();
+
+                    db.SaveEntityAsync(entity).GetAwaiter().GetResult();
+
+                    Console.WriteLine("Saved to db:");
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                }
+
+                Console.WriteLine("Delete? press <Enter> to skip.");
+                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
+                {
+                    db.DeleteEntityAsync(entity).GetAwaiter().GetResult();
+
+                    Console.WriteLine("deleted:");
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                }
+            });
+        }
+
+        public void PlayWithExistingEntity()
+        {
+            UsingEntityStore(db =>
+            {
+                Console.WriteLine("Enter entity id:");
+                var id = Console.ReadLine();
+
+                var entity = db.GetEntityAsync<SampleEntity>(id).GetAwaiter().GetResult();
+                Console.WriteLine("Found:");
+                Console.WriteLine(SerializationHelper.Serialize(entity));
+
+                Console.WriteLine("Update? press <Enter> to skip.");
+                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
+                {
+                    Console.WriteLine("Enter entity info to update.");
+                    entity.UpdateFromConsole();
+
+                    db.SaveEntityAsync(entity).GetAwaiter().GetResult();
+
+                    Console.WriteLine("Saved to db:");
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                }
+
+                Console.WriteLine("Delete? press <Enter> to skip.");
+                if (!string.IsNullOrWhiteSpace(Console.ReadLine()))
+                {
+                    db.DeleteEntityAsync(entity).GetAwaiter().GetResult();
+
+                    Console.WriteLine("deleted:");
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                }
+            });
+        }
+
+        public void GetAllEntities()
+        {
+            UsingEntityStore(db =>
+            {
+                Console.WriteLine("Enter skip (empty for 0):");
+                int skip;
+                int.TryParse(Console.ReadLine(), out skip);
+
+                Console.WriteLine("Enter limit (empty for all):");
+                int limit;
+                if (!int.TryParse(Console.ReadLine(), out limit)) limit = int.MaxValue;
+
+                var allEntities = db.GetAllEntitiesAsync<SampleEntity>(new ListQueryParams { Skip = skip, Limit = limit }).GetAwaiter().GetResult();
+
+                Console.WriteLine($"Found {allEntities.Rows.Count} entities:");
+                foreach (var entity in allEntities.Rows)
+                {
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                    Console.WriteLine("-------------------------------------");
+                }
+                Console.WriteLine("End of list.");
+            });
+        }
+
+        public void GetEntities()
+        {
+            Console.WriteLine("Enter entity IDs, one at a time. Press <Enter> when done:");
+            var entityIdList = new List<string>();
+            do
+            {
+                var id = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(id))
+                    entityIdList.Add(id);
+                else
+                    break;
+
+            } while (true);
+
+            UsingEntityStore(db =>
+            {
+                Console.WriteLine("Enter skip (empty for 0):");
+                int skip;
+                int.TryParse(Console.ReadLine(), out skip);
+
+                Console.WriteLine("Enter limit (empty for all):");
+                int limit;
+                if (!int.TryParse(Console.ReadLine(), out limit)) limit = int.MaxValue;
+
+                var entities = db.GetEntitiesAsync<SampleEntity>(entityIdList.ToArray(), new ListQueryParams { Skip = skip, Limit = limit }).GetAwaiter().GetResult();
+
+                Console.WriteLine($"Found {entities.Rows.Count} entities:");
+                foreach (var entity in entities.Rows)
+                {
+                    Console.WriteLine(SerializationHelper.Serialize(entity));
+                    Console.WriteLine("-------------------------------------");
+                }
+                Console.WriteLine("End of list.");
+            });
+        }
+
+        public void SaveEntities()
+        {
+            var entities = new List<IEntity>();
+
+            Console.WriteLine("Enter entities, one at a time. Empty to finish.");
+            do
+            {
+                var doc = Console.ReadLine();
+                if (doc.IsNullOrWhiteSpace())
+                    break;
+
+                var entity = JsonConvert.DeserializeObject<SampleEntity>(doc);
+
+                entities.Add(entity);
+
+            } while (true);
+
+            if (entities.Count == 0)
+                return;
+
+            Console.WriteLine("New edits? true/false");
+            var newEdits = Console.ReadLine().ToBool();
+
+            UsingDatabase(db =>
+            {
+                var response = db.SaveDocumentsAsync(entities.ToArray(), newEdits).GetAwaiter().GetResult();
                 Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
             });
         }

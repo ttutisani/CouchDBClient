@@ -290,22 +290,7 @@ namespace CouchDB.Client
 
             var stringDocs = documents.Select(doc => JsonConvert.SerializeObject(doc)).ToArray();
             var saveResponse = await @this.SaveDocumentsAsync(stringDocs, newEdits).Safe();
-            if (saveResponse != null)
-            {
-                for (int index = 0; index < saveResponse.DocumentResponses.Count; index++)
-                {
-                    if (index >= documents.Length)
-                        break;
-
-                    var docResponse = saveResponse.DocumentResponses[index];
-
-                    if (docResponse.Error != null)
-                        continue;
-
-                    var jsonDoc = documents[index];
-                }
-            }
-
+            
             return saveResponse;
         }
 

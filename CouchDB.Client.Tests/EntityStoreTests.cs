@@ -323,5 +323,122 @@ namespace CouchDB.Client.Tests
             Assert.NotNull(entities.Rows[1].Document);
             Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(expectedDocs[1]), JObject.FromObject(entities.Rows[1].Document)));
         }
+
+        #region Save Object Entities
+
+        [Fact]
+        public async void SaveEntitiesAsync_Requires_Entities()
+        {
+            //act / assert.
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveEntitiesAsync(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveEntitiesAsync(new IEntity[] { }));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async void SaveEntitiesAsync_Passes_Documents_AsStrings_And_NewEditsFlag(bool newEdits)
+        {
+            //arrange.
+            var docs = new []
+            {
+                new SampleEntity { _id = "123", _rev = "111", Name = "name 123" },
+                new SampleEntity { _id = "1232", _rev = "222", Name2 = 321 }
+            };
+
+            //act.
+            await _sut.SaveEntitiesAsync(docs, newEdits);
+
+            //assert.
+            Predicate<string[]> areDocsFromObject = stringDocs => stringDocs.All(s => docs.Any(d => StringIsJsonObject(s, JObject.FromObject(d))));
+
+            _db.Verify(db => db.SaveDocumentsAsync(It.Is<string[]>(strDocs => areDocsFromObject(strDocs)), newEdits), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async void SaveEntitiesAsync_Returns_Same_Result_As_DB_Object(bool newEdits)
+        {
+            //arrange.
+            var expectedResponse = new SaveDocListResponse(new CouchDBDatabase.SaveDocListResponseDTO());
+
+            _db.Setup(db => db.SaveDocumentsAsync(It.IsAny<string[]>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(expectedResponse));
+
+            //act.
+            var result = await _sut.SaveEntitiesAsync(new [] { new SampleEntity { _id = "123" } }, newEdits);
+
+            //assert.
+            Assert.Same(expectedResponse, result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async void SaveEntitiesAsync_Updates_ID_And_Rev_Of_Entities_With_Success(bool newEdits)
+        {
+            //arrange.
+            var entities = new[]
+            {
+                new SampleEntity { _id = "1", _rev = "1", Name = "name 1" },
+                new SampleEntity { _id = "2", _rev = "2", Name = "name 2" }
+            };
+
+            var entityClones = entities.Select(e => JObject.FromObject(e)).Select(j => j.ToObject<SampleEntity>()).ToArray();
+
+            var expectedResponse = new SaveDocListResponse(new CouchDBDatabase.SaveDocListResponseDTO
+            {
+                new CouchDBDatabase.SaveDocResponseDTO
+                {
+                    Id = "id 1", Rev = "rev 1", Error = "some error", Reason = "some reason"
+                },
+                new CouchDBDatabase.SaveDocResponseDTO
+                {
+                    Id = "id 2", Rev = "rev 2"
+                }
+            });
+
+            _db.Setup(db => db.SaveDocumentsAsync(It.IsAny<string[]>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(expectedResponse));
+
+            //act.
+            await _sut.SaveEntitiesAsync(entities, newEdits);
+
+            //assert.
+
+            //first entity did not change due to error.
+            Assert.Equal(entityClones[0]._id, entities[0]._id);
+            Assert.Equal(entityClones[0]._rev, entities[0]._rev);
+
+            //second entity changed (no error).
+            Assert.Equal(expectedResponse.DocumentResponses[1].Id, entities[1]._id);
+            Assert.Equal(expectedResponse.DocumentResponses[1].Revision, entities[1]._rev);
+        }
+
+        [Theory]
+        [InlineData(null, true)]
+        [InlineData(null, false)]
+        [InlineData("", true)]
+        [InlineData("", false)]
+        public async void SaveEntitiesAsync_Does_Not_Pass_Empty_ID_To_Allow_Creation(string id, bool newEdits)
+        {
+            //arrange.
+            var name = "some name";
+
+            //act.
+            await _sut.SaveEntitiesAsync(new[] { new SampleEntity { _id = id, Name = name } }, newEdits);
+
+            //assert.
+            Predicate<string[]> docsDontHaveIDButHaveName = stringDocs => stringDocs.All(s =>
+            {
+                var json = JObject.Parse(s);
+                return json.Property(CouchDBDatabase.IdPropertyName) == null;
+            });
+
+            _db.Verify(db => db.SaveDocumentsAsync(It.Is<string[]>(strDocs => docsDontHaveIDButHaveName(strDocs)), newEdits), Times.Once);
+        }
+        
+        #endregion
     }
 }
