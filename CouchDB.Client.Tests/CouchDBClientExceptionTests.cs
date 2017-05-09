@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Moq;
+using System;
+using System.Runtime.Serialization;
 using Xunit;
 
 namespace CouchDB.Client.Tests
@@ -34,6 +36,21 @@ namespace CouchDB.Client.Tests
             Assert.Equal(message, sut.Message);
             Assert.Same(serverResponse, sut.ServerResponse);
             Assert.Same(innerException, sut.InnerException);
+        }
+
+        [Fact]
+        public void GetObjectData_Sets_Info_About_Members()
+        {
+            //arrange.
+            var serverResponse = new ServerResponse(new CouchDBServer.ServerResponseDTO());
+            var sut = new CouchDBClientException("message does not matter", serverResponse);
+
+            //act.
+            var serializationInfo = new SerializationInfo(typeof(CouchDBClientException), new Mock<IFormatterConverter>().Object);
+            sut.GetObjectData(serializationInfo, new StreamingContext());
+
+            //assert.
+            Assert.Same(serverResponse, serializationInfo.GetValue(CouchDBClientException.ServerResponse_Key_InSerializationInfo, typeof(ServerResponse)));
         }
     }
 }
