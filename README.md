@@ -31,13 +31,18 @@ CouchDB .NET Client - object oriented, easy to use, intuitive, self-describing l
   * Delete document
     * By ID and Revision (`CouchDBDatabase.DeleteDocumentAsync`)
     * Given Document as JObject (JSON object) (`CouchDBDatabase.DeleteDocumentAsync` overload)
+  * Create, Update, or Delete multiple documents
+    * As string (`CouchDBDatabase.SaveDocumentsAsync`)
+    * As JObject (JSON Object) (`CouchDBDatabase.SaveDocumentsAsync` overload)
+    * As object (System.Object) (`CouchDBDatabase.SaveDocumentsAsync` overload)
 * Entitites (reusable documents) - any type implementing `IEntity`
-  * Convert database object into Entity store for working with entities (`EntityStore` constructor)
+  * Convert database object into entity store for working with entities (`EntityStore` constructor)
   * Create new or update existing entity (`EntityStore.SaveEntityAsync`)
   * Retrieve entity by ID (`EntityStore.GetEntityAsync<>`)
   * Retrieve multiple entities by ID list (`EntityStore.GetEntitiesAsync<>`)
   * Retrieve all entities (`EntityStore.GetAllEntitiesAsync<>`)
   * Delete entity (`EntityStore.DeleteEntityAsync`)
+  * Create, Update, or Delete multiple entities (`EntityStore.SaveEntitiesAsync`)
 
 ## Examples
 
