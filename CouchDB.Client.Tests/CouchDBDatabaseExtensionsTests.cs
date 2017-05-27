@@ -304,14 +304,14 @@ namespace CouchDB.Client.Tests
             //arrange.
             var queryParams = new ListQueryParams();
 
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+            _sut.Setup(db => db.GetAllDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
 
             //act.
             await _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(queryParams);
 
             //assert.
-            _sut.Verify(db => db.GetAllJsonDocumentsAsync(queryParams), Times.Once());
+            _sut.Verify(db => db.GetAllDocumentsAsync(queryParams), Times.Once());
         }
 
         [Fact]
@@ -322,8 +322,8 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 111 },
                 new { name = "some value", name2 = 222 }
             };
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+            _sut.Setup(db => db.GetAllDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
 
             //act.
             var docs = await _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, null);
@@ -349,13 +349,17 @@ namespace CouchDB.Client.Tests
                 new { what = "some value", that = 111 },
                 new { what = "some value", that = 222 }
             };
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+            _sut.Setup(db => db.GetAllDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
 
-            Func<JObject, SampleDoc> deserializer = doc => new SampleDoc { Name = doc["what"].ToString(), Name2 = doc["that"].Value<int>() };
+            Func<string, SampleDoc> deserializer = doc => 
+            {
+                var json = JObject.Parse(doc);
+                return new SampleDoc { Name = json["what"].ToString(), Name2 = json["that"].Value<int>() };
+            };
 
             //act.
-            var docs = await _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, deserializer);
+            var docs = await _sut.Object.GetAllObjectDocumentsAsync(null, deserializer);
 
             //assert.
             Assert.NotNull(docs);
@@ -375,41 +379,41 @@ namespace CouchDB.Client.Tests
         #region Get All String Docs
 
         [Fact]
-        public async void GetAllStringDocumentsAsync_Passes_QueryParams_AsReceived()
+        public async void GetAllJsonDocumentsAsync_Passes_QueryParams_AsReceived()
         {
             //arrange
             var queryParams = new ListQueryParams();
 
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, Enumerable.Empty<DocListResponseRow<JObject>>())));
+            _sut.Setup(db => db.GetAllDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
 
             //act.
-            await _sut.Object.GetAllStringDocumentsAsync(queryParams);
+            await _sut.Object.GetAllJsonDocumentsAsync(queryParams);
 
             //assert.
-            _sut.Verify(db => db.GetAllJsonDocumentsAsync(queryParams), Times.Once());
+            _sut.Verify(db => db.GetAllDocumentsAsync(queryParams), Times.Once());
         }
 
         [Fact]
-        public async void GetAllStringDocumentsAsync_Returns_StringRepresentation_OfObjects()
+        public async void GetAllJsonDocumentsAsync_Returns_JsonRepresentation_OfDocuments()
         {
             //arrange.
             var jsonDocs = new[] {
                 new { name = "some value", name2 = 111 },
                 new { name = "some value", name2 = 222 }
             };
-            _sut.Setup(db => db.GetAllJsonDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<JObject>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<JObject>("id", "key", new DocListResponseRowValue("rev"), JObject.FromObject(doc), null)))));
+            _sut.Setup(db => db.GetAllDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
 
             //act.
-            var docs = await _sut.Object.GetAllStringDocumentsAsync(null);
+            var docs = await _sut.Object.GetAllJsonDocumentsAsync(null);
 
             //assert.
             Assert.NotNull(docs);
             Assert.Equal(2, docs.Rows.Count);
 
-            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[0]), JObject.Parse(docs.Rows[0].Document)));
-            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[1]), JObject.Parse(docs.Rows[1].Document)));
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[0]), docs.Rows[0].Document));
+            Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[1]), docs.Rows[1].Document));
         }
 
         #endregion

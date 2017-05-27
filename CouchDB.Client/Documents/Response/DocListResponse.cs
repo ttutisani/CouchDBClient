@@ -44,13 +44,24 @@ namespace CouchDB.Client
         /// </summary>
         public int UpdateSeq { get; }
 
-        internal static DocListResponse<JObject> FromJson(JObject allDocsJsonObject)
+        internal static DocListResponse<string> FromJsonToString(JObject allDocsJsonObject)
         {
             var offset = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "offset");
             var totalRows = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "total_rows");
             var updateSeq = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "update_seq");
             var jsonRows = SerializationHelper.JArrayMap(SerializationHelper.GetArrayOrEmpty(allDocsJsonObject, "rows"));
-            var responseRows = jsonRows.Select(json => DocListResponseRow<JObject>.FromJson(json)).ToList();
+            var responseRows = jsonRows.Select(json => DocListResponseRow<string>.FromJsonToString(json)).ToList();
+
+            return new DocListResponse<string>(offset, totalRows, updateSeq, responseRows);
+        }
+
+        internal static DocListResponse<JObject> FromJsonToJson(JObject allDocsJsonObject)
+        {
+            var offset = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "offset");
+            var totalRows = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "total_rows");
+            var updateSeq = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "update_seq");
+            var jsonRows = SerializationHelper.JArrayMap(SerializationHelper.GetArrayOrEmpty(allDocsJsonObject, "rows"));
+            var responseRows = jsonRows.Select(json => DocListResponseRow<string>.FromJsonToJson(json)).ToList();
 
             return new DocListResponse<JObject>(offset, totalRows, updateSeq, responseRows);
         }

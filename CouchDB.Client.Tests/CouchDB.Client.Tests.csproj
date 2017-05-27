@@ -116,7 +116,8 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="run-unit-tests-in-console.bat" />
+    <None Include="run-unit-tests-in-console-x32.bat" />
+    <None Include="run-unit-tests-in-console-x86.bat" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

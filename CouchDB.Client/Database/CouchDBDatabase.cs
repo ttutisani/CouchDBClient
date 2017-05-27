@@ -143,17 +143,17 @@ namespace CouchDB.Client
         /// about the return structure, including a list of all documents and basic contents, 
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
+        /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        public async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null)
+        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
+        public async Task<DocListResponse<string>> GetAllDocumentsAsync(ListQueryParams queryParams = null)
         {
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
-
             var allDocsResponse = await _http.GetAsync(allDocsUrl).Safe();
             var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
-            var docListResponse = DocListResponse<JObject>.FromJson(allDocsJsonObject);
+            var docListResponse = DocListResponse<string>.FromJsonToString(allDocsJsonObject);
             return docListResponse;
         }
 
@@ -183,7 +183,7 @@ namespace CouchDB.Client
             var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
-            var docListResponse = DocListResponse<JObject>.FromJson(allDocsJsonObject);
+            var docListResponse = DocListResponse<JObject>.FromJsonToJson(allDocsJsonObject);
             return docListResponse;
         }
 

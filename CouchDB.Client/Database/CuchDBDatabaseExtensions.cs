@@ -143,19 +143,13 @@ namespace CouchDB.Client
         /// about the return structure, including a list of all documents and basic contents, 
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
-        /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
-        /// <typeparam name="TDocument">Specifies resulting document object type.</typeparam>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <param name="deserializer">Provide your own deserializer if you prefer. 
-        /// By default, it will deserialize by using NewtonSoft.Json methods.
-        /// NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
-        /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
-        /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
-        public static async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, ListQueryParams queryParams = null, Func<JObject, TDocument> deserializer = null)
+        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
+        public static async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(this ICouchDBDatabase @this, ListQueryParams queryParams = null)
         {
-            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams).Safe();
+            var stringDocs = await @this.GetAllDocumentsAsync(queryParams).Safe();
 
-            return jsonDocs.Cast(deserializer ?? new Func<JObject, TDocument>(json => json != null ? json.ToObject<TDocument>() : default(TDocument)));
+            return stringDocs.Cast(strDoc => JObject.Parse(strDoc));
         }
 
         /// <summary>
@@ -165,13 +159,18 @@ namespace CouchDB.Client
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
         /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
+        /// <typeparam name="TDocument">Specifies resulting document object type.</typeparam>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
-        public static async Task<DocListResponse<string>> GetAllStringDocumentsAsync(this ICouchDBDatabase @this, ListQueryParams queryParams = null)
+        /// <param name="deserializer">Provide your own deserializer if you prefer. 
+        /// By default, it will deserialize by using NewtonSoft.Json methods.
+        /// NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
+        /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
+        /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+        public static async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, ListQueryParams queryParams = null, Func<string, TDocument> deserializer = null)
         {
-            var jsonDocs = await @this.GetAllJsonDocumentsAsync(queryParams).Safe();
+            var jsonDocs = await @this.GetAllDocumentsAsync(queryParams).Safe();
 
-            return jsonDocs.Cast(json => json?.ToString());
+            return jsonDocs.Cast(deserializer ?? new Func<string, TDocument>(json => json != null ? JsonConvert.DeserializeObject<TDocument>(json) : default(TDocument)));
         }
 
         #endregion

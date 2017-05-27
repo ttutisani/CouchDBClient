@@ -48,7 +48,18 @@ namespace CouchDB.Client
             return new DocListResponseRow<TResult>(Id, Key, Value, converter(Document), Error);
         }
 
-        internal static DocListResponseRow<JObject> FromJson(JObject json)
+        internal static DocListResponseRow<string> FromJsonToString(JObject json)
+        {
+            var id = SerializationHelper.GetStringOrDefault(json, "id");
+            var key = SerializationHelper.GetStringOrDefault(json, "key");
+            var value = SerializationHelper.GetObjectOrDefault(json, "value");
+            var doc = SerializationHelper.GetObjectOrDefault(json, "doc")?.ToString();
+            var error = SerializationHelper.GetStringOrDefault(json, "error");
+
+            return new DocListResponseRow<string>(id, key, DocListResponseRowValue.FromJson(value), doc, ServerResponseError.FromString(error));
+        }
+
+        internal static DocListResponseRow<JObject> FromJsonToJson(JObject json)
         {
             var id = SerializationHelper.GetStringOrDefault(json, "id");
             var key = SerializationHelper.GetStringOrDefault(json, "key");

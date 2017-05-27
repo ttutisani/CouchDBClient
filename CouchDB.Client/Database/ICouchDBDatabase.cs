@@ -42,14 +42,15 @@ namespace CouchDB.Client
         Task<SaveDocResponse> DeleteDocumentAsync(string docId, string revision, bool batch = false);
 
         /// <summary>
-        /// Returns a JSON structure of all the documents in a given database. 
+        /// Returns a JSON structure of all of the documents in a given database. 
         /// The information is returned as a JSON structure containing meta information 
         /// about the return structure, including a list of all documents and basic contents, 
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
+        /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(ListQueryParams queryParams = null);
+        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
+        Task<DocListResponse<string>> GetAllDocumentsAsync(ListQueryParams queryParams = null);
 
         /// <summary>
         /// Returns a JSON structure of documents in a given database, by multiple IDs.

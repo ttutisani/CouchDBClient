@@ -302,7 +302,7 @@ namespace CouchDB.ClientDemo
             {
                 ListQueryParams qParams = new ListQueryParams { Include_Docs = true };
 
-                var allDocs = db.GetAllStringDocumentsAsync(qParams).Result;
+                var allDocs = db.GetAllDocumentsAsync(qParams).Result;
                 Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
                 foreach (var row in allDocs.Rows)
@@ -384,7 +384,7 @@ namespace CouchDB.ClientDemo
         {
             UsingDatabase(db =>
             {
-                var allDocs = db.GetAllObjectDocumentsAsync<NiceAuthorInfo>(queryParams: new ListQueryParams { Include_Docs = true }, deserializer: jObject => new NiceAuthorInfo(jObject)).Result;
+                var allDocs = db.GetAllObjectDocumentsAsync(queryParams: new ListQueryParams { Include_Docs = true }, deserializer: strObject => new NiceAuthorInfo(JObject.Parse(strObject))).Result;
                 Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
                 foreach (var row in allDocs.Rows)
