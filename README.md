@@ -21,7 +21,7 @@ CouchDB .NET Client - object oriented, easy to use, intuitive, self-describing l
     * As JObject (JSON object) (`CouchDBDatabase.GetDocumentJsonAsync`)
     * As generic TDocument (any type) (`CouchDBDatabase.GetDocumentAsync<>`)
   * Retrieve multiple documents by ID list
-    * As string documents (`CouchDBDatabase.GetStringDocumentAsync`)
+    * As string documents (`CouchDBDatabase.GetStringDocumentsAsync`)
     * As JObject documents (JSON object) (`CouchDBDatabase.GetJsonDocumentsAsync`)
     * As generic TDocument (any type) (`CouchDBDatabase.GetObjectDocumentsAsync<>`)
   * Retrieve all documents
