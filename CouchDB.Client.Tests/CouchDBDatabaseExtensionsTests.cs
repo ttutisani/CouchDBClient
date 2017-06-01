@@ -24,7 +24,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public async void SaveJsonDocumentAsync_Requires_Json_Document()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentAsync((JObject)null, new DocUpdateParams()));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveJsonDocumentAsync((JObject)null, new DocUpdateParams()));
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace CouchDB.Client.Tests
             var updateParams = new DocUpdateParams();
 
             //act.
-            await _sut.Object.SaveDocumentAsync(JObject.FromObject(new { }), updateParams);
+            await _sut.Object.SaveJsonDocumentAsync(JObject.FromObject(new { }), updateParams);
 
             //assert.
             _sut.Verify(db => db.SaveDocumentAsync(It.IsAny<string>(), updateParams), Times.Once());
@@ -58,7 +58,7 @@ namespace CouchDB.Client.Tests
 
             //act.
             var jsonDoc = JObject.FromObject(new { Name = "value" });
-            await _sut.Object.SaveDocumentAsync(jsonDoc);
+            await _sut.Object.SaveJsonDocumentAsync(jsonDoc);
 
             //assert.
             Assert.Equal(saveResponse.Id, jsonDoc[CouchDBDatabase.IdPropertyName]);
@@ -72,7 +72,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public async void SaveObjectDocumentAsync_Requires_Object_Document()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentAsync((object)null, new DocUpdateParams()));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveObjectDocumentAsync((object)null, new DocUpdateParams()));
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace CouchDB.Client.Tests
             var doc = new { _id = string.Empty, SomeProperty = "some value" };
 
             //act.
-            await _sut.Object.SaveDocumentAsync(doc);
+            await _sut.Object.SaveObjectDocumentAsync(doc);
 
             //assert.
             var docWithoutId = JObject.FromObject(new { SomeProperty = "some value" });
@@ -102,7 +102,7 @@ namespace CouchDB.Client.Tests
             var updateParams = new DocUpdateParams();
 
             //act.
-            await _sut.Object.SaveDocumentAsync(new { }, updateParams);
+            await _sut.Object.SaveObjectDocumentAsync(new { }, updateParams);
 
             //assert.
             _sut.Verify(db => db.SaveDocumentAsync(It.IsAny<string>(), updateParams), Times.Once());
@@ -123,7 +123,7 @@ namespace CouchDB.Client.Tests
 
             //act.
             var objectDoc = new { Name = "value" };
-            var result = await _sut.Object.SaveDocumentAsync(objectDoc);
+            var result = await _sut.Object.SaveObjectDocumentAsync(objectDoc);
 
             //assert.
             Assert.Equal(saveResponse.Id, result.Id);
@@ -137,7 +137,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public async void GetDocumentJsonAsync_Requires_DocId()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetDocumentJsonAsync(null, new DocQueryParams()));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetJsonDocumentAsync(null, new DocQueryParams()));
         }
 
         [Fact]
@@ -151,7 +151,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new DocQueryParams();
 
             //act.
-            await _sut.Object.GetDocumentJsonAsync(docId, queryParams);
+            await _sut.Object.GetJsonDocumentAsync(docId, queryParams);
 
             //assert.
             _sut.Verify(db => db.GetDocumentAsync(docId, queryParams), Times.Once());
@@ -166,7 +166,7 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(docString));
 
             //act.
-            var jsonDoc = await _sut.Object.GetDocumentJsonAsync("id");
+            var jsonDoc = await _sut.Object.GetJsonDocumentAsync("id");
 
             //assert.
             Assert.NotNull(jsonDoc);
@@ -187,7 +187,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public async void GetGenericDoc_Requires_DocId()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetDocumentAsync<SampleDoc>(null, new DocQueryParams()));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetObjectDocumentAsync<SampleDoc>(null, new DocQueryParams()));
         }
 
         [Fact]
@@ -201,7 +201,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new DocQueryParams();
 
             //act.
-            await _sut.Object.GetDocumentAsync<SampleDoc>(docId, queryParams);
+            await _sut.Object.GetObjectDocumentAsync<SampleDoc>(docId, queryParams);
 
             //assert.
             _sut.Verify(db => db.GetDocumentAsync(docId, queryParams), Times.Once());
@@ -216,7 +216,7 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(docString));
 
             //act.
-            var result = await _sut.Object.GetDocumentAsync<SampleDoc>("id");
+            var result = await _sut.Object.GetObjectDocumentAsync<SampleDoc>("id");
 
             //assert.
             Assert.NotNull(result);
@@ -231,7 +231,7 @@ namespace CouchDB.Client.Tests
         [Fact]
         public async void DeleteJSONDoc_Requires_Document()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.DeleteDocumentAsync(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.DeleteJsonDocumentAsync(null));
         }
 
         [Fact]
@@ -241,7 +241,7 @@ namespace CouchDB.Client.Tests
             var jsonDoc = JObject.FromObject(new { _id = "", _rev = "not empty" });
 
             //act / assert.
-            await Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.DeleteDocumentAsync(jsonDoc));
+            await Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.DeleteJsonDocumentAsync(jsonDoc));
         }
 
         [Fact]
@@ -251,7 +251,7 @@ namespace CouchDB.Client.Tests
             var jsonDoc = JObject.FromObject(new { _id = "not empty", _rev = "" });
 
             //act / assert.
-            await Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.DeleteDocumentAsync(jsonDoc));
+            await Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.DeleteJsonDocumentAsync(jsonDoc));
         }
 
         [Fact]
@@ -267,7 +267,7 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO { Id = "id123", Rev = "rev123" })));
 
             //act.
-            await _sut.Object.DeleteDocumentAsync(jsonDoc, expectedBatch);
+            await _sut.Object.DeleteJsonDocumentAsync(jsonDoc, expectedBatch);
 
             //assert.
             _sut.Verify(db => db.DeleteDocumentAsync(expectedId, expecttedRev, expectedBatch), Times.Once());
@@ -287,7 +287,7 @@ namespace CouchDB.Client.Tests
             var jsonDoc = JObject.FromObject(new { _id = "old id", _rev = "old rev" });
 
             //act.
-            await _sut.Object.DeleteDocumentAsync(jsonDoc);
+            await _sut.Object.DeleteJsonDocumentAsync(jsonDoc);
 
             //assert.
             Assert.Equal(expectedId, jsonDoc[CouchDBDatabase.IdPropertyName]);
@@ -606,8 +606,8 @@ namespace CouchDB.Client.Tests
         public async void SaveDocumentsAsync_Requires_Documents()
         {
             //act / assert.
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentsAsync((JObject[])null));
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentsAsync(new JObject[] { }));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveJsonDocumentsAsync((JObject[])null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveJsonDocumentsAsync(new JObject[] { }));
         }
 
         [Theory]
@@ -623,7 +623,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            await _sut.Object.SaveDocumentsAsync(docs, newEdits);
+            await _sut.Object.SaveJsonDocumentsAsync(docs, newEdits);
 
             //assert.
             Predicate<string[]> areDocsFromJson = stringDocs => stringDocs.All(s => docs.Any(d => StringIsJsonObject(s, d)));
@@ -643,7 +643,7 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(expectedResponse));
 
             //act.
-            var result = await _sut.Object.SaveDocumentsAsync(new JObject[] { JObject.FromObject(new { id = 123 }) }, newEdits);
+            var result = await _sut.Object.SaveJsonDocumentsAsync(new JObject[] { JObject.FromObject(new { id = 123 }) }, newEdits);
 
             //assert.
             Assert.Same(expectedResponse, result);
@@ -683,7 +683,7 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(expectedResponse));
 
             //act.
-            await _sut.Object.SaveDocumentsAsync(docs, newEdits);
+            await _sut.Object.SaveJsonDocumentsAsync(docs, newEdits);
 
             //assert.
 
@@ -704,8 +704,8 @@ namespace CouchDB.Client.Tests
         public async void SaveObjDocumentsAsync_Requires_Documents()
         {
             //act / assert.
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentsAsync((object[])null));
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveDocumentsAsync(new object[] { }));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveObjectDocumentsAsync((object[])null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.SaveObjectDocumentsAsync(new object[] { }));
         }
 
         [Theory]
@@ -721,7 +721,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            await _sut.Object.SaveDocumentsAsync(docs, newEdits);
+            await _sut.Object.SaveObjectDocumentsAsync(docs, newEdits);
 
             //assert.
             Predicate<string[]> areDocsFromObject = stringDocs => stringDocs.All(s => docs.Any(d => StringIsJsonObject(s, JObject.FromObject(d))));
@@ -741,7 +741,7 @@ namespace CouchDB.Client.Tests
                 .Returns(Task.FromResult(expectedResponse));
 
             //act.
-            var result = await _sut.Object.SaveDocumentsAsync(new object[] { new { id = 123 } }, newEdits);
+            var result = await _sut.Object.SaveObjectDocumentsAsync(new object[] { new { id = 123 } }, newEdits);
 
             //assert.
             Assert.Same(expectedResponse, result);

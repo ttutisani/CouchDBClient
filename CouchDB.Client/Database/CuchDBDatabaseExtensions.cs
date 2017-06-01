@@ -21,7 +21,7 @@ namespace CouchDB.Client
         /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public static async Task SaveDocumentAsync(this ICouchDBDatabase @this, JObject documentJsonObject, DocUpdateParams updateParams = null)
+        public static async Task SaveJsonDocumentAsync(this ICouchDBDatabase @this, JObject documentJsonObject, DocUpdateParams updateParams = null)
         {
             if (documentJsonObject == null)
                 throw new ArgumentNullException(nameof(documentJsonObject));
@@ -39,7 +39,7 @@ namespace CouchDB.Client
         /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public static async Task<SaveDocResponse> SaveDocumentAsync(this ICouchDBDatabase @this, object documentObject, DocUpdateParams updateParams = null)
+        public static async Task<SaveDocResponse> SaveObjectDocumentAsync(this ICouchDBDatabase @this, object documentObject, DocUpdateParams updateParams = null)
         {
             if (documentObject == null)
                 throw new ArgumentNullException(nameof(documentObject));
@@ -64,7 +64,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Additional query parameters for retrieving document.</param>
         /// <returns><see cref="JObject"/> containing document JSON.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public static async Task<JObject> GetDocumentJsonAsync(this ICouchDBDatabase @this, string docId, DocQueryParams queryParams = null)
+        public static async Task<JObject> GetJsonDocumentAsync(this ICouchDBDatabase @this, string docId, DocQueryParams queryParams = null)
         {
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
@@ -87,7 +87,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Additional query parameters for retrieving document.</param>
         /// <returns>Object containing deserialized document.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public static async Task<TResult> GetDocumentAsync<TResult>(this ICouchDBDatabase @this, string docId, DocQueryParams queryParams = null)
+        public static async Task<TResult> GetObjectDocumentAsync<TResult>(this ICouchDBDatabase @this, string docId, DocQueryParams queryParams = null)
         {
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
@@ -115,7 +115,7 @@ namespace CouchDB.Client
         /// <param name="document"><see cref="JObject"/> instance representing a document.</param>
         /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns>Awaitable task.</returns>
-        public static async Task DeleteDocumentAsync(this ICouchDBDatabase @this, JObject document, bool batch = false)
+        public static async Task DeleteJsonDocumentAsync(this ICouchDBDatabase @this, JObject document, bool batch = false)
         {
             if (document == null)
                 throw new ArgumentNullException(nameof(document));
@@ -240,7 +240,7 @@ namespace CouchDB.Client
         /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public static async Task<SaveDocListResponse> SaveDocumentsAsync(this ICouchDBDatabase @this, JObject[] documents, bool newEdits = true)
+        public static async Task<SaveDocListResponse> SaveJsonDocumentsAsync(this ICouchDBDatabase @this, JObject[] documents, bool newEdits = true)
         {
             if (documents == null || documents.Length == 0)
                 throw new ArgumentNullException(nameof(documents));
@@ -280,7 +280,7 @@ namespace CouchDB.Client
         /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public static async Task<SaveDocListResponse> SaveDocumentsAsync(this ICouchDBDatabase @this, object[] documents, bool newEdits = true)
+        public static async Task<SaveDocListResponse> SaveObjectDocumentsAsync(this ICouchDBDatabase @this, object[] documents, bool newEdits = true)
         {
             if (documents == null || documents.Length == 0)
                 throw new ArgumentNullException(nameof(documents));

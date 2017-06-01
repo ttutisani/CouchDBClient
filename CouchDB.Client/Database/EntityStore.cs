@@ -38,7 +38,7 @@ namespace CouchDB.Client
 
             var jsonEntity = EntityHelper.ConvertEntityToJSON(entity);
 
-            await _db.SaveDocumentAsync(jsonEntity, entityUpdateParams).Safe();
+            await _db.SaveJsonDocumentAsync(jsonEntity, entityUpdateParams).Safe();
             entity._id = jsonEntity[CouchDBDatabase.IdPropertyName]?.ToString();
             entity._rev = jsonEntity[CouchDBDatabase.RevisionPropertyName]?.ToString();
         }
@@ -53,7 +53,7 @@ namespace CouchDB.Client
         public async Task<TEntity> GetEntityAsync<TEntity>(string entityId, DocQueryParams entityQueryParams = null)
             where TEntity : IEntity
         {
-            return await _db.GetDocumentAsync<TEntity>(entityId, entityQueryParams).Safe();
+            return await _db.GetObjectDocumentAsync<TEntity>(entityId, entityQueryParams).Safe();
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace CouchDB.Client
         {
             var entityJsonObjects = entities.Select(entity => EntityHelper.ConvertEntityToJSON(entity)).ToArray();
 
-            var saveResponse = await _db.SaveDocumentsAsync(entityJsonObjects, newEdits).Safe();
+            var saveResponse = await _db.SaveJsonDocumentsAsync(entityJsonObjects, newEdits).Safe();
             if (saveResponse != null)
             {
                 for (int index = 0; index < saveResponse.DocumentResponses.Count; index++)

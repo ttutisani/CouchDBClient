@@ -233,7 +233,7 @@ namespace CouchDB.ClientDemo
             UsingDatabase(db => 
             {
                 
-                db.SaveDocumentAsync(obj).GetAwaiter().GetResult();
+                db.SaveJsonDocumentAsync(obj).GetAwaiter().GetResult();
                 Console.WriteLine("Successfully saved document '{0}'.", obj.ToString());
             });
         }
@@ -246,7 +246,7 @@ namespace CouchDB.ClientDemo
             UsingDatabase(db => 
             {
                 
-                var doc = db.GetDocumentJsonAsync(docId).Result;
+                var doc = db.GetJsonDocumentAsync(docId).Result;
                 Console.WriteLine("Found document:");
                 Console.WriteLine(doc);
                 Console.WriteLine("End of document.");
@@ -260,7 +260,7 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db => 
             {
-                var obj = db.GetDocumentAsync<SampleDoc>(docId).Result;
+                var obj = db.GetObjectDocumentAsync<SampleDoc>(docId).Result;
 
                 Console.WriteLine("Found document:");
                 Console.WriteLine(SerializationHelper.Serialize(obj));
@@ -527,7 +527,7 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db =>
             {
-                var response = db.SaveDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
+                var response = db.SaveJsonDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
                 Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
             });
         }
@@ -557,7 +557,7 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db =>
             {
-                var response = db.SaveDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
+                var response = db.SaveObjectDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
                 Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
             });
         }
@@ -720,7 +720,7 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db =>
             {
-                var response = db.SaveDocumentsAsync(entities.ToArray(), newEdits).GetAwaiter().GetResult();
+                var response = db.SaveObjectDocumentsAsync(entities.ToArray(), newEdits).GetAwaiter().GetResult();
                 Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
             });
         }
