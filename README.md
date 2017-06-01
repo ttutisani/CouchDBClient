@@ -14,14 +14,14 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
 * Documents
   * Create new or update existing document
     * As string (`CouchDBDatabase.SaveDocumentAsync`)
-    * As JObject (JSON object) (`CouchDBDatabase.SaveDocumentAsync` overload)
-    * As object (System.Object) (`CouchDBDatabase.SaveDocumentAsync` overload)
+    * As JObject (JSON object) (`CouchDBDatabase.SaveJsonDocumentAsync` overload)
+    * As object (System.Object) (`CouchDBDatabase.SaveObjectDocumentAsync` overload)
   * Retrieve document by ID
     * As string (`CouchDBDatabase.GetDocumentAsync`)
-    * As JObject (JSON object) (`CouchDBDatabase.GetDocumentJsonAsync`)
-    * As generic TDocument (any type) (`CouchDBDatabase.GetDocumentAsync<>`)
+    * As JObject (JSON object) (`CouchDBDatabase.GetJsonDocumentAsync`)
+    * As generic TDocument (any type) (`CouchDBDatabase.GetObjectDocumentAsync<>`)
   * Retrieve multiple documents by ID list
-    * As string documents (`CouchDBDatabase.GetStringDocumentsAsync`)
+    * As string documents (`CouchDBDatabase.GetDocumentsAsync`)
     * As JObject documents (JSON object) (`CouchDBDatabase.GetJsonDocumentsAsync`)
     * As generic TDocument (any type) (`CouchDBDatabase.GetObjectDocumentsAsync<>`)
   * Retrieve all documents
@@ -30,11 +30,11 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
     * As generic TDocument (any type) (`CouchDBDatabase.GetAllObjectDocumentsAsync<>`)
   * Delete document
     * By ID and Revision (`CouchDBDatabase.DeleteDocumentAsync`)
-    * Given Document as JObject (JSON object) (`CouchDBDatabase.DeleteDocumentAsync` overload)
+    * Given Document as JObject (JSON object) (`CouchDBDatabase.DeleteJsonDocumentAsync` overload)
   * Create, Update, or Delete multiple documents
     * As string (`CouchDBDatabase.SaveDocumentsAsync`)
-    * As JObject (JSON Object) (`CouchDBDatabase.SaveDocumentsAsync` overload)
-    * As object (System.Object) (`CouchDBDatabase.SaveDocumentsAsync` overload)
+    * As JObject (JSON Object) (`CouchDBDatabase.SaveJsonDocumentsAsync` overload)
+    * As object (System.Object) (`CouchDBDatabase.SaveObjectDocumentsAsync` overload)
 * Entitites (reusable documents) - any type implementing `IEntity`
   * Convert database object into entity store for working with entities (`EntityStore` constructor)
   * Create new or update existing entity (`EntityStore.SaveEntityAsync`)
