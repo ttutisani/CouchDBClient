@@ -143,7 +143,6 @@ namespace CouchDB.Client
         /// about the return structure, including a list of all documents and basic contents, 
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
-        /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
         public async Task<DocListResponse<string>> GetAllDocumentsAsync(ListQueryParams queryParams = null)
@@ -162,12 +161,15 @@ namespace CouchDB.Client
         #region Get Docs
 
         /// <summary>
-        /// Returns a JSON structure of documents in a given database, by multiple IDs.
+        /// Returns a JSON structure of the documents in a given database, found by ID list. 
+        /// The information is returned as a JSON structure containing meta information 
+        /// about the return structure, including a list of all documents and basic contents, 
+        /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
-        /// <param name="docIdList">Array of document IDs for retrieving documents.</param>
+        /// <param name="docIdList">Array of document IDs to be retrieved.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        public async Task<DocListResponse<JObject>> GetJsonDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null)
+        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
+        public async Task<DocListResponse<string>> GetDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null)
         {
             if (docIdList == null)
                 throw new ArgumentNullException(nameof(docIdList));
@@ -183,7 +185,7 @@ namespace CouchDB.Client
             var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
-            var docListResponse = DocListResponse<JObject>.FromJsonToJson(allDocsJsonObject);
+            var docListResponse = DocListResponse<string>.FromJsonToString(allDocsJsonObject);
             return docListResponse;
         }
 

@@ -47,19 +47,21 @@ namespace CouchDB.Client
         /// about the return structure, including a list of all documents and basic contents, 
         /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
-        /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
         Task<DocListResponse<string>> GetAllDocumentsAsync(ListQueryParams queryParams = null);
 
         /// <summary>
-        /// Returns a JSON structure of documents in a given database, by multiple IDs.
+        /// Returns a JSON structure of the documents in a given database, found by ID list. 
+        /// The information is returned as a JSON structure containing meta information 
+        /// about the return structure, including a list of all documents and basic contents, 
+        /// consisting the ID, revision and key. The key is the from the document’s _id.
         /// </summary>
-        /// <param name="docIdList">Array of document IDs for retrieving documents.</param>
+        /// <param name="docIdList">Array of document IDs to be retrieved.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
-        /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
-        Task<DocListResponse<JObject>> GetJsonDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null);
-
+        /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
+        Task<DocListResponse<string>> GetDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null);
+        
         /// <summary>
         /// Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
         /// When creating new documents the document ID(_id) is optional.

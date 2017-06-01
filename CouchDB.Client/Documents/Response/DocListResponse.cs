@@ -54,18 +54,7 @@ namespace CouchDB.Client
 
             return new DocListResponse<string>(offset, totalRows, updateSeq, responseRows);
         }
-
-        internal static DocListResponse<JObject> FromJsonToJson(JObject allDocsJsonObject)
-        {
-            var offset = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "offset");
-            var totalRows = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "total_rows");
-            var updateSeq = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "update_seq");
-            var jsonRows = SerializationHelper.JArrayMap(SerializationHelper.GetArrayOrEmpty(allDocsJsonObject, "rows"));
-            var responseRows = jsonRows.Select(json => DocListResponseRow<string>.FromJsonToJson(json)).ToList();
-
-            return new DocListResponse<JObject>(offset, totalRows, updateSeq, responseRows);
-        }
-
+        
         internal DocListResponse<TResult> Cast<TResult>(Func<TDocument, TResult> converter)
         {
             if (converter == null)

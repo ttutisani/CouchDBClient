@@ -412,6 +412,38 @@ namespace CouchDB.ClientDemo
             });
         }
 
+        public void GetDocs()
+        {
+            Console.WriteLine("Enter doc IDs, one at a time. Press <Enter> when done:");
+            var docIdList = new List<string>();
+            do
+            {
+                var id = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(id))
+                    docIdList.Add(id);
+                else
+                    break;
+
+            } while (true);
+
+            UsingDatabase(db =>
+            {
+                ListQueryParams qParams = new ListQueryParams { Include_Docs = true };
+
+                var allDocs = db.GetDocumentsAsync(docIdList.ToArray(), qParams).GetAwaiter().GetResult();
+                Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
+
+                foreach (var row in allDocs.Rows)
+                {
+                    Console.WriteLine(row.Document);
+                    Console.WriteLine("----------");
+                }
+
+                Console.WriteLine("End of list.");
+            });
+        }
+
         public void GetDocsJson()
         {
             Console.WriteLine("Enter doc IDs, one at a time. Press <Enter> when done:");
