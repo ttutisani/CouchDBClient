@@ -131,7 +131,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
     {
         var newDoc = new { _id = "some-id", someProp = "some value" };
         
-        var response = await db.SaveDocumentAsync(newDoc);
+        var response = await db.SaveObjectDocumentAsync(newDoc);
         
         Console.WriteLine($"Newly created document ID: {response.Id}.");
         Console.WriteLine($"Newly created document revision number: {response.Revision}.");
@@ -158,7 +158,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 {
     using (var db = server.SelectDatabase("my-db"))
     {
-        var allDocsObject = await db.GetAllStringDocumentsAsync("some-id");
+        var allDocsObject = await db.GetAllDocumentsAsync("some-id");
         
         Console.WriteLine($"Total count of docs found: {allDocsObject.Rows.Count}");
     }
@@ -171,7 +171,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 {
     using (var db = server.SelectDatabase("my-db"))
     {
-        var response = await db.DeleteDocumentAsync("some-id", "");
+        var response = await db.DeleteDocumentAsync("some-id", "some-revision");
         
         Console.WriteLine($"Deleted document ID: {response.Id}.");
         Console.WriteLine($"Deleted document revision number: {response.Revision}.");
