@@ -7,12 +7,27 @@ namespace CouchDB.Client
 {
     internal static class HttpClientHelper
     {
-        internal async static Task HandleResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
+        internal async static Task<byte[]> HandleRawResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            await HandleResponse<CouchDBServer.ServerResponseDTO>(httpResponse, convertNotFoundIntoNull).Safe();
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                if (convertNotFoundIntoNull && httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+
+                var errorMessage = $"Http status code '{httpResponse.StatusCode}', Http reason phrase '{httpResponse.ReasonPhrase}'.";
+                throw new CouchDBClientException(errorMessage, null, null);
+            }
+
+            var contentAsBytes = await httpResponse.Content.ReadAsByteArrayAsync().Safe();
+            return contentAsBytes;
         }
 
-        internal async static Task<TResult> HandleResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer, bool convertNotFoundIntoNull)
+        internal async static Task HandleJsonResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
+        {
+            await HandleJsonResponse<CouchDBServer.ServerResponseDTO>(httpResponse, convertNotFoundIntoNull).Safe();
+        }
+
+        internal async static Task<TResult> HandleJsonResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer, bool convertNotFoundIntoNull)
         {
             var responseJson = await httpResponse.Content.ReadAsStringAsync().Safe();
             if (!httpResponse.IsSuccessStatusCode)
@@ -35,14 +50,14 @@ namespace CouchDB.Client
             return resultObject;
         }
 
-        internal async static Task<TResult> HandleResponse<TResult>(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
+        internal async static Task<TResult> HandleJsonResponse<TResult>(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            return await HandleResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson), convertNotFoundIntoNull).Safe();
+            return await HandleJsonResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson), convertNotFoundIntoNull).Safe();
         }
 
-        internal async static Task<string> HandleStringResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
+        internal async static Task<string> HandleJsonAsStringResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            return await HandleResponse(httpResponse, strJson => strJson, convertNotFoundIntoNull).Safe();
+            return await HandleJsonResponse(httpResponse, strJson => strJson, convertNotFoundIntoNull).Safe();
         }
     }
 }

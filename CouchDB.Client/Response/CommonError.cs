@@ -55,7 +55,7 @@
         /// <returns>True if values equal, otherwise false.</returns>
         public static bool EqualsErrorString(this CommonError @this, string error)
         {
-            return @this.ToString().ToLower().Equals(error, System.StringComparison.OrdinalIgnoreCase);
+            return @this.ToString().Equals(error, System.StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

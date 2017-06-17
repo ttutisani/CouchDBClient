@@ -66,7 +66,7 @@ namespace CouchDB.Client
             
             var newDocUrl = QueryParams.AppendQueryParams(string.Empty, updateParams);
             var newDocResponse = await _http.PostAsync(newDocUrl, new StringContent(documentJsonString, Encoding.UTF8, "application/json")).Safe();
-            var docResponseDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(newDocResponse, false).Safe();
+            var docResponseDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(newDocResponse, false).Safe();
 
             return new SaveDocResponse(docResponseDTO);
         }
@@ -91,7 +91,7 @@ namespace CouchDB.Client
             var docQuery = QueryParams.AppendQueryParams(docId, queryParams);
 
             var docResponse = await _http.GetAsync(docQuery).Safe();
-            var documentString = await HttpClientHelper.HandleStringResponse(docResponse, true).Safe();
+            var documentString = await HttpClientHelper.HandleJsonAsStringResponse(docResponse, true).Safe();
 
             return documentString;
         }
@@ -127,7 +127,7 @@ namespace CouchDB.Client
             var deleteDocUrl = QueryParams.AppendQueryParams(docId, deleteQueryParams);
 
             var deleteResponse = await _http.DeleteAsync(deleteDocUrl).Safe();
-            var saveDTO = await HttpClientHelper.HandleResponse<SaveDocResponseDTO>(deleteResponse, convertNotFoundIntoNull: true).Safe()
+            var saveDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(deleteResponse, convertNotFoundIntoNull: true).Safe()
                 ?? new SaveDocResponseDTO { Id = docId, Rev = revision };
 
             return new SaveDocResponse(saveDTO);
@@ -149,7 +149,7 @@ namespace CouchDB.Client
         {
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
             var allDocsResponse = await _http.GetAsync(allDocsUrl).Safe();
-            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
+            var allDocsJsonString = await HttpClientHelper.HandleJsonAsStringResponse(allDocsResponse, false).Safe();
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
             var docListResponse = DocListResponse<string>.FromJsonToString(allDocsJsonObject);
@@ -182,7 +182,7 @@ namespace CouchDB.Client
             var allDocsJsonRequest = JsonConvert.SerializeObject(allDocsRequest);
 
             var allDocsResponse = await _http.PostAsync(allDocsUrl, new StringContent(allDocsJsonRequest, Encoding.UTF8, "application/json")).Safe();
-            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
+            var allDocsJsonString = await HttpClientHelper.HandleJsonAsStringResponse(allDocsResponse, false).Safe();
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
 
             var docListResponse = DocListResponse<string>.FromJsonToString(allDocsJsonObject);
@@ -217,9 +217,59 @@ namespace CouchDB.Client
             var saveDocListRequestJson = saveDocListRequest.ToJson().ToString();
 
             var saveDocListResponse = await _http.PostAsync("_bulk_docs", new StringContent(saveDocListRequestJson, Encoding.UTF8, "application/json")).Safe();
-            var saveDocListResponseDTO = await HttpClientHelper.HandleResponse<SaveDocListResponseDTO>(saveDocListResponse, false).Safe();
+            var saveDocListResponseDTO = await HttpClientHelper.HandleJsonResponse<SaveDocListResponseDTO>(saveDocListResponse, false).Safe();
 
             return new SaveDocListResponse(saveDocListResponseDTO);
+        }
+
+        #endregion
+
+        #region Attachments
+
+        /// <summary>
+        /// Uploads the supplied content as an attachment to the specified document.
+        /// </summary>
+        /// <param name="docId">Document ID</param>
+        /// <param name="attName">Attachment name</param>
+        /// <param name="revision">Document revision. Required.</param>
+        /// <param name="attachment">Attachment content.</param>
+        /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
+        public async Task<SaveDocResponse> SaveAttachmentAsync(string docId, string attName, string revision, byte[] attachment)
+        {
+            if (string.IsNullOrWhiteSpace(docId))
+                throw new ArgumentNullException(nameof(docId));
+
+            if (string.IsNullOrWhiteSpace(attName))
+                throw new ArgumentNullException(nameof(attName));
+
+            var queryParams = new AttachmentQueryParams { Rev = revision };
+
+            var saveAttUrl = QueryParams.AppendQueryParams($"{docId}/{attName}", queryParams);
+            var saveAttResponse = await _http.PutAsync(saveAttUrl, new ByteArrayContent(attachment)).Safe();
+            var saveAttResponseDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(saveAttResponse, false).Safe();
+
+            return new SaveDocResponse(saveAttResponseDTO);
+        }
+
+        /// <summary>
+        /// Returns the file attachment associated with the document. 
+        /// The raw data of the associated attachment is returned (just as if you were accessing a static file).
+        /// </summary>
+        /// <param name="docId">Document ID.</param>
+        /// <param name="attName">Attachment name.</param>
+        /// <returns>Attachment content.</returns>
+        public async Task<byte[]> GetAttachmentAsync(string docId, string attName)
+        {
+            if (string.IsNullOrWhiteSpace(docId))
+                throw new ArgumentNullException(nameof(docId));
+
+            if (string.IsNullOrWhiteSpace(attName))
+                throw new ArgumentNullException(nameof(attName));
+
+            var attachmentUrl = $"{docId}/{attName}";
+            var attachmentResponse = await _http.GetAsync(attachmentUrl).Safe();
+            var attachmentBytes = await HttpClientHelper.HandleRawResponse(attachmentResponse, true).Safe();
+            return attachmentBytes;
         }
 
         #endregion

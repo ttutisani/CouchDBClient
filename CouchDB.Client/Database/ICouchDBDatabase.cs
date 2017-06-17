@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace CouchDB.Client
@@ -73,5 +72,24 @@ namespace CouchDB.Client
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         Task<SaveDocListResponse> SaveDocumentsAsync(string[] documents, bool newEdits = true);
+
+        /// <summary>
+        /// Uploads the supplied content as an attachment to the specified document.
+        /// </summary>
+        /// <param name="docId">Document ID</param>
+        /// <param name="attName">Attachment name</param>
+        /// <param name="revision">Document revision. Required.</param>
+        /// <param name="attachment">Attachment content.</param>
+        /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
+        Task<SaveDocResponse> SaveAttachmentAsync(string docId, string attName, string revision, byte[] attachment);
+
+        /// <summary>
+        /// Returns the file attachment associated with the document. 
+        /// The raw data of the associated attachment is returned (just as if you were accessing a static file).
+        /// </summary>
+        /// <param name="docId">Document ID.</param>
+        /// <param name="attName">Attachment name.</param>
+        /// <returns>Attachment content.</returns>
+        Task<byte[]> GetAttachmentAsync(string docId, string attName);
     }
 }

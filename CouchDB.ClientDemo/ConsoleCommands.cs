@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace CouchDB.ClientDemo
 {
@@ -559,6 +560,58 @@ namespace CouchDB.ClientDemo
             {
                 var response = db.SaveObjectDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
                 Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
+            });
+        }
+
+        public void SaveAttachment()
+        {
+            Console.WriteLine("Enter doc id:");
+            var docId = Console.ReadLine();
+            Console.WriteLine("Enter attachment name:");
+            var attName = Console.ReadLine();
+            Console.WriteLine("Enter doc revision:");
+            var revision = Console.ReadLine();
+
+            Console.WriteLine("Enter attachment file (full path or just file name):");
+            var attachmentPath = Console.ReadLine();
+            if (!attachmentPath.Contains(@"\"))
+                attachmentPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\{attachmentPath}";
+
+            var attachment = File.ReadAllBytes(attachmentPath);
+
+            UsingDatabase(db => 
+            {
+                var result = db.SaveAttachmentAsync(docId, attName, revision, attachment).GetAwaiter().GetResult();
+
+                Console.WriteLine(SerializationHelper.Serialize(result));
+            });
+        }
+
+        public void GetAttachment()
+        {
+            Console.WriteLine("Enter doc id:");
+            var docId = Console.ReadLine();
+            Console.WriteLine("Enter attachment name:");
+            var attName = Console.ReadLine();
+
+            Console.WriteLine("Enter attachment download path (full path or just file name):");
+            var attachmentPath = Console.ReadLine();
+            if (!attachmentPath.Contains(@"\"))
+                attachmentPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\{attachmentPath}";
+
+            UsingDatabase(db => 
+            {
+                var attachment = db.GetAttachmentAsync(docId, attName).GetAwaiter().GetResult();
+
+                if (attachment == null)
+                    Console.WriteLine("Attachment not found.");
+                else
+                {
+                    File.WriteAllBytes(attachmentPath, attachment);
+                    Console.WriteLine($"Attachment was written to file {attachmentPath}.");
+                }
+
+                Console.WriteLine();
             });
         }
 

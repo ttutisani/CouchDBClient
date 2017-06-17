@@ -84,6 +84,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AttachmentQueryParamsTests.cs" />
     <Compile Include="CommonErrorTests.cs" />
     <Compile Include="CouchDBDatabaseExtensionsTests.cs" />
     <Compile Include="SaveDocResponseTests.cs" />
