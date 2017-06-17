@@ -35,6 +35,11 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
     * As string (`CouchDBDatabase.SaveDocumentsAsync`)
     * As JObject (JSON Object) (`CouchDBDatabase.SaveJsonDocumentsAsync` overload)
     * As object (System.Object) (`CouchDBDatabase.SaveObjectDocumentsAsync` overload)
+* Attachments
+  * Create or Update an attachment
+    * As raw byte array (`CouchDBDatabase.SaveAttachmentAsync`)
+  * Retrieve attachment
+    * As raw byte array (`CouchDBDatabase.GetAttachmentAsync`)
 * Entitites (reusable documents) - any type implementing `IEntity`
   * Convert database object into entity store for working with entities (`EntityStore` constructor)
   * Create new or update existing entity (`EntityStore.SaveEntityAsync`)
