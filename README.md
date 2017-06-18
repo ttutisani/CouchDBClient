@@ -198,10 +198,10 @@ Demo assumes that you have CouchDB running under [http://localhost:5984/](http:/
 ## Contributing Rules
 
 First, check the Projects tab. I have tasked out things that need to be done.
-If what you intend to do is not in the existing todo list, contact me to align your goals with the overall goals.
+If what you intend to do is not in the existing todo list, contact me to align your goals with the overall goals. You can do so by opening an issue or directly writing to my email - tengo_tutisani [at] hotmail [dot] com.
 Once the task is in place, and we both know what you want to contribute, you can go on with next steps.
 
 Fork -> Write code -> Commit to your fork -> Pull request -> wait until I review and merge.
 
-I'm coming with ABOVE senior level engineering and software architecture backgrounds, so I will be reviewing every letter you wrote.
-I welcome contributors, and I value quality over quantity.
+I value quality over quantity, so please be patient with the thorough code review process with me.
+I appreciate your valuable contributions!
