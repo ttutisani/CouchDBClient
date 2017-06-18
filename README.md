@@ -192,7 +192,12 @@ I'm currently using Visual Studio 2015 Community Edition. As long as you have th
 Solution contains a demo project in it, which is a console app.
 Just run that demo, and it will ask you to enter one of the supported commands into the console.
 
-Demo assumes that you have CouchDB running under [http://localhost:5984/](http://localhost:5984/).
+Demo assumes couple of things by default:
+
+* You should have CouchDB running under [http://localhost:5984/](http://localhost:5984/).
+* There must be an existing CouchDB database named 'my-db'
+
+If any of these assumptions is not met, demo app will still run, but the commands will fail when you run them.
 
 
 ## Contributing Rules
