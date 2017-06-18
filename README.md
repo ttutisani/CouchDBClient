@@ -36,7 +36,7 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
     * As JObject (JSON Object) (`CouchDBDatabase.SaveJsonDocumentsAsync` overload)
     * As object (System.Object) (`CouchDBDatabase.SaveObjectDocumentsAsync` overload)
 * Attachments
-  * Create or Update an attachment
+  * Create or Update attachment
     * As raw byte array (`CouchDBDatabase.SaveAttachmentAsync`)
   * Retrieve attachment
     * As raw byte array (`CouchDBDatabase.GetAttachmentAsync`)
