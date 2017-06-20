@@ -4,14 +4,14 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
 
 ## Full Function Reference
 
-* Server
+* __Server__
   * Get server info (`CouchDBServer.GetInfoAsync`)
-* Databases
+* __Databases__
   * List all databases (`CouchDBServer.GetAllDbNamesAsync`)
   * Create database (`CouchDBServer.CreateDbAsync`)
   * Delete database (`CouchDBServer.DeleteDbAsync`)
   * Get database object to work with documents in it (`CouchDBServer.SelectDatabase`)
-* Documents
+* __Documents__
   * Create new or update existing document
     * As string (`CouchDBDatabase.SaveDocumentAsync`)
     * As JObject (JSON object) (`CouchDBDatabase.SaveJsonDocumentAsync` overload)
@@ -35,14 +35,14 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
     * As string (`CouchDBDatabase.SaveDocumentsAsync`)
     * As JObject (JSON Object) (`CouchDBDatabase.SaveJsonDocumentsAsync` overload)
     * As object (System.Object) (`CouchDBDatabase.SaveObjectDocumentsAsync` overload)
-* Attachments
+* __Attachments__
   * Create or Update attachment
     * As raw byte array (`CouchDBDatabase.SaveAttachmentAsync`)
   * Retrieve attachment
     * As raw byte array (`CouchDBDatabase.GetAttachmentAsync`)
   * Delete attachment
     * By document ID, attachment name and revision (`CouchDBDatabase.DeleteAttachmentAsync`)
-* Entitites (reusable documents) - any type implementing `IEntity`
+* __Entitites__ (reusable documents) - any type implementing `IEntity`
   * Convert database object into entity store for working with entities (`EntityStore` constructor)
   * Create new or update existing entity (`EntityStore.SaveEntityAsync`)
   * Retrieve entity by ID (`EntityStore.GetEntityAsync<>`)
