@@ -125,16 +125,19 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 
 ### Entities (reusable documents)
 
-Documents (discussed below) are fine if you want to deal with ID and Revision values on your own. i.e. if you just saved a new object document, you need to maintain its ID and Revision for consecutive updates; otherwise you need to keep retrieving the document by ID every time you want to apply further changes to it.
-Entities solve the aforementioned problem by updating the ID and Revision in your object, as long as you implement `IEntity` interface.
+Entities are a culmination of object oriented abstractions in CouchDBClient framework. CouchDB itself does not have such notion as Entity. I introduced this concept to support auto-update of the _id and _rev values into the documents. This comes with the price that the document objects need to implement `IEntity` interface, which just requires existence of _id and _rev read-write properties. Once you implement `IEntity` interface, you can use the same object over and over again in all save operations (including deletion).
+
+As you know, CouchDB requires correct _id and _rev values with every operation, which means you need to assign new values (at least to _rev) when trying to use the same document object in next save operations. Entities will have automatically updated _id and _rev values after every operation, so you won't have to keep them up-to-date for using the same document instance in next save operations.
 
 For example:
 ``` C#
 public sealed class SampleEntity : IEntity
 {
+    // IEntity members implemented.
     public string _id { get; set; }
     public string _rev { get; set; }
     
+    // Additional properties of SampleEntity document.
     public string Text { get; set; }
     public int Number { get; set; }
 }
@@ -143,24 +146,29 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 {
     using (var db = server.SelectDatabase("my-db"))
     {
-        //Treat database as Entity store.
+        // Treat database as Entity store.
         var store = new EntityStore(db);
     
-        // create entity (_id is optional).
-        var entity = new SampleEntity { _id = "Sample-entity-1", Text = "This is text", Number = 123 };
+        // create entity (_id is optional, so let's skip it).
+        var entity = new SampleEntity { Text = "This is text", Number = 123 };
         
         // save #1.
         await store.SaveEntityAsync(entity);
         
-        //just change entity's properties, no hassle with ID and Revision anymore.
+        // just change entity's properties.
+        // if this was not Entity, you would have to also assign _id and _rev manually.
         entity.Text = "This is AWESOME";
         entity.Number = 321;
         
         // and save #2.
+        // if this was not Entity, you would have to also assign _rev manually.
         await store.SaveEntityAsync(entity);
         
         // bored? just delete the entity.
+        // if this was not Entity, you would have to also assign _rev manually.
         await store.DeleteEntityAsync(entity);
+        
+        // all calls succeeded, no CouchDB errors received, long live Entities!
     }
 }
 ```
