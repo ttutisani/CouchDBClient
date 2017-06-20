@@ -40,6 +40,8 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
     * As raw byte array (`CouchDBDatabase.SaveAttachmentAsync`)
   * Retrieve attachment
     * As raw byte array (`CouchDBDatabase.GetAttachmentAsync`)
+  * Delete attachment
+    * By document ID, attachment name and revision (`CouchDBDatabase.DeleteAttachmentAsync`)
 * Entitites (reusable documents) - any type implementing `IEntity`
   * Convert database object into entity store for working with entities (`EntityStore` constructor)
   * Create new or update existing entity (`EntityStore.SaveEntityAsync`)
