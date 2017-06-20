@@ -119,12 +119,12 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(revision))
                 throw new ArgumentNullException(nameof(revision));
 
-            var deleteQueryParams = new DeleteDocParams
+            var deleteDocParams = new DeleteDocParams
             {
                 Revision = revision,
                 Batch = batch
             };
-            var deleteDocUrl = QueryParams.AppendQueryParams(docId, deleteQueryParams);
+            var deleteDocUrl = QueryParams.AppendQueryParams(docId, deleteDocParams);
 
             var deleteResponse = await _http.DeleteAsync(deleteDocUrl).Safe();
             var saveDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(deleteResponse, convertNotFoundIntoNull: true).Safe()
@@ -242,6 +242,9 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(attName))
                 throw new ArgumentNullException(nameof(attName));
 
+            if (string.IsNullOrWhiteSpace(revision))
+                throw new ArgumentNullException(nameof(revision));
+
             var queryParams = new AttachmentQueryParams { Rev = revision };
 
             var saveAttUrl = QueryParams.AppendQueryParams($"{docId}/{attName}", queryParams);
@@ -270,6 +273,40 @@ namespace CouchDB.Client
             var attachmentResponse = await _http.GetAsync(attachmentUrl).Safe();
             var attachmentBytes = await HttpClientHelper.HandleRawResponse(attachmentResponse, true).Safe();
             return attachmentBytes;
+        }
+
+        /// <summary>
+        /// Deletes the attachment of the specified doc.
+        /// You must supply the current revision to delete the attachment.
+        /// </summary>
+        /// <param name="docId">Document ID.</param>
+        /// <param name="attName">Attachment name.</param>
+        /// <param name="revision">Document revision. Required.</param>
+        /// <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
+        /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task<SaveDocResponse> DeleteAttachmentAsync(string docId, string attName, string revision, bool batch = false)
+        {
+            if (string.IsNullOrWhiteSpace(docId))
+                throw new ArgumentNullException(nameof(docId));
+
+            if (string.IsNullOrWhiteSpace(attName))
+                throw new ArgumentNullException(nameof(attName));
+
+            if (string.IsNullOrWhiteSpace(revision))
+                throw new ArgumentNullException(nameof(revision));
+
+            var deleteAttParams = new DeleteDocParams
+            {
+                Revision = revision,
+                Batch = batch
+            };
+
+            var deleteAttUrl = QueryParams.AppendQueryParams($"{docId}/{attName}", deleteAttParams);
+            var deleteAttResponse = await _http.DeleteAsync(deleteAttUrl).Safe();
+            var deleteAttResponseDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(deleteAttResponse, false).Safe();
+
+            return new SaveDocResponse(deleteAttResponseDTO);
         }
 
         #endregion

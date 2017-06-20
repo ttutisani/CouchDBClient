@@ -91,5 +91,17 @@ namespace CouchDB.Client
         /// <param name="attName">Attachment name.</param>
         /// <returns>Attachment content.</returns>
         Task<byte[]> GetAttachmentAsync(string docId, string attName);
+
+        /// <summary>
+        /// Deletes the attachment of the specified doc.
+        /// You must supply the current revision to delete the attachment.
+        /// </summary>
+        /// <param name="docId">Document ID.</param>
+        /// <param name="attName">Attachment name.</param>
+        /// <param name="revision">Document revision. Required.</param>
+        /// <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
+        /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        Task<SaveDocResponse> DeleteAttachmentAsync(string docId, string attName, string revision, bool batch = false);
     }
 }
