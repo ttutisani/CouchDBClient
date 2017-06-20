@@ -55,7 +55,14 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
 
 ### Documents
 
-You can work with documents as you own types (any POCO object, no inheritence necessary). CouchDBClient functions will serialize and deserialize from and to your types.
+You can work with documents as you own types (any POCO object, no inheritence necessary). CouchDBClient functions will serialize and deserialize from and to your types. This is the recommended approach with CouchDBClient framework, since it aims to promote object usage over the raw request/response/JSON usage. 
+
+You can also use JObject (new Newtonsoft.Json library), which is an object representation of JSON data. Since JObject allows writing into it, CouchDBClient functions will modify _id and _rev values after every save operation (including deletion, which results in new _rev). This will give you a feeling of the consistency for your data - you won't have to assign the right values into _id and _rev before trying to save it once again (CouchDB requires correct values before trying to update the record). Refer to note about consistency of _id and _rev values below.
+
+Most low level approach allows usage of string documents.
+
+**Note about consistency of _id and _rev values**: this feature does not cover object and string documents, since the framework cannot write into these without additional serialization or reflection hit. These were considered as side effects, so in these cases you will have to assign the resulting _id and _rev values back into your documents in case of strings and objects. JObject document will have _id and _rev values updated after save operations (including deletion, which results in new _rev). If you need consistency of _id and _rev together with the strongly typed object usage, consider turning your objects into _Entities_ (described below), which allows CouchDBClient framework to rely on existence of _id and _rev values in your data, so it will keep them consistent, similar to how it does for JObject.
+
 
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
