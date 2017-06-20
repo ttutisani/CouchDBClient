@@ -175,10 +175,6 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 }
 ```
 
-
-
-
-
 ## Building & Running the Code
 
 I'm currently using Visual Studio 2015 Community Edition. As long as you have that, you will be able to compile and run the code out of the box.
@@ -192,6 +188,11 @@ Demo assumes couple of things by default:
 * There must be an existing CouchDB database named 'my-db'
 
 If any of these assumptions is not met, demo app will still run, but the commands will fail when you run them.
+
+
+## New Feature Requests
+
+If you think there is an important feature which you need and I need to prioritize, just open an issue. Every comment or suggestion will be considered seriously.
 
 
 ## Contributing Rules
