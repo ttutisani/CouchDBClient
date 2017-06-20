@@ -116,46 +116,6 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 }
 ```
 
-Get document JSON string by ID (can get as JObject or your own custom type through generics as well):
-``` C#
-using (var server = new CouchDBServer("http://localhost:5984"))
-{
-    using (var db = server.SelectDatabase("my-db"))
-    {
-        string document = await db.GetDocumentAsync("some-id");
-        
-        Console.WriteLine($"Found document JSON string: {document}");
-    }
-}
-```
-
-Get all documents as strings (can get as JObject or your own custom type through generics as well):
-``` C#
-using (var server = new CouchDBServer("http://localhost:5984"))
-{
-    using (var db = server.SelectDatabase("my-db"))
-    {
-        var allDocsObject = await db.GetAllDocumentsAsync("some-id");
-        
-        Console.WriteLine($"Total count of docs found: {allDocsObject.Rows.Count}");
-    }
-}
-```
-
-Delete document:
-``` C#
-using (var server = new CouchDBServer("http://localhost:5984"))
-{
-    using (var db = server.SelectDatabase("my-db"))
-    {
-        var response = await db.DeleteDocumentAsync("some-id", "some-revision");
-        
-        Console.WriteLine($"Deleted document ID: {response.Id}.");
-        Console.WriteLine($"Deleted document revision number: {response.Revision}.");
-    }
-}
-```
-
 ### Entities (reusable documents)
 
 Documents (discussed below) are fine if you want to deal with ID and Revision values on your own. i.e. if you just saved a new object document, you need to maintain its ID and Revision for consecutive updates; otherwise you need to keep retrieving the document by ID every time you want to apply further changes to it.
