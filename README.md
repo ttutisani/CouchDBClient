@@ -156,16 +156,18 @@ using (var server = new CouchDBServer("http://localhost:5984"))
         await store.SaveEntityAsync(entity);
         
         // just change entity's properties.
-        // if this was not Entity, you would have to also assign _id and _rev manually.
         entity.Text = "This is AWESOME";
         entity.Number = 321;
         
         // and save #2.
-        // if this was not Entity, you would have to also assign _rev manually.
+        // if this was not Entity, you would end up creating new document again,
+        // unless you assign same _id and _rev.
+        // Now you don't need all that, this updates same document!
         await store.SaveEntityAsync(entity);
         
         // bored? just delete the entity.
-        // if this was not Entity, you would have to also assign _rev manually.
+        // if this was not Entity, you would receive error from CouchDB, asking for correct _id and _rev.
+        // Now you don't need all that, this deletes same document!
         await store.DeleteEntityAsync(entity);
         
         // all calls succeeded, no CouchDB errors received, long live Entities!
