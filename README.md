@@ -53,31 +53,106 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
 
 ## Examples
 
-### Databases
+### Documents
 
-Create database:
+You can work with documents as you own types (any POCO object, no inheritence necessary). CouchDBClient functions will serialize and deserialize from and to your types.
+
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    await server.CreateDbAsync("my-db");
+    using (var db = server.SelectDatabase("my-db"))
+    {
+        // Create document in one of many ways.
+        await db.SaveObjectDocumentAsync(new { city = "Austin" });
+        await db.SaveObjectDocumentAsync(new Address { city = "Austin" });
+        await db.SaveJsonDocumentAsync(new JObject { ["city"] = "Austin" });
+        await db.SaveDocumentAsync("{ \"city\": \"Austin\" }");
+        
+        // Update document in one of many ways.
+        // (just add _id and _rev from database or from Response object of creation function).
+        await db.SaveObjectDocumentAsync(new { _id = "123", _rev = "1-rev", city = "Austin" });
+        await db.SaveObjectDocumentAsync(new Address { _id = "123", _rev = "1-rev", city = "Austin" });
+        await db.SaveJsonDocumentAsync(new JObject { ["_id"] = "123", ["_rev"] = "1-rev", ["city"] = "Austin" });
+        await db.SaveDocumentAsync("{ \"_id\": \"123\", \"_rev\": \"1-rev\", \"city\": \"Austin\" }");
+        
+        // Retrieve document in one of many ways.
+        Address document = await db.GetObjectDocumentAsync<Address>("123");
+        JObject document = await db.GetJsonDocumentAsync("123");
+        string document = await db.GetDocumentAsync("123");
+
+        // Delete document in one of many ways.
+        await db.DeleteDocumentAsync("123", "1-rev");
+        await db.DeleteJsonDocumentAsync(new JObject { ["_id"] = "123", ["_rev"] = "1-rev", ["city"] = "Austin" });
+        
+        // Get all documents in one of many ways.
+        DocListResponse<Address> documents = await db.GetAllObjectDocumentsAsync<Address>();
+        DocListResponse<JObject> documents = await db.GetAllJsonDocumentsAsync();
+        DocListResponse<string> documents = await db.GetAllDocumentsAsync();
+        
+        // Get multiple documents in one of many ways.
+        DocListResponse<Address> documents = await db.GetObjectDocumentsAsync<Address>(new [] { "id-1", "id-2", "id=3" });
+        DocListResponse<JObject> documents = await db.GetJsonDocumentsAsync(new [] { "id-1", "id-2", "id=3" });
+        DocListResponse<string> documents = await db.GetDocumentsAsync(new [] { "id-1", "id-2", "id=3" });
+        
+        // Create, Update, or Delete multiple documents in one go.
+        await db.SaveObjectDocumentsAsync(new [] {
+            new { city = "Austin" }, /* will be created */
+            new { _id = "123", _rev = "1-rev", city = "New York" }, /* will be updated */
+            new { _id = "123", _rev = "1-rev", _deleted = true, city = "Lost" } /* will be deleted */
+            });
+        
+        await db.SaveJsonDocumentsAsync(new [] {
+            new JObject { ["city"] = "Austin" }, /* will be created */
+            new JObject { ["_id"] = "123", ["_rev"] = "1-rev", ["city"] = "New York" }, /* will be updated */
+            new JObject { ["_id"] = "123", ["_rev"] = "1-rev", ["_deleted"] = true, ["city"] = "Lost" } /* will be deleted */
+            });
+            
+        await db.SaveDocumentsAsync(new [] {
+            "{ \"city\": \"Austin\" }", /* will be created */
+            "{ \"_id\": \"123\", \"_rev\": \"1-rev\", \"city\": \"New York\" }", /* will be updated */
+            "{ \"_id\": \"123\", \"_rev\": \"1-rev\", \"_deleted\": true, \"city\": \"Lost\" }" /* will be deleted */
+            });
+    }
 }
 ```
 
-Get list of all databases:
+Get document JSON string by ID (can get as JObject or your own custom type through generics as well):
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    string[] allDbs = await server.GetAllDbNamesAsync();
-
-    Console.WriteLine($"Total count of DBs: {allDbs.Length}.");
+    using (var db = server.SelectDatabase("my-db"))
+    {
+        string document = await db.GetDocumentAsync("some-id");
+        
+        Console.WriteLine($"Found document JSON string: {document}");
+    }
 }
 ```
 
-Delete database:
+Get all documents as strings (can get as JObject or your own custom type through generics as well):
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    await server.DeleteDbAsync("my-db");
+    using (var db = server.SelectDatabase("my-db"))
+    {
+        var allDocsObject = await db.GetAllDocumentsAsync("some-id");
+        
+        Console.WriteLine($"Total count of docs found: {allDocsObject.Rows.Count}");
+    }
+}
+```
+
+Delete document:
+``` C#
+using (var server = new CouchDBServer("http://localhost:5984"))
+{
+    using (var db = server.SelectDatabase("my-db"))
+    {
+        var response = await db.DeleteDocumentAsync("some-id", "some-revision");
+        
+        Console.WriteLine($"Deleted document ID: {response.Id}.");
+        Console.WriteLine($"Deleted document revision number: {response.Revision}.");
+    }
 }
 ```
 
@@ -124,67 +199,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 ```
 
 
-### Documents
 
-You can work with documents as strings, or JObject's (JSON objects), or your own custom objects (generics when loading, System.Object when saving).
-All operations with objects will target to support this flexible approach.
-Examples below are using one or another approach just for simplicity's sake.
-
-Create new or save existing document (to save existing, _id and _rev is needed; to create new, none of these is required):
-``` C#
-using (var server = new CouchDBServer("http://localhost:5984"))
-{
-    using (var db = server.SelectDatabase("my-db"))
-    {
-        var newDoc = new { _id = "some-id", someProp = "some value" };
-        
-        var response = await db.SaveObjectDocumentAsync(newDoc);
-        
-        Console.WriteLine($"Newly created document ID: {response.Id}.");
-        Console.WriteLine($"Newly created document revision number: {response.Revision}.");
-    }
-}
-```
-
-Get document JSON string by ID (can get as JObject or your own custom type through generics as well):
-``` C#
-using (var server = new CouchDBServer("http://localhost:5984"))
-{
-    using (var db = server.SelectDatabase("my-db"))
-    {
-        string document = await db.GetDocumentAsync("some-id");
-        
-        Console.WriteLine($"Found document JSON string: {document}");
-    }
-}
-```
-
-Get all documents as strings (can get as JObject or your own custom type through generics as well):
-``` C#
-using (var server = new CouchDBServer("http://localhost:5984"))
-{
-    using (var db = server.SelectDatabase("my-db"))
-    {
-        var allDocsObject = await db.GetAllDocumentsAsync("some-id");
-        
-        Console.WriteLine($"Total count of docs found: {allDocsObject.Rows.Count}");
-    }
-}
-```
-
-Delete document:
-``` C#
-using (var server = new CouchDBServer("http://localhost:5984"))
-{
-    using (var db = server.SelectDatabase("my-db"))
-    {
-        var response = await db.DeleteDocumentAsync("some-id", "some-revision");
-        
-        Console.WriteLine($"Deleted document ID: {response.Id}.");
-        Console.WriteLine($"Deleted document revision number: {response.Revision}.");
-    }
-}
-```
 
 
 ## Building & Running the Code
