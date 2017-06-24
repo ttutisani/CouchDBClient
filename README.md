@@ -55,7 +55,14 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
 
 ### Documents
 
-You can work with documents as you own types (any POCO object, no inheritence necessary). CouchDBClient functions will serialize and deserialize from and to your types.
+You can work with documents as you own types (any POCO object, no inheritence necessary). CouchDBClient functions will serialize and deserialize from and to your types. This is the recommended approach with CouchDBClient framework, since it aims to promote object usage over the raw request/response/JSON usage. 
+
+You can also use JObject (from Newtonsoft.Json library), which is an object representation of JSON data. Since JObject allows writing into it, CouchDBClient functions will modify _id and _rev values after every save operation (including deletion, which results in new _rev). This will give you a feeling of the consistency for your data - you won't have to assign the right values into _id and _rev before trying to save it once again (CouchDB requires correct values before trying to update the record). Refer to note about consistency of _id and _rev values below.
+
+Most low level approach allows usage of string documents.
+
+**Note about consistency of _id and _rev values**: this feature does not cover object and string documents, since the framework cannot write into these without additional serialization or reflection hit. These were considered as side effects, so in these cases you will have to assign the resulting _id and _rev values back into your documents in case of strings and objects. JObject document will have _id and _rev values updated after save operation (including deletion, which results in new _rev). If you need consistency of _id and _rev together with the strongly typed object usage, consider turning your objects into _Entities_ (described below), which allows CouchDBClient framework to rely on existence of _id and _rev values in your data, so it will keep them consistent, similar to how it does for JObject.
+
 
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
@@ -118,16 +125,19 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 
 ### Entities (reusable documents)
 
-Documents (discussed below) are fine if you want to deal with ID and Revision values on your own. i.e. if you just saved a new object document, you need to maintain its ID and Revision for consecutive updates; otherwise you need to keep retrieving the document by ID every time you want to apply further changes to it.
-Entities solve the aforementioned problem by updating the ID and Revision in your object, as long as you implement `IEntity` interface.
+Entities are a culmination of object oriented abstractions in CouchDBClient framework. CouchDB itself does not have such notion as Entity. I introduced this concept to support auto-update of the _id and _rev values into the documents. This comes with the price that the document objects need to implement `IEntity` interface, which just requires existence of _id and _rev read-write properties. Once you implement `IEntity` interface, you can use the same object over and over again in all save operations (including deletion).
+
+As you know, CouchDB requires correct _id and _rev values with every operation, which means you need to assign new values (at least to _rev) when trying to use the same document object in next save operations. Entities will have automatically updated _id and _rev values after every operation, so you won't have to keep them up-to-date for using the same document instance in next save operations.
 
 For example:
 ``` C#
 public sealed class SampleEntity : IEntity
 {
+    // IEntity members implemented.
     public string _id { get; set; }
     public string _rev { get; set; }
     
+    // Additional properties of SampleEntity document.
     public string Text { get; set; }
     public int Number { get; set; }
 }
@@ -136,31 +146,34 @@ using (var server = new CouchDBServer("http://localhost:5984"))
 {
     using (var db = server.SelectDatabase("my-db"))
     {
-        //Treat database as Entity store.
+        // Treat database as Entity store.
         var store = new EntityStore(db);
     
-        // create entity (_id is optional).
-        var entity = new SampleEntity { _id = "Sample-entity-1", Text = "This is text", Number = 123 };
+        // create entity (_id is optional, so let's skip it).
+        var entity = new SampleEntity { Text = "This is text", Number = 123 };
         
         // save #1.
         await store.SaveEntityAsync(entity);
         
-        //just change entity's properties, no hassle with ID and Revision anymore.
+        // just change entity's properties.
         entity.Text = "This is AWESOME";
         entity.Number = 321;
         
         // and save #2.
+        // if this was not Entity, you would end up creating new document again,
+        // unless you assign same _id and _rev.
+        // Now you don't need all that, this updates same document!
         await store.SaveEntityAsync(entity);
         
         // bored? just delete the entity.
+        // if this was not Entity, you would receive error from CouchDB, asking for correct _id and _rev.
+        // Now you don't need all that, this deletes same document!
         await store.DeleteEntityAsync(entity);
+        
+        // all calls succeeded, no CouchDB errors received, long live Entities!
     }
 }
 ```
-
-
-
-
 
 ## Building & Running the Code
 
@@ -175,6 +188,11 @@ Demo assumes couple of things by default:
 * There must be an existing CouchDB database named 'my-db'
 
 If any of these assumptions is not met, demo app will still run, but the commands will fail when you run them.
+
+
+## New Feature Requests
+
+If you think there is an important feature which you need and I need to prioritize, just open an issue. Every comment or suggestion will be considered seriously.
 
 
 ## Contributing Rules
