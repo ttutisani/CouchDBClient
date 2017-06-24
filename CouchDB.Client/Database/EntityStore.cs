@@ -148,5 +148,27 @@ namespace CouchDB.Client
 
             return saveResponse;
         }
+
+        /// <summary>
+        /// Saves attachment on the entity.
+        /// </summary>
+        /// <param name="entity">Entity to which the attachment will be associated.</param>
+        /// <param name="attName">Attachmend name.</param>
+        /// <param name="attachment">Attachment content as byte array.</param>
+        /// <returns>Awaitable task.</returns>
+        public async Task SaveAttachmentAsync(IEntity entity, string attName, byte[] attachment)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            if (string.IsNullOrWhiteSpace(attName))
+                throw new ArgumentNullException(nameof(attName));
+
+            if (attachment == null || attachment.Length == 0)
+                throw new ArgumentNullException(nameof(attachment));
+
+            var saveResponse = await _db.SaveAttachmentAsync(entity._id, attName, entity._rev, attachment).Safe();
+            entity._rev = saveResponse?.Revision;
+        }
     }
 }

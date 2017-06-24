@@ -794,5 +794,32 @@ namespace CouchDB.ClientDemo
                 Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
             });
         }
+
+        public void SaveEntityAttachment()
+        {
+            Console.WriteLine("Enter entity id:");
+            var docId = Console.ReadLine();
+            Console.WriteLine("Enter attachment name:");
+            var attName = Console.ReadLine();
+            
+            Console.WriteLine("Enter attachment file (full path or just file name):");
+            var attachmentPath = Console.ReadLine();
+            if (!attachmentPath.Contains(@"\"))
+                attachmentPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\{attachmentPath}";
+
+            var attachment = File.ReadAllBytes(attachmentPath);
+
+            UsingEntityStore(es => 
+            {
+                var entity = es.GetEntityAsync<SampleEntity>(docId).GetAwaiter().GetResult();
+                Console.WriteLine("Entity before saving:");
+                Console.WriteLine(SerializationHelper.Serialize(entity));
+
+                es.SaveAttachmentAsync(entity, attName, attachment).GetAwaiter().GetResult();
+
+                Console.WriteLine("Entity after saving:");
+                Console.WriteLine(SerializationHelper.Serialize(entity));
+            });
+        }
     }
 }

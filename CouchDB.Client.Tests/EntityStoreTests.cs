@@ -438,7 +438,63 @@ namespace CouchDB.Client.Tests
 
             _db.Verify(db => db.SaveDocumentsAsync(It.Is<string[]>(strDocs => docsDontHaveIDButHaveName(strDocs)), newEdits), Times.Once);
         }
-        
+
+        #endregion
+
+        #region Attachments
+
+        public static IEnumerable<object[]> GetDataFor_SaveAttachmentAsync_Requires_Arguments()
+        {
+            return new List<object[]>
+            {
+                new object[] { null, null, null },
+                new object[] { null, "something", new byte[] { 1, 2 } },
+                new object[] { new SampleEntity(), null, new byte[] { 1, 2 } },
+                new object[] { new SampleEntity(), null, new byte[] { 1, 2 } },
+                new object[] { new SampleEntity(), string.Empty, new byte[] { 1, 2 } },
+                new object[] { new SampleEntity(), "something", null },
+                new object[] { new SampleEntity(), "something", new byte[] { } }
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(GetDataFor_SaveAttachmentAsync_Requires_Arguments))]
+        public async void SaveAttachmentAsync_Requires_Arguments(IEntity entity, string attName, byte[] attachment)
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveAttachmentAsync(entity, attName, attachment));
+        }
+
+        [Fact]
+        public async void SaveAttachmentAsync_Saves_By_Entity_Into_Db()
+        {
+            //arrange.
+            string expectedId = "exp id", expectedRev = "exp rev";
+            var expectedAttName = "some attachment name";
+            var expectedAttachment = new byte[] { 1, 2, 3 };
+
+            //act.
+            await _sut.SaveAttachmentAsync(new SampleEntity { _id = expectedId, _rev = expectedRev }, expectedAttName, expectedAttachment);
+
+            //assert.
+            _db.Verify(db => db.SaveAttachmentAsync(expectedId, expectedAttName, expectedRev, expectedAttachment), Times.Once);
+        }
+
+        [Fact]
+        public async void SaveAttachmentAsync_Updates_Rev_On_Success()
+        {
+            //arrange.
+            var entity = new SampleEntity { _rev = "old rev" };
+            var expectedRev = "new rev";
+            _db.Setup(db => db.SaveAttachmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<byte[]>()))
+                .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO { Rev = expectedRev })));
+
+            //act.
+            await _sut.SaveAttachmentAsync(entity, "attname", new byte[] { 1, 2, 3 });
+
+            //assert.
+            Assert.Equal(expectedRev, entity._rev);
+        }
+
         #endregion
     }
 }
