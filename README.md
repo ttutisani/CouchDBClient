@@ -35,7 +35,7 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
     * As string (`CouchDBDatabase.SaveDocumentsAsync`)
     * As JObject (JSON Object) (`CouchDBDatabase.SaveJsonDocumentsAsync` overload)
     * As object (System.Object) (`CouchDBDatabase.SaveObjectDocumentsAsync` overload)
-* __Attachments__
+* __Document Attachments__
   * Create or Update attachment
     * As raw byte array (`CouchDBDatabase.SaveAttachmentAsync`)
   * Retrieve attachment
@@ -50,6 +50,13 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
   * Retrieve all entities (`EntityStore.GetAllEntitiesAsync<>`)
   * Delete entity (`EntityStore.DeleteEntityAsync`)
   * Create, Update, or Delete multiple entities (`EntityStore.SaveEntitiesAsync`)
+* __Entity Attachments__
+  * Create or Update attachment
+    * As raw byte array (`EntityStore.SaveAttachmentAsync`)
+  * Retrieve attachment
+    * As raw byte array (`EntityStore.GetAttachmentAsync`)
+  * Delete attachment
+    * By document ID, attachment name and revision (`EntityStore.DeleteAttachmentAsync`)
 
 ## Examples
 
