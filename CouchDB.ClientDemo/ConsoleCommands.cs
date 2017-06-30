@@ -849,5 +849,26 @@ namespace CouchDB.ClientDemo
                 Console.WriteLine();
             });
         }
+
+        public void DeleteEntityAttachment()
+        {
+            Console.WriteLine("Enter entity id:");
+            var docId = Console.ReadLine();
+            Console.WriteLine("Enter attachment name:");
+            var attName = Console.ReadLine();
+
+            UsingEntityStore(es => 
+            {
+                var entity = es.GetEntityAsync<SampleEntity>(docId).GetAwaiter().GetResult();
+
+                Console.WriteLine("Entity before attachment deletion:");
+                Console.WriteLine(SerializationHelper.Serialize(entity));
+
+                es.DeleteAttachmentAsync(entity, attName).GetAwaiter().GetResult();
+
+                Console.WriteLine("Entity after attachment deletion:");
+                Console.WriteLine(SerializationHelper.Serialize(entity));
+            });
+        }
     }
 }

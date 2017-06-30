@@ -495,7 +495,7 @@ namespace CouchDB.Client.Tests
             Assert.Equal(expectedRev, entity._rev);
         }
 
-        public static IEnumerable<object[]> GetDataFor_GetAttachmentAsync_Requires_Entity_And_AttName()
+        public static IEnumerable<object[]> GetDataFor_Required_Entity_And_AttName()
         {
             return new List<object[]>
             {
@@ -506,7 +506,7 @@ namespace CouchDB.Client.Tests
         }
 
         [Theory]
-        [MemberData(nameof(GetDataFor_GetAttachmentAsync_Requires_Entity_And_AttName))]
+        [MemberData(nameof(GetDataFor_Required_Entity_And_AttName))]
         public async void GetAttachmentAsync_Requires_Entity_And_AttName(IEntity entity, string attName)
         {
             //act.
@@ -540,6 +540,50 @@ namespace CouchDB.Client.Tests
 
             //assert.
             Assert.Same(expectedAttachment, actualAttachment);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetDataFor_Required_Entity_And_AttName))]
+        public async Task DeleteAttachmentAsync_Requires_Entity_And_AttName(IEntity entity, string attName)
+        {
+            //act.
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.DeleteAttachmentAsync(entity, attName));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task DeleteAttachmentAsync_DeletesBy_Id_Rev_And_Name(bool expectedBatch)
+        {
+            //arrange.
+            var expectedId = "docid_ajhsahsh";
+            var expectedName = "attname-ajhashs";
+            var expectedRev = "rev_ajhsajhs as";
+
+            //act.
+            await _sut.DeleteAttachmentAsync(new SampleEntity { _id = expectedId, _rev = expectedRev }, expectedName, expectedBatch);
+
+            //assert.
+            _db.Verify(db => db.DeleteAttachmentAsync(expectedId, expectedName, expectedRev, expectedBatch), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task DeleteAttachmentAsync_Updates_Revision_On_Success(bool expectedBatch)
+        {
+            //arrange.
+            var expectedRev = "rev-ashajshajhs";
+            _db.Setup(db => db.DeleteAttachmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO { Rev = expectedRev })));
+
+            var entity = new SampleEntity { _rev = "initial value" };
+
+            //act.
+            await _sut.DeleteAttachmentAsync(entity, "name-does not matter");
+
+            //assert.
+            Assert.Equal(expectedRev, entity._rev);
         }
 
         #endregion

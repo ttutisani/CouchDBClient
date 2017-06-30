@@ -189,5 +189,25 @@ namespace CouchDB.Client
 
             return await _db.GetAttachmentAsync(entity._id, attName).Safe();
         }
+
+        /// <summary>
+        /// Deletes attachment from database.
+        /// </summary>
+        /// <param name="entity">Instance of entity owning the attachment to delete.</param>
+        /// <param name="attName">Attachment name.</param>
+        /// <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
+        /// <returns>Awaitable task.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task DeleteAttachmentAsync(IEntity entity, string attName, bool batch = false)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            if (attName == null)
+                throw new ArgumentNullException(nameof(attName));
+
+            var deleteResult = await _db.DeleteAttachmentAsync(entity._id, attName, entity._rev, batch).Safe();
+            entity._rev = deleteResult?.Revision;
+        }
     }
 }
