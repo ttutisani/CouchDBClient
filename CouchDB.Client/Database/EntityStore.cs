@@ -156,6 +156,7 @@ namespace CouchDB.Client
         /// <param name="attName">Attachmend name.</param>
         /// <param name="attachment">Attachment content as byte array.</param>
         /// <returns>Awaitable task.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public async Task SaveAttachmentAsync(IEntity entity, string attName, byte[] attachment)
         {
             if (entity == null)
@@ -169,6 +170,24 @@ namespace CouchDB.Client
 
             var saveResponse = await _db.SaveAttachmentAsync(entity._id, attName, entity._rev, attachment).Safe();
             entity._rev = saveResponse?.Revision;
+        }
+
+        /// <summary>
+        /// Retrieves attachment from database.
+        /// </summary>
+        /// <param name="entity">Entity instance which owns the attachment.</param>
+        /// <param name="attName">Attachment name.</param>
+        /// <returns>Attachment as byte array.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public async Task<byte[]> GetAttachmentAsync(IEntity entity, string attName)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            if (string.IsNullOrWhiteSpace(attName))
+                throw new ArgumentNullException(nameof(attName));
+
+            return await _db.GetAttachmentAsync(entity._id, attName).Safe();
         }
     }
 }

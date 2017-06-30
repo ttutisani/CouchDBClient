@@ -495,6 +495,53 @@ namespace CouchDB.Client.Tests
             Assert.Equal(expectedRev, entity._rev);
         }
 
+        public static IEnumerable<object[]> GetDataFor_GetAttachmentAsync_Requires_Entity_And_AttName()
+        {
+            return new List<object[]>
+            {
+                new object[] { null, null },
+                new object[] { null, "something" },
+                new object[] { new SampleEntity(), null }
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(GetDataFor_GetAttachmentAsync_Requires_Entity_And_AttName))]
+        public async void GetAttachmentAsync_Requires_Entity_And_AttName(IEntity entity, string attName)
+        {
+            //act.
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetAttachmentAsync(entity, attName));
+        }
+
+        [Fact]
+        public async void GetAttachmentAsync_Retrieves_Attachment_By_EntityId_And_Name()
+        {
+            //arrange.
+            var expectedId = "id=aksjaksj";
+            var expectedName = "attname-aljsajsh";
+
+            //act.
+            await _sut.GetAttachmentAsync(new SampleEntity { _id = expectedId }, expectedName);
+
+            //assert.
+            _db.Verify(db => db.GetAttachmentAsync(expectedId, expectedName), Times.Once);
+        }
+
+        [Fact]
+        public async void GetAttachmentAsync_Returns_Attachment_From_Db()
+        {
+            //arrange.
+            var expectedAttachment = new byte[] { 2, 3, 1 };
+            _db.Setup(db => db.GetAttachmentAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.FromResult(expectedAttachment));
+
+            //act.
+            var actualAttachment = await _sut.GetAttachmentAsync(new SampleEntity(), "name-does not matter");
+
+            //assert.
+            Assert.Same(expectedAttachment, actualAttachment);
+        }
+
         #endregion
     }
 }
