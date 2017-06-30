@@ -1,6 +1,15 @@
 # CouchDBClient (CouchDB .NET Client)
 This is a client framework for working with CouchDB from .NET code. It abstracts and simplifies the usage of CouchDB, so that you can easily use it from your application code. All the complexity of working with plain json and http request/responses is burried under the framework. You will be able create, retrieve, save, and delete documents as plain objects, by using this framework.
 
+## Key Strengths of CouchDBClient Framework
+
+* Fully object oriented.
+* Fully unit tested.
+* Fully async (uses async/await).
+* Designed for simplicity in usage.
+
+PS: unit tested using TDD (Test Driven Development), which ensures minimum number of code lines to get the job done.
+
 
 ## Full Function Reference
 
