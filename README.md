@@ -56,7 +56,7 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
   * Retrieve attachment
     * As raw byte array (`EntityStore.GetAttachmentAsync`)
   * Delete attachment
-    * By document ID, attachment name and revision (`EntityStore.DeleteAttachmentAsync`)
+    * By entity instance and attachment name (`EntityStore.DeleteAttachmentAsync`)
 
 ## Examples
 
