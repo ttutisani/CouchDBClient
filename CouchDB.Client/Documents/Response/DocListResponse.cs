@@ -44,8 +44,10 @@ namespace CouchDB.Client
         /// </summary>
         public int UpdateSeq { get; }
 
-        internal static DocListResponse<string> FromJsonToString(JObject allDocsJsonObject)
+        internal static DocListResponse<string> FromJsonToStringList(string allDocsJsonString)
         {
+            var allDocsJsonObject = JObject.Parse(allDocsJsonString);
+
             var offset = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "offset");
             var totalRows = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "total_rows");
             var updateSeq = SerializationHelper.GetIntOrDefault(allDocsJsonObject, "update_seq");

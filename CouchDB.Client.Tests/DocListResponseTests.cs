@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using static CouchDB.Client.Tests.AssertHelper;
 
@@ -41,7 +42,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            var sut = DocListResponse<RawDocument>.FromJsonToString(JObject.FromObject(responseJson));
+            var sut = DocListResponse<RawDocument>.FromJsonToStringList(JsonConvert.SerializeObject(responseJson));
 
             //assert.
             Assert.NotNull(sut);

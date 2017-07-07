@@ -66,7 +66,7 @@ namespace CouchDB.Client
             
             var newDocUrl = QueryParams.AppendQueryParams(string.Empty, updateParams);
             var newDocResponse = await _http.PostAsync(newDocUrl, new StringContent(documentJsonString, Encoding.UTF8, "application/json")).Safe();
-            var docResponseDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(newDocResponse, false).Safe();
+            var docResponseDTO = await HttpClientHelper.HandleObjectResponse<SaveDocResponseDTO>(newDocResponse, false).Safe();
 
             return new SaveDocResponse(docResponseDTO);
         }
@@ -91,7 +91,7 @@ namespace CouchDB.Client
             var docQuery = QueryParams.AppendQueryParams(docId, queryParams);
 
             var docResponse = await _http.GetAsync(docQuery).Safe();
-            var documentString = await HttpClientHelper.HandleJsonAsStringResponse(docResponse, true).Safe();
+            var documentString = await HttpClientHelper.HandleStringResponse(docResponse, true).Safe();
 
             return documentString;
         }
@@ -127,7 +127,7 @@ namespace CouchDB.Client
             var deleteDocUrl = QueryParams.AppendQueryParams(docId, deleteDocParams);
 
             var deleteResponse = await _http.DeleteAsync(deleteDocUrl).Safe();
-            var saveDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(deleteResponse, convertNotFoundIntoNull: true).Safe()
+            var saveDTO = await HttpClientHelper.HandleObjectResponse<SaveDocResponseDTO>(deleteResponse, convertNotFoundIntoNull: true).Safe()
                 ?? new SaveDocResponseDTO { Id = docId, Rev = revision };
 
             return new SaveDocResponse(saveDTO);
@@ -149,10 +149,9 @@ namespace CouchDB.Client
         {
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
             var allDocsResponse = await _http.GetAsync(allDocsUrl).Safe();
-            var allDocsJsonString = await HttpClientHelper.HandleJsonAsStringResponse(allDocsResponse, false).Safe();
-            var allDocsJsonObject = JObject.Parse(allDocsJsonString);
+            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
 
-            var docListResponse = DocListResponse<string>.FromJsonToString(allDocsJsonObject);
+            var docListResponse = DocListResponse<string>.FromJsonToStringList(allDocsJsonString);
             return docListResponse;
         }
 
@@ -182,10 +181,9 @@ namespace CouchDB.Client
             var allDocsJsonRequest = JsonConvert.SerializeObject(allDocsRequest);
 
             var allDocsResponse = await _http.PostAsync(allDocsUrl, new StringContent(allDocsJsonRequest, Encoding.UTF8, "application/json")).Safe();
-            var allDocsJsonString = await HttpClientHelper.HandleJsonAsStringResponse(allDocsResponse, false).Safe();
-            var allDocsJsonObject = JObject.Parse(allDocsJsonString);
+            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
 
-            var docListResponse = DocListResponse<string>.FromJsonToString(allDocsJsonObject);
+            var docListResponse = DocListResponse<string>.FromJsonToStringList(allDocsJsonString);
             return docListResponse;
         }
 
@@ -217,7 +215,7 @@ namespace CouchDB.Client
             var saveDocListRequestJson = saveDocListRequest.ToJson().ToString();
 
             var saveDocListResponse = await _http.PostAsync("_bulk_docs", new StringContent(saveDocListRequestJson, Encoding.UTF8, "application/json")).Safe();
-            var saveDocListResponseDTO = await HttpClientHelper.HandleJsonResponse<SaveDocListResponseDTO>(saveDocListResponse, false).Safe();
+            var saveDocListResponseDTO = await HttpClientHelper.HandleObjectResponse<SaveDocListResponseDTO>(saveDocListResponse, false).Safe();
 
             return new SaveDocListResponse(saveDocListResponseDTO);
         }
@@ -249,7 +247,7 @@ namespace CouchDB.Client
 
             var saveAttUrl = QueryParams.AppendQueryParams($"{docId}/{attName}", queryParams);
             var saveAttResponse = await _http.PutAsync(saveAttUrl, new ByteArrayContent(attachment)).Safe();
-            var saveAttResponseDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(saveAttResponse, false).Safe();
+            var saveAttResponseDTO = await HttpClientHelper.HandleObjectResponse<SaveDocResponseDTO>(saveAttResponse, false).Safe();
 
             return new SaveDocResponse(saveAttResponseDTO);
         }
@@ -304,7 +302,7 @@ namespace CouchDB.Client
 
             var deleteAttUrl = QueryParams.AppendQueryParams($"{docId}/{attName}", deleteAttParams);
             var deleteAttResponse = await _http.DeleteAsync(deleteAttUrl).Safe();
-            var deleteAttResponseDTO = await HttpClientHelper.HandleJsonResponse<SaveDocResponseDTO>(deleteAttResponse, false).Safe();
+            var deleteAttResponseDTO = await HttpClientHelper.HandleObjectResponse<SaveDocResponseDTO>(deleteAttResponse, false).Safe();
 
             return new SaveDocResponse(deleteAttResponseDTO);
         }

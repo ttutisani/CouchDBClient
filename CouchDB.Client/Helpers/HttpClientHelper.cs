@@ -22,12 +22,12 @@ namespace CouchDB.Client
             return contentAsBytes;
         }
 
-        internal async static Task HandleJsonResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
+        internal async static Task HandleVoidResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            await HandleJsonResponse<CouchDBServer.ServerResponseDTO>(httpResponse, convertNotFoundIntoNull).Safe();
+            await HandleObjectResponse<CouchDBServer.ServerResponseDTO>(httpResponse, convertNotFoundIntoNull).Safe();
         }
 
-        internal async static Task<TResult> HandleJsonResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer, bool convertNotFoundIntoNull)
+        internal async static Task<TResult> HandleObjectResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer, bool convertNotFoundIntoNull)
         {
             var responseJson = await httpResponse.Content.ReadAsStringAsync().Safe();
             if (!httpResponse.IsSuccessStatusCode)
@@ -50,14 +50,14 @@ namespace CouchDB.Client
             return resultObject;
         }
 
-        internal async static Task<TResult> HandleJsonResponse<TResult>(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
+        internal async static Task<TResult> HandleObjectResponse<TResult>(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            return await HandleJsonResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson), convertNotFoundIntoNull).Safe();
+            return await HandleObjectResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson), convertNotFoundIntoNull).Safe();
         }
 
-        internal async static Task<string> HandleJsonAsStringResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
+        internal async static Task<string> HandleStringResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            return await HandleJsonResponse(httpResponse, strJson => strJson, convertNotFoundIntoNull).Safe();
+            return await HandleObjectResponse(httpResponse, strJson => strJson, convertNotFoundIntoNull).Safe();
         }
     }
 }
