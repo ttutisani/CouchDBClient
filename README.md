@@ -15,6 +15,7 @@ PS: unit tested using TDD (Test Driven Development), which ensures minimum numbe
 
 * __Server__
   * Get server info (`CouchDBServer.GetInfoAsync`)
+  * Get handler interface for raw request/response calls (`CouchDBServer.GetHandler`)
 * __Databases__
   * List all databases (`CouchDBServer.GetAllDbNamesAsync`)
   * Create database (`CouchDBServer.CreateDbAsync`)
@@ -66,6 +67,9 @@ PS: unit tested using TDD (Test Driven Development), which ensures minimum numbe
     * As raw byte array (`EntityStore.GetAttachmentAsync`)
   * Delete attachment
     * By entity instance and attachment name (`EntityStore.DeleteAttachmentAsync`)
+* __Raw Request / Response__
+  * Get handler interface for raw request/response calls (`CouchDBServer.GetHandler`)
+  * Send raw request to relative URL on CouchDB: (`ICouchDBHandler.SendRequestAsync`)
 
 ## Examples
 
@@ -206,9 +210,26 @@ Demo assumes couple of things by default:
 If any of these assumptions is not met, demo app will still run, but the commands will fail when you run them.
 
 
+## Extensibility Points
+
+If you can't find a needed functionality implemented by the CouchDBClinet framework, you can still make a raw http call to any relative URL on the CouchDB instance.
+
+For example, if CouchDB server URL is http://localhost:5984/, then this is how you can send a GET request to http://localhost:5984/views URL (i.e. `/views` relative URL):
+
+``` C#
+var server = new CouchDBServer("http://localhost:5984");
+var handler = server.GetHandler();
+
+var response = await handler.SentRequestAsync("views", RequestMethod.GET, Request.Empty);
+HttpResponseMessage rawResponse = response.GetHttpResponseMessage();
+```
+
+Resulting `HttpResponseMessage` type ships with .NET Framework, so you are free to do anything with it, such as read content as string or as byte array. Or you can directly send me an email: tengo_tutisani [at] hotmail [dot] com.
+
+
 ## New Feature Requests
 
-If you think there is an important feature which you need and I need to prioritize, just open an issue. Every comment or suggestion will be considered seriously.
+If you think there is an important feature which you are looking for and I need to prioritize, just open an issue. Every comment or suggestion will be considered seriously.
 
 
 ## Contributing Rules
