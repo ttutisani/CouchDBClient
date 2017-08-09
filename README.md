@@ -212,7 +212,7 @@ If any of these assumptions is not met, demo app will still run, but the command
 
 ## Extensibility Points
 
-If you can't find a needed functionality implemented by the CouchDBClinet framework, you can still make a raw http call to any relative URL on the CouchDB instance.
+If you can't find a needed functionality implemented by the CouchDBClinet framework, you can still make a raw HTTP call to any relative URL on the CouchDB instance.
 
 For example, if CouchDB server URL is http://localhost:5984/, then this is how you can send a GET request to http://localhost:5984/views URL (i.e. `/views` relative URL):
 
