@@ -224,12 +224,14 @@ var response = await handler.SentRequestAsync("views", RequestMethod.GET, Reques
 HttpResponseMessage rawResponse = response.GetHttpResponseMessage();
 ```
 
-Resulting `HttpResponseMessage` type ships with .NET Framework, so you are free to do anything with it, such as read content as string or as byte array. Or you can directly send me an email: tengo_tutisani [at] hotmail [dot] com.
+Resulting `HttpResponseMessage` type ships with .NET Framework, so you are free to do anything with it, such as read content as string or as byte array.
 
 
 ## New Feature Requests
 
-If you think there is an important feature which you are looking for and I need to prioritize, just open an issue. Every comment or suggestion will be considered seriously.
+If you think there is an important feature which you are looking for and I need to prioritize, just open an issue. Or you can directly send me an email: tengo_tutisani [at] hotmail [dot] com. 
+
+Every comment or suggestion will be considered seriously.
 
 
 ## Contributing Rules
