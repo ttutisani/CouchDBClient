@@ -69,11 +69,17 @@
     <Compile Include="Documents\Response\SaveDocResponse.cs" />
     <Compile Include="Documents\Request\DocUpdateParams.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Handlers\CouchDBHandler.cs" />
+    <Compile Include="Handlers\ICouchDBHandler.cs" />
+    <Compile Include="Handlers\Request.cs" />
+    <Compile Include="Handlers\RequestType.cs" />
+    <Compile Include="Handlers\Response.cs" />
     <Compile Include="Helpers\EntityHelper.cs" />
     <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Documents\Request\DocQueryParams.cs" />
     <Compile Include="Queries\QueryParams.cs" />
+    <Compile Include="Response\ServerResponseDTO.cs" />
     <Compile Include="Response\ServerResponseError.cs" />
     <Compile Include="Server\CouchDBServer.cs" />
     <Compile Include="Helpers\HttpClientHelper.cs" />

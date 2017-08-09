@@ -16,7 +16,7 @@ namespace CouchDB.Client.Tests
         public void Ctor_Assigns_NullError_IfNotPassed()
         {
             //arrange.
-            var serverResponseDTO = new CouchDBServer.ServerResponseDTO
+            var serverResponseDTO = new ServerResponseDTO
             {
                 OK = true,
                 Error = null,
@@ -34,7 +34,7 @@ namespace CouchDB.Client.Tests
         public void Ctor_Initializes_PropertiesAsPassed()
         {
             //arrange.
-            var serverResponseDTO = new CouchDBServer.ServerResponseDTO
+            var serverResponseDTO = new ServerResponseDTO
             {
                 OK = true,
                 Error = CommonError.File_Exists.ToErrorString(),

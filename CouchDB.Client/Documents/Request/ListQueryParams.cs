@@ -25,19 +25,9 @@ namespace CouchDB.Client
         public string EndKey { get; set; }
 
         /// <summary>
-        /// Alias for endkey param. 
-        /// </summary>
-        public string End_Key { get { return EndKey; } set { EndKey = value; } }
-
-        /// <summary>
         /// Stop returning records when the specified document ID is reached. Optional.
         /// </summary>
         public string EndKey_DocId { get; set; }
-
-        /// <summary>
-        /// Alias for endkey_docid param.
-        /// </summary>
-        public string End_Key_Doc_Id { get { return EndKey_DocId; } set { EndKey_DocId = value; } }
 
         /// <summary>
         /// Include the full content of the documents in the return. Default is false.
@@ -82,19 +72,9 @@ namespace CouchDB.Client
         public string StartKey { get; set; }
 
         /// <summary>
-        /// Alias for startkey param.
-        /// </summary>
-        public string Start_Key { get { return StartKey; } set { StartKey = value; } }
-
-        /// <summary>
         /// Return records starting with the specified document ID. Optional.
         /// </summary>
         public string StartKey_DocId { get; set; }
-
-        /// <summary>
-        /// Alias for startkey_docid param.
-        /// </summary>
-        public string Start_Key_Doc_Id { get { return StartKey_DocId; } set { StartKey_DocId = value; } }
 
         /// <summary>
         /// Response includes an update_seq value indicating which sequence id of the underlying database 

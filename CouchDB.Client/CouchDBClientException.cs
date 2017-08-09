@@ -24,7 +24,7 @@ namespace CouchDB.Client
         /// <param name="innerException">Inner exception describing more specific error.</param>
         public CouchDBClientException(
             string message, 
-            ServerResponse serverResponse,
+            ServerResponse serverResponse = null,
             Exception innerException = null)
             
             : base(message, innerException)

@@ -22,7 +22,7 @@ namespace CouchDB.Client
         /// </summary>
         public string Reason { get; }
 
-        internal ServerResponse(CouchDBServer.ServerResponseDTO serverResponseDTO)
+        internal ServerResponse(ServerResponseDTO serverResponseDTO)
         {
             if (serverResponseDTO == null)
                 throw new ArgumentNullException(nameof(serverResponseDTO));

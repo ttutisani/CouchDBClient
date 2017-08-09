@@ -14,7 +14,7 @@ namespace CouchDB.Client.Tests
             var message = "some ex message";
 
             //act.
-            var sut = new CouchDBClientException(message, null);
+            var sut = new CouchDBClientException(message);
 
             //assert.
             Assert.Equal(message, sut.Message);
@@ -26,7 +26,7 @@ namespace CouchDB.Client.Tests
         {
             //arrange.
             var message = "some ex message";
-            var serverResponse = new ServerResponse(new CouchDBServer.ServerResponseDTO { });
+            var serverResponse = new ServerResponse(new ServerResponseDTO { });
             var innerException = new Exception();
 
             //act.
@@ -42,7 +42,7 @@ namespace CouchDB.Client.Tests
         public void GetObjectData_Sets_Info_About_Members()
         {
             //arrange.
-            var serverResponse = new ServerResponse(new CouchDBServer.ServerResponseDTO());
+            var serverResponse = new ServerResponse(new ServerResponseDTO());
             var sut = new CouchDBClientException("message does not matter", serverResponse);
 
             //act.

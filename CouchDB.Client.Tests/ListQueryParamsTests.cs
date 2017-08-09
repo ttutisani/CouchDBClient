@@ -1,75 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Xunit;
 
 namespace CouchDB.Client.Tests
 {
     public sealed class ListQueryParamsTests
     {
-        [Fact]
-        public void End_Key_IsAnAliasFor_EndKey()
-        {
-            //arrange / act.
-            var sut = new ListQueryParams { End_Key = "end-key-123" };
-
-            //assert.
-            Assert.Equal(sut.End_Key, sut.EndKey);
-        }
-
-        [Fact]
-        public void End_Key_Doc_Id_IsAnAliasFor_EndKey_DocId()
-        {
-            //arrange / act.
-            var sut = new ListQueryParams { End_Key_Doc_Id = "end-key-doc-id-19218" };
-
-            //assert.
-            Assert.Equal(sut.End_Key_Doc_Id, sut.EndKey_DocId);
-        }
-
-        [Fact]
-        public void Start_Key_IsAnAliasFor_StartKey()
-        {
-            //arrange / act.
-            var sut = new ListQueryParams { Start_Key = "start-key-123" };
-
-            //assert.
-            Assert.Equal(sut.Start_Key, sut.StartKey);
-        }
-
-        [Fact]
-        public void Start_Key_Doc_Id_IsAnAliasFor_StartKey_DocId()
-        {
-            //arrange / act.
-            var sut = new ListQueryParams { Start_Key_Doc_Id = "start-key-doc-id-19218" };
-
-            //assert.
-            Assert.Equal(sut.Start_Key_Doc_Id, sut.StartKey_DocId);
-        }
-
-        [Fact]
-        public void Alias_DoesNotAppearInQueryString()
-        {
-            //arrange.
-            var sut = new ListQueryParams
-            {
-                End_Key = "end-key-123",
-                End_Key_Doc_Id = "end-key-doc-id-19218",
-                Start_Key = "start-key-123",
-                Start_Key_Doc_Id = "start-key-doc-id-19218"
-            };
-
-            //act.
-            var query = sut.ToQueryString();
-
-            //assert.
-            var queryParts = query.Split('&');
-            Assert.Equal(4, queryParts.Length);
-            Assert.True(queryParts.Any(p => p.Equals($"endkey=\"{sut.End_Key}\"", StringComparison.OrdinalIgnoreCase)));
-            Assert.True(queryParts.Any(p => p.Equals($"endkey_docid=\"{sut.End_Key_Doc_Id}\"", StringComparison.OrdinalIgnoreCase)));
-            Assert.True(queryParts.Any(p => p.Equals($"startkey=\"{sut.Start_Key}\"", StringComparison.OrdinalIgnoreCase)));
-            Assert.True(queryParts.Any(p => p.Equals($"startkey_docid=\"{sut.Start_Key_Doc_Id}\"", StringComparison.OrdinalIgnoreCase)));
-        }
-
         [Fact]
         public void NonChanged_Params_GiveNoQueryString()
         {

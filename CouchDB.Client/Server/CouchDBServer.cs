@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace CouchDB.Client
@@ -8,9 +7,9 @@ namespace CouchDB.Client
     /// Represents CouchDB server instance. 
     /// Starting point for all interactions with CouchDB.
     /// </summary>
-    public sealed class CouchDBServer : IDisposable
+    public sealed class CouchDBServer
     {
-        private readonly HttpClient _http;
+        private readonly string _baseUrl;
 
         /// <summary>
         /// Initializes new instance of <see cref="CouchDBServer"/> class.
@@ -19,24 +18,19 @@ namespace CouchDB.Client
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         /// <exception cref="FormatException"><paramref name="baseUrl"/> is not in valid format.</exception>
         public CouchDBServer(string baseUrl)
+            : this(new CouchDBHandler(baseUrl))
         {
-            if (string.IsNullOrWhiteSpace(baseUrl))
-                throw new ArgumentNullException(nameof(baseUrl));
-
-            Uri serverUri;
-            if (!Uri.TryCreate(UrlHelper.CombineUrl(baseUrl, "/"), UriKind.Absolute, out serverUri))
-                throw new FormatException("URL is not in valid format.");
-
-            _http = new HttpClient();
-            _http.BaseAddress = serverUri;
+            _baseUrl = baseUrl;
         }
 
-        /// <summary>
-        /// Disposes <see cref="CouchDBServer"/> instance, after which it becomes unusable.
-        /// </summary>
-        public void Dispose()
+        private readonly ICouchDBHandler _handler;
+
+        internal CouchDBServer(ICouchDBHandler handler)
         {
-            _http.Dispose();
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
+
+            _handler = handler;
         }
 
         #region GetInfo
@@ -49,10 +43,15 @@ namespace CouchDB.Client
         /// <returns><see cref="ServerInfo"/> object containing server metadata information.</returns>
         public async Task<ServerInfo> GetInfoAsync()
         {
-            var infoHttpResponse = await _http.GetAsync(string.Empty).Safe();
-            var infoDTO = await HttpClientHelper.HandleObjectResponse<ServerInfoDTO>(infoHttpResponse, false).Safe();
-            var serverInfo = new ServerInfo(infoDTO);
+            ServerInfo serverInfo = null;
 
+            var response = await _handler.SendRequestAsync(string.Empty, RequestMethod.GET, Request.Empty).Safe();
+            if (response != null)
+            {
+                var infoDTO = await response.ReadAsAsync<ServerInfoDTO>(false).Safe();
+                if (infoDTO != null)
+                    serverInfo = new ServerInfo(infoDTO);
+            }
             return serverInfo;
         }
 
@@ -78,15 +77,16 @@ namespace CouchDB.Client
         /// <returns>String array containing all database names.</returns>
         public async Task<string[]> GetAllDbNamesAsync(ListQueryParams queryParams = null)
         {
+            string[] dbNames = null;
+
             var allDbsQuery = QueryParams.AppendQueryParams("_all_dbs", queryParams);
+            var response = await _handler.SendRequestAsync(allDbsQuery, RequestMethod.GET, Request.Empty).Safe();
 
-            var dbNamesHttpResponse = await _http.GetAsync(allDbsQuery).Safe();
-            var dbNamesArray = await HttpClientHelper.HandleObjectResponse<string[]>(dbNamesHttpResponse, false).Safe();
-            
-            return dbNamesArray;
+            if (response != null)
+                dbNames = await response.ReadAsAsync<string[]>(false).Safe();
+
+            return dbNames;
         }
-
-        #region CreateDb
 
         /// <summary>
         /// Creates a new database.
@@ -99,20 +99,10 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
 
-            var createDbHttpResponse = await _http.PutAsync(dbName, null).Safe();
-            await HttpClientHelper.HandleVoidResponse(createDbHttpResponse, false).Safe();
+            var response = await _handler.SendRequestAsync(dbName, RequestMethod.PUT, Request.Empty).Safe();
+            if (response != null)
+                await response.EnsureSuccessAsync(false).Safe();
         }
-
-        internal sealed class ServerResponseDTO
-        {
-            public bool OK { get; set; }
-
-            public string Error { get; set; }
-
-            public string Reason { get; set; }
-        }
-
-        #endregion
 
         /// <summary>
         /// Deletes the specified database, 
@@ -126,8 +116,9 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
 
-            var deleteHttpResponse = await _http.DeleteAsync(dbName).Safe();
-            await HttpClientHelper.HandleVoidResponse(deleteHttpResponse, convertNotFoundIntoNull: true).Safe();
+            var response = await _handler.SendRequestAsync(dbName, RequestMethod.DELETE, Request.Empty).Safe();
+            if (response != null)
+                await response.EnsureSuccessAsync(true);
         }
 
         /// <summary>
@@ -141,7 +132,16 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
 
-            return new CouchDBDatabase(UrlHelper.CombineUrl(_http.BaseAddress.OriginalString, dbName));
+            return new CouchDBDatabase(UrlHelper.CombineUrl(_baseUrl, dbName));
+        }
+
+        /// <summary>
+        /// Retrieves instance of <see cref="ICouchDBHandler"/> which can be used to send raw requests to CouchDB.
+        /// </summary>
+        /// <returns>Instance of <see cref="ICouchDBHandler"/>.</returns>
+        public ICouchDBHandler GetHandler()
+        {
+            return _handler;
         }
     }
 }

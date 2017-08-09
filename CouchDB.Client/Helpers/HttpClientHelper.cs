@@ -15,7 +15,7 @@ namespace CouchDB.Client
                     return null;
 
                 var errorMessage = $"Http status code '{httpResponse.StatusCode}', Http reason phrase '{httpResponse.ReasonPhrase}'.";
-                throw new CouchDBClientException(errorMessage, null, null);
+                throw new CouchDBClientException(errorMessage);
             }
 
             var contentAsBytes = await httpResponse.Content.ReadAsByteArrayAsync().Safe();
@@ -24,7 +24,7 @@ namespace CouchDB.Client
 
         internal async static Task HandleVoidResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
-            await HandleObjectResponse<CouchDBServer.ServerResponseDTO>(httpResponse, convertNotFoundIntoNull).Safe();
+            await HandleObjectResponse<ServerResponseDTO>(httpResponse, convertNotFoundIntoNull).Safe();
         }
 
         internal async static Task<TResult> HandleObjectResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer, bool convertNotFoundIntoNull)
@@ -35,15 +35,15 @@ namespace CouchDB.Client
                 var errorMessage = $"Http status code '{httpResponse.StatusCode}', Http reason phrase '{httpResponse.ReasonPhrase}'.";
                 if (string.IsNullOrWhiteSpace(responseJson))
                 {
-                    throw new CouchDBClientException(errorMessage, null, null);
+                    throw new CouchDBClientException(errorMessage);
                 }
 
-                var responseObject = JsonConvert.DeserializeObject<CouchDBServer.ServerResponseDTO>(responseJson);
+                var responseObject = JsonConvert.DeserializeObject<ServerResponseDTO>(responseJson);
                 if (convertNotFoundIntoNull && CommonError.Not_Found.EqualsErrorString(responseObject.Error))
                 {
                     return default(TResult);
                 }
-                throw new CouchDBClientException(errorMessage, new ServerResponse(responseObject), null);
+                throw new CouchDBClientException(errorMessage, new ServerResponse(responseObject));
             }
 
             var resultObject = deserializer(responseJson);

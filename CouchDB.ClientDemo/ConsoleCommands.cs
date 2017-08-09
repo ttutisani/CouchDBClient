@@ -12,21 +12,20 @@ namespace CouchDB.ClientDemo
     {
         private void UsingServer(Action<CouchDBServer> body)
         {
-            using (var server = new CouchDBServer(_serverUrl))
+            var server = new CouchDBServer(_serverUrl);
+
+            try
             {
-                try
-                {
-                    body(server);
-                }
-                catch (CouchDBClientException ex)
-                {
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
-                catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
-                {
-                    var ex = ae.InnerException as CouchDBClientException;
-                    Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
-                }
+                body(server);
+            }
+            catch (CouchDBClientException ex)
+            {
+                Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
+            }
+            catch (AggregateException ae) when (ae.InnerException is CouchDBClientException)
+            {
+                var ex = ae.InnerException as CouchDBClientException;
+                Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
             }
         }
 
