@@ -39,7 +39,12 @@
         /// <summary>
         /// Document format validation failed. e.g. if _id is passed with upper case property name, such as _Id.
         /// </summary>
-        Doc_Validation
+        Doc_Validation,
+
+        /// <summary>
+        /// Unauthorized request.
+        /// </summary>
+        Unauthorized
     }
 
     /// <summary>

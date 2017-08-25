@@ -49,6 +49,7 @@ namespace CouchDB.Client.Tests
             Assert.NotNull(sut.Error);
             Assert.True(sut.Error.CommonError.HasValue);
             Assert.True(sut.Error.CommonError.GetValueOrDefault().EqualsErrorString(serverResponseDTO.Error));
+            Assert.Equal(serverResponseDTO.Reason, sut.Error.Reason);
             Assert.Equal(serverResponseDTO.Reason, sut.Reason);
         }
     }
