@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -16,9 +15,8 @@ namespace CouchDB.Client
         internal const string IdPropertyName = "_id";
         internal const string RevisionPropertyName = "_rev";
 
-        private readonly HttpClient _http;
-
         internal CouchDBDatabase(string baseUrl)
+            : this(new CouchDBHandler(baseUrl))
         {
             if (string.IsNullOrWhiteSpace(baseUrl))
                 throw new ArgumentNullException(nameof(baseUrl));
@@ -26,9 +24,16 @@ namespace CouchDB.Client
             Uri dbUri;
             if (!Uri.TryCreate(UrlHelper.CombineUrl(baseUrl, "/"), UriKind.Absolute, out dbUri))
                 throw new FormatException("URL is not in valid format.");
+        }
 
-            _http = new HttpClient();
-            _http.BaseAddress = dbUri;
+        private readonly ICouchDBHandler _handler;
+
+        internal CouchDBDatabase(ICouchDBHandler handler)
+        {
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
+
+            _handler = handler;
         }
 
         /// <summary>
@@ -36,7 +41,8 @@ namespace CouchDB.Client
         /// </summary>
         public void Dispose()
         {
-            _http.Dispose();
+            var disposableHandler = _handler as IDisposable;
+            disposableHandler?.Dispose();
         }
 
         #region Save doc
@@ -63,11 +69,13 @@ namespace CouchDB.Client
         {
             if (string.IsNullOrWhiteSpace(documentJsonString))
                 throw new ArgumentNullException(nameof(documentJsonString));
-            
-            var newDocUrl = QueryParams.AppendQueryParams(string.Empty, updateParams);
-            var newDocResponse = await _http.PostAsync(newDocUrl, new StringContent(documentJsonString, Encoding.UTF8, "application/json")).Safe();
-            var docResponseDTO = await HttpClientHelper.HandleObjectResponse<SaveDocResponseDTO>(newDocResponse, false).Safe();
 
+            var newDocUrl = QueryParams.AppendQueryParams(string.Empty, updateParams);
+            var response = await _handler.SendRequestAsync(newDocUrl, RequestMethod.POST, Request.JsonString(documentJsonString)).Safe();
+            if (response == null)
+                return null;
+
+            var docResponseDTO = await response.ReadAsAsync<SaveDocResponseDTO>(false).Safe();
             return new SaveDocResponse(docResponseDTO);
         }
         
@@ -89,11 +97,11 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(docId));
 
             var docQuery = QueryParams.AppendQueryParams(docId, queryParams);
+            var response = await _handler.SendRequestAsync(docQuery, RequestMethod.GET, Request.Empty).Safe();
+            if (response == null)
+                return null;
 
-            var docResponse = await _http.GetAsync(docQuery).Safe();
-            var documentString = await HttpClientHelper.HandleStringResponse(docResponse, true).Safe();
-
-            return documentString;
+            return await response.ReadAsStringAsync(true).Safe();
         }
         
         #endregion
@@ -125,12 +133,14 @@ namespace CouchDB.Client
                 Batch = batch
             };
             var deleteDocUrl = QueryParams.AppendQueryParams(docId, deleteDocParams);
+            var response = await _handler.SendRequestAsync(deleteDocUrl, RequestMethod.DELETE, Request.Empty).Safe();
+            if (response == null)
+                return null;
 
-            var deleteResponse = await _http.DeleteAsync(deleteDocUrl).Safe();
-            var saveDTO = await HttpClientHelper.HandleObjectResponse<SaveDocResponseDTO>(deleteResponse, convertNotFoundIntoNull: true).Safe()
+            var responseDTO = await response.ReadAsAsync<SaveDocResponseDTO>(true).Safe()
                 ?? new SaveDocResponseDTO { Id = docId, Rev = revision };
 
-            return new SaveDocResponse(saveDTO);
+            return new SaveDocResponse(responseDTO);
         }
         
         #endregion
@@ -148,9 +158,11 @@ namespace CouchDB.Client
         public async Task<DocListResponse<string>> GetAllDocumentsAsync(ListQueryParams queryParams = null)
         {
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
-            var allDocsResponse = await _http.GetAsync(allDocsUrl).Safe();
-            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
+            var response = await _handler.SendRequestAsync(allDocsUrl, RequestMethod.GET, Request.Empty).Safe();
+            if (response == null)
+                return null;
 
+            var allDocsJsonString = await response.ReadAsStringAsync(false).Safe();
             var docListResponse = DocListResponse<string>.FromJsonToStringList(allDocsJsonString);
             return docListResponse;
         }
@@ -168,21 +180,21 @@ namespace CouchDB.Client
         /// <param name="docIdList">Array of document IDs to be retrieved.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public async Task<DocListResponse<string>> GetDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null)
         {
-            if (docIdList == null)
+            if (docIdList == null || docIdList.Length == 0)
                 throw new ArgumentNullException(nameof(docIdList));
-
-            if (docIdList.Length == 0)
-                throw new ArgumentException($"{nameof(docIdList)} should not be empty.", nameof(docIdList));
 
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
             var allDocsRequest = new { keys = docIdList };
             var allDocsJsonRequest = JsonConvert.SerializeObject(allDocsRequest);
 
-            var allDocsResponse = await _http.PostAsync(allDocsUrl, new StringContent(allDocsJsonRequest, Encoding.UTF8, "application/json")).Safe();
-            var allDocsJsonString = await HttpClientHelper.HandleStringResponse(allDocsResponse, false).Safe();
+            var allDocsResponse = await _handler.SendRequestAsync(allDocsUrl, RequestMethod.POST, Request.JsonString(allDocsJsonRequest)).Safe();
+            if (allDocsResponse == null)
+                return null;
 
+            var allDocsJsonString = await allDocsResponse.ReadAsStringAsync(false).Safe();
             var docListResponse = DocListResponse<string>.FromJsonToStringList(allDocsJsonString);
             return docListResponse;
         }
@@ -214,8 +226,11 @@ namespace CouchDB.Client
             saveDocListRequest.AddDocuments(documents);
             var saveDocListRequestJson = saveDocListRequest.ToJson().ToString();
 
-            var saveDocListResponse = await _http.PostAsync("_bulk_docs", new StringContent(saveDocListRequestJson, Encoding.UTF8, "application/json")).Safe();
-            var saveDocListResponseDTO = await HttpClientHelper.HandleObjectResponse<SaveDocListResponseDTO>(saveDocListResponse, false).Safe();
+            var saveDocListResponse = await _handler.SendRequestAsync("_bulk_docs", RequestMethod.POST, Request.JsonString(saveDocListRequestJson)).Safe();
+            if (saveDocListResponse == null)
+                return null;
+
+            var saveDocListResponseDTO = await saveDocListResponse.ReadAsAsync<SaveDocListResponseDTO>(false).Safe();
 
             return new SaveDocListResponse(saveDocListResponseDTO);
         }
@@ -232,6 +247,7 @@ namespace CouchDB.Client
         /// <param name="revision">Document revision. Required.</param>
         /// <param name="attachment">Attachment content.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public async Task<SaveDocResponse> SaveAttachmentAsync(string docId, string attName, string revision, byte[] attachment)
         {
             if (string.IsNullOrWhiteSpace(docId))
@@ -246,9 +262,11 @@ namespace CouchDB.Client
             var queryParams = new AttachmentQueryParams { Rev = revision };
 
             var saveAttUrl = QueryParams.AppendQueryParams($"{docId}/{attName}", queryParams);
-            var saveAttResponse = await _http.PutAsync(saveAttUrl, new ByteArrayContent(attachment)).Safe();
-            var saveAttResponseDTO = await HttpClientHelper.HandleObjectResponse<SaveDocResponseDTO>(saveAttResponse, false).Safe();
+            var saveAttResponse = await _handler.SendRequestAsync(saveAttUrl, RequestMethod.PUT, Request.Raw(attachment)).Safe();
+            if (saveAttResponse == null)
+                return null;
 
+            var saveAttResponseDTO = await saveAttResponse.ReadAsAsync<SaveDocResponseDTO>(false).Safe();
             return new SaveDocResponse(saveAttResponseDTO);
         }
 
@@ -259,6 +277,7 @@ namespace CouchDB.Client
         /// <param name="docId">Document ID.</param>
         /// <param name="attName">Attachment name.</param>
         /// <returns>Attachment content.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public async Task<byte[]> GetAttachmentAsync(string docId, string attName)
         {
             if (string.IsNullOrWhiteSpace(docId))
@@ -268,8 +287,12 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(attName));
 
             var attachmentUrl = $"{docId}/{attName}";
-            var attachmentResponse = await _http.GetAsync(attachmentUrl).Safe();
-            var attachmentBytes = await HttpClientHelper.HandleRawResponse(attachmentResponse, true).Safe();
+            var attachmentResponse = await _handler.SendRequestAsync(attachmentUrl, RequestMethod.GET, Request.Empty).Safe();
+            if (attachmentResponse == null)
+                return null;
+
+            var attachmentBytes = await attachmentResponse.ReadAsByteArrayAsync(true).Safe();
+
             return attachmentBytes;
         }
 
@@ -301,8 +324,11 @@ namespace CouchDB.Client
             };
 
             var deleteAttUrl = QueryParams.AppendQueryParams($"{docId}/{attName}", deleteAttParams);
-            var deleteAttResponse = await _http.DeleteAsync(deleteAttUrl).Safe();
-            var deleteAttResponseDTO = await HttpClientHelper.HandleObjectResponse<SaveDocResponseDTO>(deleteAttResponse, false).Safe();
+            var deleteAttresponse = await _handler.SendRequestAsync(deleteAttUrl, RequestMethod.DELETE, Request.Empty).Safe();
+            if (deleteAttresponse == null)
+                return null;
+
+            var deleteAttResponseDTO = await deleteAttresponse.ReadAsAsync<SaveDocResponseDTO>(false).Safe();
 
             return new SaveDocResponse(deleteAttResponseDTO);
         }

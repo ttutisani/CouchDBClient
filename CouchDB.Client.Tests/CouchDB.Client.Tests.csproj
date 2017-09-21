@@ -88,6 +88,7 @@
     <Compile Include="AttachmentQueryParamsTests.cs" />
     <Compile Include="CommonErrorTests.cs" />
     <Compile Include="CouchDBDatabaseExtensionsTests.cs" />
+    <Compile Include="CouchDbDatabaseTests.cs" />
     <Compile Include="CouchDBServerTests.cs" />
     <Compile Include="Helpers\HandlerTestHelpers.cs" />
     <Compile Include="ResponseTests.cs" />

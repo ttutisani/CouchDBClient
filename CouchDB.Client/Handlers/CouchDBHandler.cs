@@ -58,6 +58,9 @@ namespace CouchDB.Client
                 case RequestMethod.DELETE:
                     httpResponseMessage = await _http.DeleteAsync(relativeUrl).Safe();
                     break;
+                case RequestMethod.POST:
+                    httpResponseMessage = await _http.PostAsync(relativeUrl, request?.ToHttpContent()).Safe();
+                    break;
                 default:
                     var errorMessage = $"Error while executing `{nameof(CouchDBHandler)}::{nameof(SendRequestAsync)}`: Request method {requestMethod} is not supported."
                         + $" Possibly uncovered member in `{nameof(RequestMethod)}` enum.";

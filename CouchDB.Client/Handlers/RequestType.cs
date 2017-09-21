@@ -18,6 +18,8 @@
         /// <summary>
         /// HTTP DELETE.
         /// </summary>
-        DELETE
+        DELETE,
+
+        POST
     }
 }

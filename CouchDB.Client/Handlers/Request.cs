@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
+using System.Text;
 
 namespace CouchDB.Client
 {
@@ -20,5 +22,49 @@ namespace CouchDB.Client
         /// </summary>
         /// <returns></returns>
         public abstract HttpContent ToHttpContent();
+
+        #region String
+
+        public static Request JsonString(string content) 
+            => 
+            new StringRequest(content, Encoding.UTF8, "application/json");
+
+        private sealed class StringRequest : Request
+        {
+            private readonly HttpContent _content;
+
+            public StringRequest(string content, Encoding encoding, string mediaType)
+            {
+                _content = new StringContent(content, encoding, mediaType);
+            }
+
+            public override HttpContent ToHttpContent()
+            {
+                return _content;
+            }
+        }
+
+        #endregion
+
+        #region Raw
+
+        public static Request Raw(byte[] content) => new RawRequest(content);
+
+        private sealed class RawRequest : Request
+        {
+            private readonly HttpContent _httpContent;
+
+            public RawRequest(byte[] attachment)
+            {
+                _httpContent = new ByteArrayContent(attachment);
+            }
+
+            public override HttpContent ToHttpContent()
+            {
+                return _httpContent;
+            }
+        }
+
+        #endregion
     }
 }
