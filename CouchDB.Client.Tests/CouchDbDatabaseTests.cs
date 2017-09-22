@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
+
 namespace CouchDB.Client.Tests
 {
     public sealed class CouchDbDatabaseTests

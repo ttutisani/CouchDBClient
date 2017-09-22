@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CouchDB.Client
@@ -18,12 +16,6 @@ namespace CouchDB.Client
         internal CouchDBDatabase(string baseUrl)
             : this(new CouchDBHandler(baseUrl))
         {
-            if (string.IsNullOrWhiteSpace(baseUrl))
-                throw new ArgumentNullException(nameof(baseUrl));
-
-            Uri dbUri;
-            if (!Uri.TryCreate(UrlHelper.CombineUrl(baseUrl, "/"), UriKind.Absolute, out dbUri))
-                throw new FormatException("URL is not in valid format.");
         }
 
         private readonly ICouchDBHandler _handler;
