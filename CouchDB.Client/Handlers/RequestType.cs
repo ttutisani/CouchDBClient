@@ -18,6 +18,11 @@
         /// <summary>
         /// HTTP DELETE.
         /// </summary>
-        DELETE
+        DELETE,
+
+        /// <summary>
+        /// HTTP POST.
+        /// </summary>
+        POST
     }
 }

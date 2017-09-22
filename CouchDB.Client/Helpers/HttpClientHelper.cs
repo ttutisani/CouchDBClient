@@ -29,6 +29,11 @@ namespace CouchDB.Client
 
         internal async static Task<TResult> HandleObjectResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer, bool convertNotFoundIntoNull)
         {
+            if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound && convertNotFoundIntoNull)
+            {
+                return default(TResult);
+            }
+
             var responseJson = await httpResponse.Content.ReadAsStringAsync().Safe();
             if (!httpResponse.IsSuccessStatusCode)
             {
@@ -39,10 +44,6 @@ namespace CouchDB.Client
                 }
 
                 var responseObject = JsonConvert.DeserializeObject<ServerResponseDTO>(responseJson);
-                if (convertNotFoundIntoNull && CommonError.Not_Found.EqualsErrorString(responseObject.Error))
-                {
-                    return default(TResult);
-                }
                 throw new CouchDBClientException(errorMessage, new ServerResponse(responseObject));
             }
 

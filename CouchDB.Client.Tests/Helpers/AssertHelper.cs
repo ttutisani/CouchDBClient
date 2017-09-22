@@ -16,5 +16,8 @@ namespace CouchDB.Client.Tests
 
             return JToken.DeepEquals(json, valueJson);
         }
+
+        public static bool StringIsJsonObject(string value, object json)
+            => StringIsJsonObject(value, JObject.FromObject(json));
     }
 }
