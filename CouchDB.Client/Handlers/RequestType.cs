@@ -20,6 +20,9 @@
         /// </summary>
         DELETE,
 
+        /// <summary>
+        /// HTTP POST.
+        /// </summary>
         POST
     }
 }

@@ -13,7 +13,7 @@ namespace CouchDB.Client
     public abstract class Request
     {
         /// <summary>
-        /// Represents empty request content.
+        /// Empty request content.
         /// </summary>
         public static readonly Request Empty;
 
@@ -25,6 +25,11 @@ namespace CouchDB.Client
 
         #region String
 
+        /// <summary>
+        /// Generates <see cref="Request"/> with json string content in it.
+        /// </summary>
+        /// <param name="content">Json string.</param>
+        /// <returns>Instance of <see cref="Request"/>.</returns>
         public static Request JsonString(string content) 
             => 
             new StringRequest(content, Encoding.UTF8, "application/json");
@@ -48,6 +53,11 @@ namespace CouchDB.Client
 
         #region Raw
 
+        /// <summary>
+        /// Generates <see cref="Request"/> with row byte array content in it.
+        /// </summary>
+        /// <param name="content">Byte array content.</param>
+        /// <returns>Instance of <see cref="Request"/>.</returns>
         public static Request Raw(byte[] content) => new RawRequest(content);
 
         private sealed class RawRequest : Request

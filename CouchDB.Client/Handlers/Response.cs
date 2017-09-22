@@ -30,11 +30,21 @@ namespace CouchDB.Client
             return await HttpClientHelper.HandleObjectResponse<TResult>(_httpResponseMessage, nullIfNotFound).Safe();
         }
 
+        /// <summary>
+        /// Reads response as string.
+        /// </summary>
+        /// <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
+        /// <returns>String content read from the current instance of <see cref="Response"/>.</returns>
         public async Task<string> ReadAsStringAsync(bool nullIfNotFound)
         {
             return await HttpClientHelper.HandleStringResponse(_httpResponseMessage, nullIfNotFound).Safe();
         }
 
+        /// <summary>
+        /// Reads response as raw byte array.
+        /// </summary>
+        /// <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
+        /// <returns>Byte array content read from the current instance of <see cref="Response"/>.</returns>
         public async Task<byte[]> ReadAsByteArrayAsync(bool nullIfNotFound)
         {
             return await HttpClientHelper.HandleRawResponse(_httpResponseMessage, nullIfNotFound).Safe();
