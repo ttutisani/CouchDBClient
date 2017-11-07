@@ -14,7 +14,7 @@ namespace CouchDB.Client
         internal const string RevisionPropertyName = "_rev";
 
         internal CouchDBDatabase(string baseUrl)
-            : this(new CouchDBHandler(baseUrl))
+            : this(new HttpCouchDBHandler(baseUrl, new StatelessHttpClientProxy()))
         {
         }
 

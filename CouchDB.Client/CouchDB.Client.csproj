@@ -69,11 +69,13 @@
     <Compile Include="Documents\Response\SaveDocResponse.cs" />
     <Compile Include="Documents\Request\DocUpdateParams.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
-    <Compile Include="Handlers\CouchDBHandler.cs" />
+    <Compile Include="Handlers\HttpCouchDBHandler.cs" />
     <Compile Include="Handlers\ICouchDBHandler.cs" />
+    <Compile Include="Handlers\IStatelessHttpClient.cs" />
     <Compile Include="Handlers\Request.cs" />
     <Compile Include="Handlers\RequestType.cs" />
     <Compile Include="Handlers\Response.cs" />
+    <Compile Include="Handlers\StatelessHttpClientProxy.cs" />
     <Compile Include="Helpers\EntityHelper.cs" />
     <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />

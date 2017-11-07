@@ -18,7 +18,7 @@ namespace CouchDB.Client
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         /// <exception cref="FormatException"><paramref name="baseUrl"/> is not in valid format.</exception>
         public CouchDBServer(string baseUrl)
-            : this(new CouchDBHandler(baseUrl))
+            : this(new HttpCouchDBHandler(baseUrl, new StatelessHttpClientProxy()))
         {
             _baseUrl = baseUrl;
         }
