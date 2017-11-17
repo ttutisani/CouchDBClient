@@ -190,6 +190,16 @@ namespace CouchDB.Client.Tests
             await Assert.ThrowsAsync<CouchDBClientException>(async () => await _sut.DeleteDbAsync("db-name"));
         }
 
+        [Fact]
+        public async Task DeleteDbAsync_ThrowsError_IfNotFound()
+        {
+            //arrange.
+            _handler.SetupResponse(new Response(new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.NotFound)));
+
+            //act / assert.
+            await Assert.ThrowsAsync<CouchDBClientException>(async () => await _sut.DeleteDbAsync("some-name"));
+        }
+
         #endregion
 
         [Fact]

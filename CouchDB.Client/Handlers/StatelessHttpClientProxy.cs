@@ -6,12 +6,7 @@ namespace CouchDB.Client
 {
     internal sealed class StatelessHttpClientProxy : IStatelessHttpClient, IDisposable
     {
-        private readonly HttpClient _http;
-
-        public StatelessHttpClientProxy()
-        {
-            _http = new HttpClient();
-        }
+        private static readonly HttpClient _http = new HttpClient();
 
         public void Dispose()
         {

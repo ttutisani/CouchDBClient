@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace CouchDB.Client
 {
-    internal sealed class HttpCouchDBHandler : ICouchDBHandler, IDisposable
+    internal class HttpCouchDBHandler : ICouchDBHandler, IDisposable
     {
-        private readonly IStatelessHttpClient _http;
         private readonly string _baseUrl;
+        private readonly IStatelessHttpClient _http;
 
         public HttpCouchDBHandler(string baseUrl, IStatelessHttpClient http)
         {

@@ -10,10 +10,8 @@ namespace CouchDB.ClientDemo
 {
     public sealed class ConsoleCommands
     {
-        private void UsingServer(Action<CouchDBServer> body)
+        private static void ExecuteCoudhDBServerAction(CouchDBServer server, Action<CouchDBServer> body)
         {
-            var server = new CouchDBServer(_serverUrl);
-
             try
             {
                 body(server);
@@ -27,6 +25,20 @@ namespace CouchDB.ClientDemo
                 var ex = ae.InnerException as CouchDBClientException;
                 Console.WriteLine("Error: {0}, Response object: {1}.", ex.Message, SerializationHelper.Serialize(ex.ServerResponse));
             }
+        }
+
+        private void UsingServer(Action<CouchDBServer> body)
+        {
+            var server = new CouchDBServer(_serverUrl);
+
+            ExecuteCoudhDBServerAction(server, body);
+        }
+
+        private void UsingServer(string username, string password, Action<CouchDBServer> body)
+        {
+            var server = new CouchDBServer(_serverUrl, username, password);
+
+            ExecuteCoudhDBServerAction(server, body);
         }
 
         private string _serverUrl = "http://localhost:5984/";
@@ -170,7 +182,12 @@ namespace CouchDB.ClientDemo
 
         public void deletedb()
         {
-            UsingServer(server => 
+            Console.WriteLine("Enter username:");
+            var username = Console.ReadLine();
+            Console.WriteLine("Enter password:");
+            var password = Console.ReadLine();
+
+            UsingServer(username, password, server => 
             {
                 Console.WriteLine("Enter DB name followed by <ENTER>:");
                 var dbName = Console.ReadLine();

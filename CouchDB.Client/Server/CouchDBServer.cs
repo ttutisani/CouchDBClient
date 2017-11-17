@@ -10,6 +10,21 @@ namespace CouchDB.Client
     public sealed class CouchDBServer
     {
         private readonly string _baseUrl;
+        private readonly string _username;
+        private readonly string _password;
+
+        internal static ICouchDBHandler CreateHandler(string baseUrl, string username, string password)
+        {
+            return new AuthenticatedCouchDBHandler(username, password, baseUrl, new StatelessHttpClientProxy());
+        }
+
+        public CouchDBServer(string baseUrl, string username, string password)
+            : this(CreateHandler(baseUrl, username, password))
+        {
+            _baseUrl = baseUrl;
+            _username = username;
+            _password = password;
+        }
 
         /// <summary>
         /// Initializes new instance of <see cref="CouchDBServer"/> class.
@@ -18,9 +33,8 @@ namespace CouchDB.Client
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         /// <exception cref="FormatException"><paramref name="baseUrl"/> is not in valid format.</exception>
         public CouchDBServer(string baseUrl)
-            : this(new HttpCouchDBHandler(baseUrl, new StatelessHttpClientProxy()))
+            : this(baseUrl, null, null)
         {
-            _baseUrl = baseUrl;
         }
 
         private readonly ICouchDBHandler _handler;
@@ -118,7 +132,7 @@ namespace CouchDB.Client
 
             var response = await _handler.SendRequestAsync(dbName, RequestMethod.DELETE, Request.Empty).Safe();
             if (response != null)
-                await response.EnsureSuccessAsync(true);
+                await response.EnsureSuccessAsync(false);
         }
 
         /// <summary>
@@ -132,7 +146,7 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
 
-            return new CouchDBDatabase(UrlHelper.CombineUrl(_baseUrl, dbName));
+            return new CouchDBDatabase(UrlHelper.CombineUrl(_baseUrl, dbName), _username, _password);
         }
 
         /// <summary>

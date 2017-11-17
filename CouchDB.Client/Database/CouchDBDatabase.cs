@@ -13,8 +13,8 @@ namespace CouchDB.Client
         internal const string IdPropertyName = "_id";
         internal const string RevisionPropertyName = "_rev";
 
-        internal CouchDBDatabase(string baseUrl)
-            : this(new HttpCouchDBHandler(baseUrl, new StatelessHttpClientProxy()))
+        internal CouchDBDatabase(string baseUrl, string username, string password)
+            : this(CouchDBServer.CreateHandler(baseUrl, username, password))
         {
         }
 

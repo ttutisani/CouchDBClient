@@ -90,8 +90,9 @@
     <Compile Include="CouchDBDatabaseExtensionsTests.cs" />
     <Compile Include="CouchDbDatabaseTests.cs" />
     <Compile Include="CouchDBServerTests.cs" />
+    <Compile Include="HandlersTests\AuthenticatedCouchDBHandlerTests.cs" />
     <Compile Include="Helpers\HandlerTestHelpers.cs" />
-    <Compile Include="HttpCouchDBHandlerTests.cs" />
+    <Compile Include="HandlersTests\HttpCouchDBHandlerTests.cs" />
     <Compile Include="ResponseTests.cs" />
     <Compile Include="SaveDocResponseTests.cs" />
     <Compile Include="DeleteDocParamsTests.cs" />

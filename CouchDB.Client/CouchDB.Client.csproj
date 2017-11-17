@@ -69,6 +69,7 @@
     <Compile Include="Documents\Response\SaveDocResponse.cs" />
     <Compile Include="Documents\Request\DocUpdateParams.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Handlers\AuthenticatedCouchDBHandler.cs" />
     <Compile Include="Handlers\HttpCouchDBHandler.cs" />
     <Compile Include="Handlers\ICouchDBHandler.cs" />
     <Compile Include="Handlers\IStatelessHttpClient.cs" />
