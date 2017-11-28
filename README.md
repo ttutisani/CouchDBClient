@@ -95,19 +95,19 @@ using (var server = new CouchDBServer("http://localhost:5984"))
         await db.SaveObjectDocumentAsync(new { city = "Austin" });
         await db.SaveObjectDocumentAsync(new Address { city = "Austin" });
         await db.SaveJsonDocumentAsync(new JObject { ["city"] = "Austin" });
-        await db.SaveDocumentAsync("{ \"city\": \"Austin\" }");
+        await db.SaveStringDocumentAsync("{ \"city\": \"Austin\" }");
         
         // Update document in one of many ways.
         // (just add _id and _rev from database or from Response object of creation function).
         await db.SaveObjectDocumentAsync(new { _id = "123", _rev = "1-rev", city = "Austin" });
         await db.SaveObjectDocumentAsync(new Address { _id = "123", _rev = "1-rev", city = "Austin" });
         await db.SaveJsonDocumentAsync(new JObject { ["_id"] = "123", ["_rev"] = "1-rev", ["city"] = "Austin" });
-        await db.SaveDocumentAsync("{ \"_id\": \"123\", \"_rev\": \"1-rev\", \"city\": \"Austin\" }");
+        await db.SaveStringDocumentAsync("{ \"_id\": \"123\", \"_rev\": \"1-rev\", \"city\": \"Austin\" }");
         
         // Retrieve document in one of many ways.
         Address document = await db.GetObjectDocumentAsync<Address>("123");
         JObject document = await db.GetJsonDocumentAsync("123");
-        string document = await db.GetDocumentAsync("123");
+        string document = await db.GetStringDocumentAsync("123");
 
         // Delete document in one of many ways.
         await db.DeleteDocumentAsync("123", "1-rev");
@@ -116,12 +116,12 @@ using (var server = new CouchDBServer("http://localhost:5984"))
         // Get all documents in one of many ways.
         DocListResponse<Address> documents = await db.GetAllObjectDocumentsAsync<Address>();
         DocListResponse<JObject> documents = await db.GetAllJsonDocumentsAsync();
-        DocListResponse<string> documents = await db.GetAllDocumentsAsync();
+        DocListResponse<string> documents = await db.GetAllStringDocumentsAsync();
         
         // Get multiple documents in one of many ways.
         DocListResponse<Address> documents = await db.GetObjectDocumentsAsync<Address>(new [] { "id-1", "id-2", "id=3" });
         DocListResponse<JObject> documents = await db.GetJsonDocumentsAsync(new [] { "id-1", "id-2", "id=3" });
-        DocListResponse<string> documents = await db.GetDocumentsAsync(new [] { "id-1", "id-2", "id=3" });
+        DocListResponse<string> documents = await db.GetStringDocumentsAsync(new [] { "id-1", "id-2", "id=3" });
         
         // Create, Update, or Delete multiple documents in one go.
         await db.SaveObjectDocumentsAsync(new [] {
@@ -136,7 +136,7 @@ using (var server = new CouchDBServer("http://localhost:5984"))
             new JObject { ["_id"] = "123", ["_rev"] = "1-rev", ["_deleted"] = true, ["city"] = "Lost" } /* will be deleted */
             });
             
-        await db.SaveDocumentsAsync(new [] {
+        await db.SaveStringDocumentsAsync(new [] {
             "{ \"city\": \"Austin\" }", /* will be created */
             "{ \"_id\": \"123\", \"_rev\": \"1-rev\", \"city\": \"New York\" }", /* will be updated */
             "{ \"_id\": \"123\", \"_rev\": \"1-rev\", \"_deleted\": true, \"city\": \"Lost\" }" /* will be deleted */
