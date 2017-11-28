@@ -64,14 +64,14 @@ namespace CouchDB.Client.Tests
 
             var entityWithoutRev = new { entity._id, entity.Name, entity.Name2 };
 
-            _db.Setup(db => db.SaveDocumentAsync(It.IsAny<string>(), It.IsAny<DocUpdateParams>()))
+            _db.Setup(db => db.SaveStringDocumentAsync(It.IsAny<string>(), It.IsAny<DocUpdateParams>()))
                 .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO())));
 
             //act.
             await _sut.SaveEntityAsync(entity);
 
             //assert.
-            _db.Verify(db => db.SaveDocumentAsync(It.Is<string>(str => StringIsJsonObject(str, JObject.FromObject(entityWithoutRev))), It.IsAny<DocUpdateParams>()), Times.Once());
+            _db.Verify(db => db.SaveStringDocumentAsync(It.Is<string>(str => StringIsJsonObject(str, JObject.FromObject(entityWithoutRev))), It.IsAny<DocUpdateParams>()), Times.Once());
         }
 
         [Fact]
@@ -82,14 +82,14 @@ namespace CouchDB.Client.Tests
             var entityJson = JsonConvert.SerializeObject(entity);
             var updateParams = new DocUpdateParams();
 
-            _db.Setup(db => db.SaveDocumentAsync(It.IsAny<string>(), It.IsAny<DocUpdateParams>()))
+            _db.Setup(db => db.SaveStringDocumentAsync(It.IsAny<string>(), It.IsAny<DocUpdateParams>()))
                 .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO())));
 
             //act.
             await _sut.SaveEntityAsync(entity, updateParams);
 
             //assert.
-            _db.Verify(db => db.SaveDocumentAsync(It.Is<string>(str => StringIsJsonObject(str, JObject.Parse(entityJson))), updateParams), Times.Once());
+            _db.Verify(db => db.SaveStringDocumentAsync(It.Is<string>(str => StringIsJsonObject(str, JObject.Parse(entityJson))), updateParams), Times.Once());
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace CouchDB.Client.Tests
             var expectedId = "idnew";
             var expectedRev = "revnew";
 
-            _db.Setup(db => db.SaveDocumentAsync(It.IsAny<string>(), It.IsAny<DocUpdateParams>()))
+            _db.Setup(db => db.SaveStringDocumentAsync(It.IsAny<string>(), It.IsAny<DocUpdateParams>()))
                 .Returns(Task.FromResult(new SaveDocResponse(new CouchDBDatabase.SaveDocResponseDTO { Id = expectedId, Rev = expectedRev })));
 
             //act.
@@ -128,7 +128,7 @@ namespace CouchDB.Client.Tests
             await _sut.GetEntityAsync<SampleEntity>(id, queryParams);
 
             //assert.
-            _db.Verify(db => db.GetDocumentAsync(id, queryParams), Times.Once());
+            _db.Verify(db => db.GetStringDocumentAsync(id, queryParams), Times.Once());
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace CouchDB.Client.Tests
         {
             //arrange.
             var expectedJson = JsonConvert.SerializeObject(new SampleEntity { _id = "what", _rev = "ever", Name = "name", Name2 = 123 });
-            _db.Setup(db => db.GetDocumentAsync(It.IsAny<string>(), It.IsAny<DocQueryParams>()))
+            _db.Setup(db => db.GetStringDocumentAsync(It.IsAny<string>(), It.IsAny<DocQueryParams>()))
                 .Returns(Task.FromResult(expectedJson));
 
             //act.
@@ -150,14 +150,14 @@ namespace CouchDB.Client.Tests
         public async void GetAllEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
         {
             //arrange.
-            _db.Setup(db => db.GetAllDocumentsAsync(It.IsAny<ListQueryParams>()))
+            _db.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
                 .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
 
             //act.
             await _sut.GetAllEntitiesAsync<SampleEntity>(null);
 
             //assert.
-            _db.Verify(db => db.GetAllDocumentsAsync(It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault())), Times.Once());
+            _db.Verify(db => db.GetAllStringDocumentsAsync(It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
@@ -166,14 +166,14 @@ namespace CouchDB.Client.Tests
             //arrange.
             var queryParams = new ListQueryParams();
 
-            _db.Setup(db => db.GetAllDocumentsAsync(It.IsAny<ListQueryParams>()))
+            _db.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
                 .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
 
             //act.
             await _sut.GetAllEntitiesAsync<SampleEntity>(queryParams);
 
             //assert.
-            _db.Verify(db => db.GetAllDocumentsAsync(It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault())), Times.Once());
+            _db.Verify(db => db.GetAllStringDocumentsAsync(It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
@@ -186,7 +186,7 @@ namespace CouchDB.Client.Tests
                 new SampleEntity { _id = "id2", _rev = "rev2", Name = "name2", Name2 = 2 }
             };
 
-            _db.Setup(db => db.GetAllDocumentsAsync(It.IsAny<ListQueryParams>()))
+            _db.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
                 .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>
                 {
                     new DocListResponseRow<string>("id1", "id1", new DocListResponseRowValue("rev1"), JsonConvert.SerializeObject(expectedDocs[0]), null),
@@ -265,14 +265,14 @@ namespace CouchDB.Client.Tests
         public async void GetEntitiesAsync_Makes_QueryParams_NotNull_And_Extracts_Docs()
         {
             //arrange.
-            _db.Setup(db => db.GetDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+            _db.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
                 .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
 
             //act.
             await _sut.GetEntitiesAsync<SampleEntity>(new string[] { "id-1" });
 
             //assert.
-            _db.Verify(db => db.GetDocumentsAsync(It.IsAny<string[]>(), It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault())), Times.Once());
+            _db.Verify(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.Is<ListQueryParams>(p => p != null && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
@@ -282,14 +282,14 @@ namespace CouchDB.Client.Tests
             var idList = new string[] { "id-1" };
             var queryParams = new ListQueryParams();
 
-            _db.Setup(db => db.GetDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+            _db.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
                 .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
 
             //act.
             await _sut.GetEntitiesAsync<SampleEntity>(idList, queryParams);
 
             //assert.
-            _db.Verify(db => db.GetDocumentsAsync(idList, It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault())), Times.Once());
+            _db.Verify(db => db.GetStringDocumentsAsync(idList, It.Is<ListQueryParams>(p => p == queryParams && p.Include_Docs.GetValueOrDefault())), Times.Once());
         }
 
         [Fact]
@@ -302,7 +302,7 @@ namespace CouchDB.Client.Tests
                 new SampleEntity { _id = "id2", _rev = "rev2", Name = "name2", Name2 = 2 }
             };
 
-            _db.Setup(db => db.GetDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+            _db.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
                 .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>
                 {
                     new DocListResponseRow<string>("id1", "id1", new DocListResponseRowValue("rev1"), JsonConvert.SerializeObject(expectedDocs[0]), null),
@@ -352,7 +352,7 @@ namespace CouchDB.Client.Tests
             //assert.
             Predicate<string[]> areDocsFromObject = stringDocs => stringDocs.All(s => docs.Any(d => StringIsJsonObject(s, JObject.FromObject(d))));
 
-            _db.Verify(db => db.SaveDocumentsAsync(It.Is<string[]>(strDocs => areDocsFromObject(strDocs)), newEdits), Times.Once);
+            _db.Verify(db => db.SaveStringDocumentsAsync(It.Is<string[]>(strDocs => areDocsFromObject(strDocs)), newEdits), Times.Once);
         }
 
         [Theory]
@@ -363,7 +363,7 @@ namespace CouchDB.Client.Tests
             //arrange.
             var expectedResponse = new SaveDocListResponse(new CouchDBDatabase.SaveDocListResponseDTO());
 
-            _db.Setup(db => db.SaveDocumentsAsync(It.IsAny<string[]>(), It.IsAny<bool>()))
+            _db.Setup(db => db.SaveStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<bool>()))
                 .Returns(Task.FromResult(expectedResponse));
 
             //act.
@@ -399,7 +399,7 @@ namespace CouchDB.Client.Tests
                 }
             });
 
-            _db.Setup(db => db.SaveDocumentsAsync(It.IsAny<string[]>(), It.IsAny<bool>()))
+            _db.Setup(db => db.SaveStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<bool>()))
                 .Returns(Task.FromResult(expectedResponse));
 
             //act.
@@ -436,7 +436,7 @@ namespace CouchDB.Client.Tests
                 return json.Property(CouchDBDatabase.IdPropertyName) == null;
             });
 
-            _db.Verify(db => db.SaveDocumentsAsync(It.Is<string[]>(strDocs => docsDontHaveIDButHaveName(strDocs)), newEdits), Times.Once);
+            _db.Verify(db => db.SaveStringDocumentsAsync(It.Is<string[]>(strDocs => docsDontHaveIDButHaveName(strDocs)), newEdits), Times.Once);
         }
 
         #endregion

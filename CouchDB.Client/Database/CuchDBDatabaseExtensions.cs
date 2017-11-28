@@ -26,7 +26,7 @@ namespace CouchDB.Client
             if (documentJsonObject == null)
                 throw new ArgumentNullException(nameof(documentJsonObject));
             
-            var saveResponse = await @this.SaveDocumentAsync(documentJsonObject.ToString(), updateParams).Safe();
+            var saveResponse = await @this.SaveStringDocumentAsync(documentJsonObject.ToString(), updateParams).Safe();
             documentJsonObject[CouchDBDatabase.IdPropertyName] = saveResponse.Id;
             documentJsonObject[CouchDBDatabase.RevisionPropertyName] = saveResponse.Revision;
         }
@@ -48,7 +48,7 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(documentJsonObject[CouchDBDatabase.IdPropertyName]?.ToString()))
                 documentJsonObject.Remove(CouchDBDatabase.IdPropertyName);
 
-            return await @this.SaveDocumentAsync(documentJsonObject.ToString(), updateParams).Safe();
+            return await @this.SaveStringDocumentAsync(documentJsonObject.ToString(), updateParams).Safe();
         }
 
         #endregion
@@ -69,7 +69,7 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
 
-            var jsonString = await @this.GetDocumentAsync(docId, queryParams).Safe();
+            var jsonString = await @this.GetStringDocumentAsync(docId, queryParams).Safe();
             var jsonObject = jsonString != null
                 ? JObject.Parse(jsonString)
                 : null;
@@ -92,7 +92,7 @@ namespace CouchDB.Client
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
 
-            var jsonString = await @this.GetDocumentAsync(docId, queryParams).Safe();
+            var jsonString = await @this.GetStringDocumentAsync(docId, queryParams).Safe();
             var resultObject = jsonString != null
                 ? JsonConvert.DeserializeObject<TResult>(jsonString)
                 : default(TResult);
@@ -148,7 +148,7 @@ namespace CouchDB.Client
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
         public static async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(this ICouchDBDatabase @this, ListQueryParams queryParams = null)
         {
-            var stringDocs = await @this.GetAllDocumentsAsync(queryParams).Safe();
+            var stringDocs = await @this.GetAllStringDocumentsAsync(queryParams).Safe();
 
             return stringDocs.Cast(strDoc => JObject.Parse(strDoc));
         }
@@ -169,7 +169,7 @@ namespace CouchDB.Client
         /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
         public static async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, ListQueryParams queryParams = null, Func<string, TDocument> deserializer = null)
         {
-            var jsonDocs = await @this.GetAllDocumentsAsync(queryParams).Safe();
+            var jsonDocs = await @this.GetAllStringDocumentsAsync(queryParams).Safe();
 
             return jsonDocs.Cast(deserializer ?? new Func<string, TDocument>(json => json != null ? JsonConvert.DeserializeObject<TDocument>(json) : default(TDocument)));
         }
@@ -193,7 +193,7 @@ namespace CouchDB.Client
             if (docIdList.Length == 0)
                 throw new ArgumentException($"{nameof(docIdList)} should not be empty.", nameof(docIdList));
 
-            var stringDocs = await @this.GetDocumentsAsync(docIdList, queryParams).Safe();
+            var stringDocs = await @this.GetStringDocumentsAsync(docIdList, queryParams).Safe();
 
             return stringDocs.Cast(strDoc => strDoc != null ? JObject.Parse(strDoc) : null);
         }
@@ -221,7 +221,7 @@ namespace CouchDB.Client
             if (docIdList.Length == 0)
                 throw new ArgumentException($"{nameof(docIdList)} should not be empty.", nameof(docIdList));
 
-            var stringDocs = await @this.GetDocumentsAsync(docIdList, queryParams).Safe();
+            var stringDocs = await @this.GetStringDocumentsAsync(docIdList, queryParams).Safe();
             return stringDocs.Cast(deserializer ?? new Func<string, TDocument>(strDoc => strDoc != null ? JsonConvert.DeserializeObject<TDocument>(strDoc) : default(TDocument)));
         }
 
@@ -246,7 +246,7 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(documents));
 
             var stringDocs = documents.Select(doc => doc.ToString()).ToArray();
-            var saveResponse = await @this.SaveDocumentsAsync(stringDocs, newEdits).Safe();
+            var saveResponse = await @this.SaveStringDocumentsAsync(stringDocs, newEdits).Safe();
             if (saveResponse != null)
             {
                 for (int index = 0; index < saveResponse.DocumentResponses.Count; index++)
@@ -286,7 +286,7 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(documents));
 
             var stringDocs = documents.Select(doc => JsonConvert.SerializeObject(doc)).ToArray();
-            var saveResponse = await @this.SaveDocumentsAsync(stringDocs, newEdits).Safe();
+            var saveResponse = await @this.SaveStringDocumentsAsync(stringDocs, newEdits).Safe();
             
             return saveResponse;
         }

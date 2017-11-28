@@ -15,7 +15,7 @@ namespace CouchDB.Client
         /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        Task<SaveDocResponse> SaveDocumentAsync(string documentJsonString, DocUpdateParams updateParams = null);
+        Task<SaveDocResponse> SaveStringDocumentAsync(string documentJsonString, DocUpdateParams updateParams = null);
 
         /// <summary>
         /// Returns document by the specified docid from the specified db. 
@@ -25,7 +25,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Additional query parameters for retrieving document.</param>
         /// <returns><see cref="string"/> containing document JSON.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        Task<string> GetDocumentAsync(string docId, DocQueryParams queryParams = null);
+        Task<string> GetStringDocumentAsync(string docId, DocQueryParams queryParams = null);
 
         /// <summary>
         /// Marks the specified document as deleted by adding a field 
@@ -48,7 +48,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
-        Task<DocListResponse<string>> GetAllDocumentsAsync(ListQueryParams queryParams = null);
+        Task<DocListResponse<string>> GetAllStringDocumentsAsync(ListQueryParams queryParams = null);
 
         /// <summary>
         /// Returns a JSON structure of the documents in a given database, found by ID list. 
@@ -59,7 +59,7 @@ namespace CouchDB.Client
         /// <param name="docIdList">Array of document IDs to be retrieved.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
-        Task<DocListResponse<string>> GetDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null);
+        Task<DocListResponse<string>> GetStringDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null);
         
         /// <summary>
         /// Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
@@ -71,7 +71,7 @@ namespace CouchDB.Client
         /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        Task<SaveDocListResponse> SaveDocumentsAsync(string[] documents, bool newEdits = true);
+        Task<SaveDocListResponse> SaveStringDocumentsAsync(string[] documents, bool newEdits = true);
 
         /// <summary>
         /// Uploads the supplied content as an attachment to the specified document.

@@ -49,7 +49,7 @@ namespace CouchDB.Client.Tests
         public async Task SaveDocumentAsync_Requires_Params(string documentJson)
         {
             //act.
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveDocumentAsync(documentJson));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveStringDocumentAsync(documentJson));
         }
 
         [Theory]
@@ -63,7 +63,7 @@ namespace CouchDB.Client.Tests
             var docQueryParams = new DocUpdateParams { Batch = batch, New_Edits = newEdits };
 
             //act.
-            await _sut.SaveDocumentAsync(documentJson, docQueryParams);
+            await _sut.SaveStringDocumentAsync(documentJson, docQueryParams);
 
             //assert.
             var expectedUrl = QueryParams.AppendQueryParams(string.Empty, docQueryParams);
@@ -78,7 +78,7 @@ namespace CouchDB.Client.Tests
             _handler.SetupResponse(expectedDTO);
 
             //act.
-            var response = await _sut.SaveDocumentAsync("docjson-doesnotmatter");
+            var response = await _sut.SaveStringDocumentAsync("docjson-doesnotmatter");
 
             //assert.
             Assert.NotNull(response);
@@ -95,7 +95,7 @@ namespace CouchDB.Client.Tests
             _handler.SetupResponse(expectedDTO);
 
             //act.
-            var response = await _sut.SaveDocumentAsync("docjson-doesnotmatter");
+            var response = await _sut.SaveStringDocumentAsync("docjson-doesnotmatter");
 
             //assert.
             Assert.NotNull(response);
@@ -117,7 +117,7 @@ namespace CouchDB.Client.Tests
         public async Task GetDocumentAsync_Requires_Params(string docId)
         {
             //act.
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetDocumentAsync(docId));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetStringDocumentAsync(docId));
         }
 
         [Theory]
@@ -154,7 +154,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            await _sut.GetDocumentAsync(docId, docQueryParams);
+            await _sut.GetStringDocumentAsync(docId, docQueryParams);
 
             //assert.
             var expectedUrl = QueryParams.AppendQueryParams(docId, docQueryParams);
@@ -169,7 +169,7 @@ namespace CouchDB.Client.Tests
             _handler.SetupResponse(expectedDocument);
 
             //act.
-            var document = await _sut.GetDocumentAsync("docid123");
+            var document = await _sut.GetStringDocumentAsync("docid123");
 
             //assert.
             Assert.Equal(expectedDocument, document);
@@ -182,7 +182,7 @@ namespace CouchDB.Client.Tests
             _handler.SetupResponse(new Response(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound) { Content = new StringContent("string-doc") }));
 
             //act.
-            var document = await _sut.GetDocumentAsync("docid");
+            var document = await _sut.GetStringDocumentAsync("docid");
 
             //assert.
             Assert.Null(document);
@@ -302,7 +302,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            await _sut.GetAllDocumentsAsync(queryParams);
+            await _sut.GetAllStringDocumentsAsync(queryParams);
 
             //assert.
             var expectedUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
@@ -328,7 +328,7 @@ namespace CouchDB.Client.Tests
             _handler.SetupResponse(expectedResponse);
 
             //act.
-            var allDocuments = await _sut.GetAllDocumentsAsync();
+            var allDocuments = await _sut.GetAllStringDocumentsAsync();
 
             //assert.
             Assert.NotNull(allDocuments);
@@ -367,7 +367,7 @@ namespace CouchDB.Client.Tests
         [InlineData(new object[] { new string[0] })]
         public async Task GetDocumentsAsync_RequiresParams(string[] docIdList)
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetDocumentsAsync(docIdList));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetStringDocumentsAsync(docIdList));
         }
 
         [Theory]
@@ -411,7 +411,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            await _sut.GetDocumentsAsync(docIdList, queryParams);
+            await _sut.GetStringDocumentsAsync(docIdList, queryParams);
 
             //assrert.
             var expectedUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
@@ -438,7 +438,7 @@ namespace CouchDB.Client.Tests
             _handler.SetupResponse(expectedResponse);
 
             //act.
-            var docs = await _sut.GetDocumentsAsync(new[] { "id1" });
+            var docs = await _sut.GetStringDocumentsAsync(new[] { "id1" });
 
             //assert.
             Assert.NotNull(docs);
@@ -477,7 +477,7 @@ namespace CouchDB.Client.Tests
         [InlineData(new object[] { new string[0] })]
         public async Task SaveDocumentsAsync_Requires_Params(string[] documents)
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveDocumentsAsync(documents));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.SaveStringDocumentsAsync(documents));
         }
 
         [Theory]
@@ -497,7 +497,7 @@ namespace CouchDB.Client.Tests
             };
 
             //act.
-            await _sut.SaveDocumentsAsync(expectedObject.docs.Select(d => JsonConvert.SerializeObject(d)).ToArray(), newEdits);
+            await _sut.SaveStringDocumentsAsync(expectedObject.docs.Select(d => JsonConvert.SerializeObject(d)).ToArray(), newEdits);
 
             //assert.
             _handler.Verify(h => h.SendRequestAsync("_bulk_docs", RequestMethod.POST, RequestIs.JsonObject(expectedObject)), Times.Once);
@@ -516,7 +516,7 @@ namespace CouchDB.Client.Tests
             _handler.SetupResponse(expectedDTO);
 
             //act.
-            var response = await _sut.SaveDocumentsAsync(new string[] { "{}" });
+            var response = await _sut.SaveStringDocumentsAsync(new string[] { "{}" });
 
             //assert.
             Assert.NotNull(response);

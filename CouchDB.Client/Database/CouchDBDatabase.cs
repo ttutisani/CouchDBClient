@@ -57,7 +57,7 @@ namespace CouchDB.Client
         /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task<SaveDocResponse> SaveDocumentAsync(string documentJsonString, DocUpdateParams updateParams = null)
+        public async Task<SaveDocResponse> SaveStringDocumentAsync(string documentJsonString, DocUpdateParams updateParams = null)
         {
             if (string.IsNullOrWhiteSpace(documentJsonString))
                 throw new ArgumentNullException(nameof(documentJsonString));
@@ -83,7 +83,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Additional query parameters for retrieving document.</param>
         /// <returns><see cref="string"/> containing document JSON.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task<string> GetDocumentAsync(string docId, DocQueryParams queryParams = null)
+        public async Task<string> GetStringDocumentAsync(string docId, DocQueryParams queryParams = null)
         {
             if (string.IsNullOrWhiteSpace(docId))
                 throw new ArgumentNullException(nameof(docId));
@@ -147,7 +147,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
-        public async Task<DocListResponse<string>> GetAllDocumentsAsync(ListQueryParams queryParams = null)
+        public async Task<DocListResponse<string>> GetAllStringDocumentsAsync(ListQueryParams queryParams = null)
         {
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
             var response = await _handler.SendRequestAsync(allDocsUrl, RequestMethod.GET, Request.Empty).Safe();
@@ -173,7 +173,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task<DocListResponse<string>> GetDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null)
+        public async Task<DocListResponse<string>> GetStringDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null)
         {
             if (docIdList == null || docIdList.Length == 0)
                 throw new ArgumentNullException(nameof(docIdList));
@@ -209,7 +209,7 @@ namespace CouchDB.Client
         /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public async Task<SaveDocListResponse> SaveDocumentsAsync(string[] documents, bool newEdits = true)
+        public async Task<SaveDocListResponse> SaveStringDocumentsAsync(string[] documents, bool newEdits = true)
         {
             if (documents == null || documents.Length == 0)
                 throw new ArgumentNullException(nameof(documents));

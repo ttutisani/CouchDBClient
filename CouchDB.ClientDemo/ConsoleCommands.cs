@@ -210,7 +210,7 @@ namespace CouchDB.ClientDemo
             UsingDatabase(db => 
             {
                 
-                var response = db.SaveDocumentAsync(docJson).Result;
+                var response = db.SaveStringDocumentAsync(docJson).Result;
                 Console.WriteLine("Successfully saved document. Id: '{0}', Rev: '{1}'.", response.Id, response.Revision);
                 
             });
@@ -275,7 +275,7 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db => 
             {
-                var doc = db.GetDocumentAsync(docId, new DocQueryParams { Revs = true, Revs_Info = true }).Result;
+                var doc = db.GetStringDocumentAsync(docId, new DocQueryParams { Revs = true, Revs_Info = true }).Result;
                 Console.WriteLine("Found document:");
                 Console.WriteLine(doc);
                 Console.WriteLine("End of document.");
@@ -289,7 +289,7 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db =>
             {
-                var doc = db.GetDocumentAsync(docId, new DocQueryParams { Open_Revs = new DocQueryParams.OpenRevs() }).Result;
+                var doc = db.GetStringDocumentAsync(docId, new DocQueryParams { Open_Revs = new DocQueryParams.OpenRevs() }).Result;
                 Console.WriteLine("Found document:");
                 Console.WriteLine(doc);
                 Console.WriteLine("End of document.");
@@ -302,7 +302,7 @@ namespace CouchDB.ClientDemo
             {
                 ListQueryParams qParams = new ListQueryParams { Include_Docs = true };
 
-                var allDocs = db.GetAllDocumentsAsync(qParams).Result;
+                var allDocs = db.GetAllStringDocumentsAsync(qParams).Result;
                 Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
                 foreach (var row in allDocs.Rows)
@@ -431,7 +431,7 @@ namespace CouchDB.ClientDemo
             {
                 ListQueryParams qParams = new ListQueryParams { Include_Docs = true };
 
-                var allDocs = db.GetDocumentsAsync(docIdList.ToArray(), qParams).GetAwaiter().GetResult();
+                var allDocs = db.GetStringDocumentsAsync(docIdList.ToArray(), qParams).GetAwaiter().GetResult();
                 Console.WriteLine("Found {0} docs:", allDocs.Rows.Count);
 
                 foreach (var row in allDocs.Rows)
@@ -499,7 +499,7 @@ namespace CouchDB.ClientDemo
 
             UsingDatabase(db => 
             {
-                var response = db.SaveDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
+                var response = db.SaveStringDocumentsAsync(docs.ToArray(), newEdits).GetAwaiter().GetResult();
                 Console.WriteLine($"Response: {SerializationHelper.Serialize(response)}");
             });
         }
