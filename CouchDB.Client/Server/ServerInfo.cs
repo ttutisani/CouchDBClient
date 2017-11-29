@@ -22,7 +22,11 @@ namespace CouchDB.Client
         /// </summary>
         public VendorInfo Vendor { get; }
 
-        internal ServerInfo(CouchDBServer.ServerInfoDTO serverInfoDTO)
+        /// <summary>
+        /// Initializes new instance of <see cref="ServerInfo"/> class.
+        /// </summary>
+        /// <param name="serverInfoDTO"></param>
+        public ServerInfo(CouchDBServer.ServerInfoDTO serverInfoDTO)
         {
             if (serverInfoDTO == null)
                 throw new ArgumentNullException(nameof(serverInfoDTO));

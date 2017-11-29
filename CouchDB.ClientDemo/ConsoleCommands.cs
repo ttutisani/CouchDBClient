@@ -31,13 +31,21 @@ namespace CouchDB.ClientDemo
 
         private string _serverUrl = "http://localhost:5984/";
 
-        private void UsingDatabase(Action<CouchDBDatabase> body)
+        private void UsingDatabase(Action<ICouchDBDatabase> body)
         {
             UsingServer(server =>
             {
-                using (var db = server.SelectDatabase(_dbName))
+                var db = server.SelectDatabase(_dbName);
+
+                try
                 {
                     body(db);
+                }
+                finally
+                {
+                    var disposableDb = db as IDisposable;
+                    if (disposableDb != null)
+                        disposableDb.Dispose();
                 }
             });
         }

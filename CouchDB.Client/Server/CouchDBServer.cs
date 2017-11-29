@@ -7,7 +7,7 @@ namespace CouchDB.Client
     /// Represents CouchDB server instance. 
     /// Starting point for all interactions with CouchDB.
     /// </summary>
-    public sealed class CouchDBServer
+    public sealed class CouchDBServer : ICouchDBServer
     {
         private readonly string _baseUrl;
 
@@ -55,16 +55,34 @@ namespace CouchDB.Client
             return serverInfo;
         }
 
-        internal sealed class ServerInfoDTO
+        /// <summary>
+        /// Information about CouchDB server.
+        /// </summary>
+        public sealed class ServerInfoDTO
         {
+            /// <summary>
+            /// Gets or sets welcome message from CouchDB.
+            /// </summary>
             public string CouchDB { get; set; }
 
+            /// <summary>
+            /// Gets or sets version of CouchDB server.
+            /// </summary>
             public string Version { get; set; }
 
+            /// <summary>
+            /// Gets or sets CouchDB vendor information.
+            /// </summary>
             public VendorInfoDTO Vendor { get; set; }
 
+            /// <summary>
+            /// CouchDB vendor information.
+            /// </summary>
             public sealed class VendorInfoDTO
             {
+                /// <summary>
+                /// Gets or sets name of CouchDB server vendor.
+                /// </summary>
                 public string Name { get; set; }
             }
         }
@@ -125,9 +143,9 @@ namespace CouchDB.Client
         /// Selects specific database for working with documents in it.
         /// </summary>
         /// <param name="dbName">Name of database to be selected.</param>
-        /// <returns></returns>
+        /// <returns>Instance of <see cref="ICouchDBDatabase"/>.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
-        public CouchDBDatabase SelectDatabase(string dbName)
+        public ICouchDBDatabase SelectDatabase(string dbName)
         {
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new ArgumentNullException(nameof(dbName));
