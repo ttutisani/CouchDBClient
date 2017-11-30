@@ -15,6 +15,8 @@ namespace CouchDB.Client
         /// Initializes new instance of <see cref="CouchDBHandler"/> class.
         /// </summary>
         /// <param name="baseUrl">Base url to be used when sending requests.</param>
+        /// <exception cref="ArgumentNullException">Required parameter is nul or empty.</exception>
+        /// <exception cref="FormatException">URL is not in valid format.</exception>
         public CouchDBHandler(string baseUrl)
         {
             if (string.IsNullOrWhiteSpace(baseUrl))
@@ -43,7 +45,9 @@ namespace CouchDB.Client
         /// <param name="requestMethod"><see cref="RequestMethod"/> to be used when sending request.</param>
         /// <param name="request">Instance of <see cref="Request"/> to be sent.</param>
         /// <returns>Instance of <see cref="Response"/> received from CouchDB.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         /// <exception cref="NotSupportedException">Request method is not supported.</exception>
+        /// <exception cref="InvalidOperationException">Deletion request was already sent.</exception>
         public async Task<Response> SendRequestAsync(string relativeUrl, RequestMethod requestMethod, Request request)
         {
             HttpResponseMessage httpResponseMessage;

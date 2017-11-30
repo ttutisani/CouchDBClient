@@ -13,6 +13,12 @@ namespace CouchDB.Client
         internal const string IdPropertyName = "_id";
         internal const string RevisionPropertyName = "_rev";
 
+        /// <summary>
+        /// Initializes new instance of <see cref="CouchDBDatabase"/> class.
+        /// </summary>
+        /// <param name="baseUrl"></param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="FormatException">URL is not in valid format.</exception>
         internal CouchDBDatabase(string baseUrl)
             : this(new CouchDBHandler(baseUrl))
         {
@@ -20,6 +26,11 @@ namespace CouchDB.Client
 
         private readonly ICouchDBHandler _handler;
 
+        /// <summary>
+        /// Initializes new instance of <see cref="CouchDBDatabase"/> class.
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         internal CouchDBDatabase(ICouchDBHandler handler)
         {
             if (handler == null)

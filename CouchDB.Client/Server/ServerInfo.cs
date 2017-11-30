@@ -26,6 +26,7 @@ namespace CouchDB.Client
         /// Initializes new instance of <see cref="ServerInfo"/> class.
         /// </summary>
         /// <param name="serverInfoDTO">DTO with values for initialization.</param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public ServerInfo(CouchDBServer.ServerInfoDTO serverInfoDTO)
         {
             if (serverInfoDTO == null)
@@ -42,6 +43,11 @@ namespace CouchDB.Client
     /// </summary>
     public sealed class VendorInfo
     {
+        /// <summary>
+        /// Initializes new instance of <see cref="VendorInfo"/> class.
+        /// </summary>
+        /// <param name="vendorInfoDTO"></param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         internal VendorInfo(CouchDBServer.ServerInfoDTO.VendorInfoDTO vendorInfoDTO)
         {
             if (vendorInfoDTO == null)

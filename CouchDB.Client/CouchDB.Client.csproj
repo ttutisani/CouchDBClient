@@ -70,6 +70,7 @@
     <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Documents\Request\DocQueryParams.cs" />
+    <Compile Include="NoException.cs" />
     <Compile Include="Queries\QueryParams.cs" />
     <Compile Include="Response\ServerResponseDTO.cs" />
     <Compile Include="Response\ServerResponseError.cs" />

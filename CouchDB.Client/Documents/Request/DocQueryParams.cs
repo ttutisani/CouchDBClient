@@ -74,6 +74,11 @@ namespace CouchDB.Client
         /// </summary>
         public bool? Revs_Info { get; set; }
 
+        /// <summary>
+        /// Converts current instance of <see cref="DocQueryParams"/> to <see cref="string"/>.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NoException"></exception>
         internal override string ToQueryString()
         {
             var queryParts = new List<string>();

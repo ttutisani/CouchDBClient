@@ -22,11 +22,27 @@ namespace CouchDB.Client
             return contentAsBytes;
         }
 
+        /// <summary>
+        /// Handle object response.
+        /// </summary>
+        /// <param name="httpResponse"></param>
+        /// <param name="convertNotFoundIntoNull"></param>
+        /// <returns></returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         internal async static Task HandleVoidResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
             await HandleObjectResponse<ServerResponseDTO>(httpResponse, convertNotFoundIntoNull).Safe();
         }
 
+        /// <summary>
+        /// Handle object response.
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="httpResponse"></param>
+        /// <param name="deserializer"></param>
+        /// <param name="convertNotFoundIntoNull"></param>
+        /// <returns></returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         internal async static Task<TResult> HandleObjectResponse<TResult>(HttpResponseMessage httpResponse, Func<string, TResult> deserializer, bool convertNotFoundIntoNull)
         {
             if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound && convertNotFoundIntoNull)
@@ -51,11 +67,26 @@ namespace CouchDB.Client
             return resultObject;
         }
 
+        /// <summary>
+        /// Handle object response.
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="httpResponse"></param>
+        /// <param name="convertNotFoundIntoNull"></param>
+        /// <returns></returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         internal async static Task<TResult> HandleObjectResponse<TResult>(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
             return await HandleObjectResponse(httpResponse, strJson => JsonConvert.DeserializeObject<TResult>(strJson), convertNotFoundIntoNull).Safe();
         }
 
+        /// <summary>
+        /// Handle object response.
+        /// </summary>
+        /// <param name="httpResponse"></param>
+        /// <param name="convertNotFoundIntoNull"></param>
+        /// <returns></returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         internal async static Task<string> HandleStringResponse(HttpResponseMessage httpResponse, bool convertNotFoundIntoNull)
         {
             return await HandleObjectResponse(httpResponse, strJson => strJson, convertNotFoundIntoNull).Safe();
