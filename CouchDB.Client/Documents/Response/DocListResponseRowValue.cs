@@ -7,7 +7,11 @@ namespace CouchDB.Client
     /// </summary>
     public sealed class DocListResponseRowValue
     {
-        internal DocListResponseRowValue(string revision)
+        /// <summary>
+        /// Initializes new instance of <see cref="DocListResponseRowValue"/> class.
+        /// </summary>
+        /// <param name="revision">Revision of the document.</param>
+        public DocListResponseRowValue(string revision)
         {
             Revision = revision;
         }

@@ -9,7 +9,15 @@ namespace CouchDB.Client
     /// <typeparam name="TDocument">Type of document.</typeparam>
     public sealed class DocListResponseRow<TDocument>
     {
-        internal DocListResponseRow(string id, string key, DocListResponseRowValue value, TDocument document, ServerResponseError error)
+        /// <summary>
+        /// Initializes new instance of <see cref="DocListResponseRow{TDocument}"/> class.
+        /// </summary>
+        /// <param name="id">ID of the row.</param>
+        /// <param name="key">Key of the row.</param>
+        /// <param name="value"><see cref="DocListResponseRowValue"/> of the row, which holds revision.</param>
+        /// <param name="document">Document.</param>
+        /// <param name="error">Error information (if any).</param>
+        public DocListResponseRow(string id, string key, DocListResponseRowValue value, TDocument document, ServerResponseError error)
         {
             Id = id;
             Key = key;

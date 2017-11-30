@@ -7,7 +7,12 @@ namespace CouchDB.Client
     /// </summary>
     public sealed class ServerResponseError
     {
-        internal ServerResponseError(string errorString, string reason = null)
+        /// <summary>
+        /// Initializes new instance of <see cref="ServerResponseError"/> class.
+        /// </summary>
+        /// <param name="errorString">Raw error string.</param>
+        /// <param name="reason">Reason phrase.</param>
+        public ServerResponseError(string errorString, string reason = null)
         {
             if (errorString == null)
                 throw new ArgumentNullException(nameof(errorString));

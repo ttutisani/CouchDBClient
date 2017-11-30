@@ -12,7 +12,14 @@ namespace CouchDB.Client
     /// <typeparam name="TDocument">Type of document object.</typeparam>
     public sealed class DocListResponse<TDocument>
     {
-        internal DocListResponse(int offset, int totalRows, int updateSeq, IEnumerable<DocListResponseRow<TDocument>> rows)
+        /// <summary>
+        /// Inisitalizes new instance of <see cref="DocListResponse{TDocument}"/> class.
+        /// </summary>
+        /// <param name="offset">Offset where the document list started.</param>
+        /// <param name="totalRows">Number of documents in the database/view.</param>
+        /// <param name="updateSeq">Current update sequence for the database.</param>
+        /// <param name="rows">Array of view row objects.</param>
+        public DocListResponse(int offset, int totalRows, int updateSeq, IEnumerable<DocListResponseRow<TDocument>> rows)
         {
             if (rows == null)
                 throw new ArgumentNullException(nameof(rows));
