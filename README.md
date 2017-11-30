@@ -8,6 +8,7 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
 * Fully object oriented.
 * Fully unit tested.
 * Fully async (uses async/await).
+* Fully abstract (consumers depend on interfaces, so that they can easily be unit tested).
 * Designed for simplicity in usage.
 
 PS: unit tested using TDD (Test Driven Development), which ensures minimum number of code lines to get the job done.
@@ -89,7 +90,8 @@ Most low level approach allows usage of string documents.
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    using (var db = server.SelectDatabase("my-db"))
+    var db = server.SelectDatabase("my-db");
+    
     {
         // Create document in one of many ways.
         await db.SaveObjectDocumentAsync(new { city = "Austin" });
@@ -227,6 +229,28 @@ HttpResponseMessage rawResponse = response.GetHttpResponseMessage();
 ```
 
 Resulting `HttpResponseMessage` type ships with .NET Framework, so you are free to do anything with it, such as read content as string or as byte array.
+
+#### Get Neat with Extension Methods
+
+Thanks to .NET's support of extension methods, you can easily make your own routine look like a regular CouchDBServer method. e.g. previously mentioned routine code can become an extension method like this:
+
+``` C#
+public async static string GetViewResponse(this CouchDBServer server)
+{
+    var handler = server.GetHandler();
+    
+    var response = await handler.SentRequestAsync("views", RequestMethod.GET, Request.Empty);
+    HttpResponseMessage rawResponse = response.GetHttpResponseMessage();
+    return await rawResponse.Content.ReadAsStringAsync();
+}
+```
+
+Which then can be called like any other method of the CouchDBServer:
+
+``` C#
+var server = new CouchDBServer("http://localhost:5984");
+string viewResponse = await server.GetViewResponse();
+```
 
 
 ## New Feature Requests
