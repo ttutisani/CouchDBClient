@@ -11,7 +11,11 @@ namespace CouchDB.Client
     {
         private readonly HttpResponseMessage _httpResponseMessage;
 
-        internal Response(HttpResponseMessage httpResponseMessage)
+        /// <summary>
+        /// Initializes new instance of <see cref="Response"/> class.
+        /// </summary>
+        /// <param name="httpResponseMessage"></param>
+        public Response(HttpResponseMessage httpResponseMessage)
         {
             if (httpResponseMessage == null)
                 throw new ArgumentNullException(nameof(httpResponseMessage));

@@ -34,8 +34,6 @@ namespace CouchDB.Client.ConsumerDrivenTests
         {
             _sut.Setup(s => s.GetHandler())
                 .Returns(new Mock<ICouchDBHandler>().Object);
-
-            //TODO: assert all members of ICouchDBHandler as mockable.
         }
 
         [Fact]
