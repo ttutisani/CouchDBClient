@@ -89,7 +89,8 @@ Most low level approach allows usage of string documents.
 ``` C#
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    using (var db = server.SelectDatabase("my-db"))
+    var db = server.SelectDatabase("my-db");
+    
     {
         // Create document in one of many ways.
         await db.SaveObjectDocumentAsync(new { city = "Austin" });
