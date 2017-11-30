@@ -48,8 +48,6 @@ namespace CouchDB.Client.ConsumerDrivenTests
         {
             _sut.Setup(s => s.SelectDatabase(It.IsAny<string>()))
                 .Returns(new Mock<ICouchDBDatabase>().Object);
-
-            //TODO: assert all members of ICouchDBDatabase are mockable.
         }
     }
 }

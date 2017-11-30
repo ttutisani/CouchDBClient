@@ -25,7 +25,7 @@ namespace CouchDB.Client
         /// <summary>
         /// Initializes new instance of <see cref="ServerInfo"/> class.
         /// </summary>
-        /// <param name="serverInfoDTO"></param>
+        /// <param name="serverInfoDTO">DTO with values for initialization.</param>
         public ServerInfo(CouchDBServer.ServerInfoDTO serverInfoDTO)
         {
             if (serverInfoDTO == null)

@@ -39,14 +39,29 @@ namespace CouchDB.Client
 
         #region Save doc
 
-        internal sealed class SaveDocResponseDTO
+        /// <summary>
+        /// Represents response of document operation.
+        /// </summary>
+        public sealed class SaveDocResponseDTO
         {
+            /// <summary>
+            /// Gets or sets document id.
+            /// </summary>
             public string Id { get; set; }
 
+            /// <summary>
+            /// Gets or sets document revision.
+            /// </summary>
             public string Rev { get; set; }
 
+            /// <summary>
+            /// Gets or sets raw error string.
+            /// </summary>
             public string Error { get; set; }
 
+            /// <summary>
+            /// Gets or sets reason phrase.
+            /// </summary>
             public string Reason { get; set; }
         }
 
@@ -195,7 +210,10 @@ namespace CouchDB.Client
 
         #region Save Docs
 
-        internal sealed class SaveDocListResponseDTO : List<SaveDocResponseDTO>
+        /// <summary>
+        /// Represents collection of responses for save operation of the documents.
+        /// </summary>
+        public sealed class SaveDocListResponseDTO : List<SaveDocResponseDTO>
         {
         }
 

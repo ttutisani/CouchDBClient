@@ -9,7 +9,11 @@ namespace CouchDB.Client
     /// </summary>
     public sealed class SaveDocListResponse
     {
-        internal SaveDocListResponse(CouchDBDatabase.SaveDocListResponseDTO saveDocListResponseDTO)
+        /// <summary>
+        /// Initializes new instance of <see cref="SaveDocListResponse"/> class.
+        /// </summary>
+        /// <param name="saveDocListResponseDTO">Collection of responses for save operation of the documents.</param>
+        public SaveDocListResponse(CouchDBDatabase.SaveDocListResponseDTO saveDocListResponseDTO)
         {
             if (saveDocListResponseDTO == null)
                 throw new ArgumentNullException(nameof(saveDocListResponseDTO));
