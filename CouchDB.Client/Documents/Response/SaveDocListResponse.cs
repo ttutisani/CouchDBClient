@@ -13,6 +13,7 @@ namespace CouchDB.Client
         /// Initializes new instance of <see cref="SaveDocListResponse"/> class.
         /// </summary>
         /// <param name="saveDocListResponseDTO">Collection of responses for save operation of the documents.</param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public SaveDocListResponse(CouchDBDatabase.SaveDocListResponseDTO saveDocListResponseDTO)
         {
             if (saveDocListResponseDTO == null)

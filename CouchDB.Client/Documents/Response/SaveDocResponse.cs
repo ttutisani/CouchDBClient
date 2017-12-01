@@ -11,6 +11,7 @@ namespace CouchDB.Client
         /// Initializes new instance of <see cref="SaveDocResponse"/> class.
         /// </summary>
         /// <param name="docResponseDTO">DTO with vaues for initialization.</param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public SaveDocResponse(CouchDBDatabase.SaveDocResponseDTO docResponseDTO)
         {
             if (docResponseDTO == null)

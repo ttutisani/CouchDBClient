@@ -151,7 +151,7 @@ namespace CouchDB.Client.Tests
         {
             //arrange.
             _db.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
 
             //act.
             await _sut.GetAllEntitiesAsync<SampleEntity>(null);
@@ -167,7 +167,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _db.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
 
             //act.
             await _sut.GetAllEntitiesAsync<SampleEntity>(queryParams);
@@ -266,7 +266,7 @@ namespace CouchDB.Client.Tests
         {
             //arrange.
             _db.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
 
             //act.
             await _sut.GetEntitiesAsync<SampleEntity>(new string[] { "id-1" });
@@ -283,7 +283,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _db.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
 
             //act.
             await _sut.GetEntitiesAsync<SampleEntity>(idList, queryParams);

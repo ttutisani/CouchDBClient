@@ -11,6 +11,7 @@ namespace CouchDB.Client
         /// Initializes new instance of <see cref="DocListResponseRowValue"/> class.
         /// </summary>
         /// <param name="revision">Revision of the document.</param>
+        /// <exception cref="NoException"></exception>
         public DocListResponseRowValue(string revision)
         {
             Revision = revision;
@@ -26,6 +27,12 @@ namespace CouchDB.Client
             public string Rev { get; set; }
         }
 
+        /// <summary>
+        /// Create <see cref="DocListResponseRowValue"/> by <see cref="JObject"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <exception cref="NoException"></exception>
         internal static DocListResponseRowValue FromJson(JObject value)
         {
             return value == null ? null : new DocListResponseRowValue(value.ToObject<ValueDTO>().Rev);

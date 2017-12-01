@@ -83,6 +83,7 @@ namespace CouchDB.Client
         /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<SaveDocResponse> SaveStringDocumentAsync(string documentJsonString, DocUpdateParams updateParams = null)
         {
             if (string.IsNullOrWhiteSpace(documentJsonString))
@@ -109,6 +110,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Additional query parameters for retrieving document.</param>
         /// <returns><see cref="string"/> containing document JSON.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<string> GetStringDocumentAsync(string docId, DocQueryParams queryParams = null)
         {
             if (string.IsNullOrWhiteSpace(docId))
@@ -137,6 +139,9 @@ namespace CouchDB.Client
         /// <param name="revision">Actual document’s revision.</param>
         /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Delete request was already sent.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<SaveDocResponse> DeleteDocumentAsync(string docId, string revision, bool batch = false)
         {
             if (string.IsNullOrWhiteSpace(docId))
@@ -173,6 +178,8 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
+        /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public async Task<DocListResponse<string>> GetAllStringDocumentsAsync(ListQueryParams queryParams = null)
         {
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
@@ -199,6 +206,8 @@ namespace CouchDB.Client
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{STRING}"/> containing list of JSON strings.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
+        /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public async Task<DocListResponse<string>> GetStringDocumentsAsync(string[] docIdList, ListQueryParams queryParams = null)
         {
             if (docIdList == null || docIdList.Length == 0)
@@ -238,6 +247,7 @@ namespace CouchDB.Client
         /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<SaveDocListResponse> SaveStringDocumentsAsync(string[] documents, bool newEdits = true)
         {
             if (documents == null || documents.Length == 0)
@@ -269,6 +279,7 @@ namespace CouchDB.Client
         /// <param name="attachment">Attachment content.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<SaveDocResponse> SaveAttachmentAsync(string docId, string attName, string revision, byte[] attachment)
         {
             if (string.IsNullOrWhiteSpace(docId))
@@ -299,6 +310,7 @@ namespace CouchDB.Client
         /// <param name="attName">Attachment name.</param>
         /// <returns>Attachment content.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<byte[]> GetAttachmentAsync(string docId, string attName)
         {
             if (string.IsNullOrWhiteSpace(docId))
@@ -327,6 +339,8 @@ namespace CouchDB.Client
         /// <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Delete request was already sent.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<SaveDocResponse> DeleteAttachmentAsync(string docId, string attName, string revision, bool batch = false)
         {
             if (string.IsNullOrWhiteSpace(docId))

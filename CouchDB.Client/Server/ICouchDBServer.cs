@@ -15,6 +15,7 @@ namespace CouchDB.Client
         /// <param name="dbName">Database name which will be created.</param>
         /// <returns><see cref="Task"/> which can be awaited.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         Task CreateDbAsync(string dbName);
 
         /// <summary>
@@ -24,18 +25,22 @@ namespace CouchDB.Client
         /// <param name="dbName">Database name to be deleted.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Delete request was already sent.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         Task DeleteDbAsync(string dbName);
 
         /// <summary>
         /// Returns a list of all the databases in the CouchDB instance.
         /// </summary>
         /// <returns>String array containing all database names.</returns>
+        /// <exception cref="CouchDBClientException">Error response receive from CouchDB server.</exception>
         Task<string[]> GetAllDbNamesAsync(ListQueryParams queryParams = null);
 
         /// <summary>
         /// Retrieves instance of <see cref="ICouchDBHandler"/> which can be used to send raw requests to CouchDB.
         /// </summary>
         /// <returns>Instance of <see cref="ICouchDBHandler"/>.</returns>
+        /// <exception cref="NoException"></exception>
         ICouchDBHandler GetHandler();
 
         /// <summary>
@@ -44,6 +49,7 @@ namespace CouchDB.Client
         /// about the server, including a welcome message and the version of the server.
         /// </summary>
         /// <returns><see cref="ServerInfo"/> object containing server metadata information.</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         Task<ServerInfo> GetInfoAsync();
 
         /// <summary>
@@ -52,6 +58,7 @@ namespace CouchDB.Client
         /// <param name="dbName">Name of database to be selected.</param>
         /// <returns>Instance of <see cref="ICouchDBDatabase"/>.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="FormatException">Resulting URL with <paramref name="dbName"/> was not in valid format.</exception>
         ICouchDBDatabase SelectDatabase(string dbName);
     }
 }
