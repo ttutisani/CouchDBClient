@@ -29,6 +29,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="content">Json string.</param>
         /// <returns>Instance of <see cref="Request"/>.</returns>
+        /// <exception cref="NoException"></exception>
         public static Request JsonString(string content) 
             => 
             new StringRequest(content, Encoding.UTF8, "application/json");

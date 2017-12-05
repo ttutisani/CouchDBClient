@@ -7,8 +7,20 @@ namespace CouchDB.Client
     /// </summary>
     public abstract class QueryParams
     {
+        /// <summary>
+        /// When implemented, converts current instance of <see cref="QueryParams"/> to <see cref="string"/>.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NoException"></exception>
         internal abstract string ToQueryString();
 
+        /// <summary>
+        /// Append query params to URL.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="queryParams"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         internal static string AppendQueryParams(string url, QueryParams queryParams)
         {
             if (url == null)

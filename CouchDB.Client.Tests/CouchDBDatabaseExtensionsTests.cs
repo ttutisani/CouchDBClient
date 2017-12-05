@@ -305,7 +305,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
 
             //act.
             await _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(queryParams);
@@ -323,7 +323,7 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 222 }
             };
             _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)).ToList())));
 
             //act.
             var docs = await _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, null);
@@ -350,7 +350,7 @@ namespace CouchDB.Client.Tests
                 new { what = "some value", that = 222 }
             };
             _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)).ToList())));
 
             Func<string, SampleDoc> deserializer = doc => 
             {
@@ -385,7 +385,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
 
             //act.
             await _sut.Object.GetAllJsonDocumentsAsync(queryParams);
@@ -403,7 +403,7 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 222 }
             };
             _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)).ToList())));
 
             //act.
             var docs = await _sut.Object.GetAllJsonDocumentsAsync(null);
@@ -424,7 +424,7 @@ namespace CouchDB.Client.Tests
         public async void GetObjectDocumentsAsync_Requires_NotEmpty_IdList()
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetObjectDocumentsAsync<SampleDoc>(null));
-            await Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { }));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { }));
         }
 
         [Fact]
@@ -435,7 +435,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
 
             //act.
             await _sut.Object.GetObjectDocumentsAsync<SampleDoc>(docIdList, queryParams);
@@ -453,7 +453,7 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 222 }
             };
             _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)).ToList())));
 
             //act.
             var docs = await _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { "id-1" }, null);
@@ -480,7 +480,7 @@ namespace CouchDB.Client.Tests
                 new { what = "some value", that = 222 }
             };
             _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)).ToList())));
 
             Func<string, SampleDoc> deserializer = strDoc =>
             {
@@ -534,7 +534,7 @@ namespace CouchDB.Client.Tests
         public async void GetJsonDocumentsAsync_Requires_NotEmpty_IdList()
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetJsonDocumentsAsync(null));
-            await Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.GetJsonDocumentsAsync(new string[] { }));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetJsonDocumentsAsync(new string[] { }));
         }
 
         [Fact]
@@ -545,7 +545,7 @@ namespace CouchDB.Client.Tests
             var queryParams = new ListQueryParams();
 
             _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, Enumerable.Empty<DocListResponseRow<string>>())));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
 
             //act.
             await _sut.Object.GetJsonDocumentsAsync(docIdList, queryParams);
@@ -563,7 +563,7 @@ namespace CouchDB.Client.Tests
                 new { name = "some value", name2 = 222 }
             };
             _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
-                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)))));
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, jsonDocs.Select(doc => new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("rev"), JsonConvert.SerializeObject(doc), null)).ToList())));
 
             //act.
             var docs = await _sut.Object.GetJsonDocumentsAsync(new string[] { "id-1" }, null);

@@ -19,7 +19,8 @@ namespace CouchDB.Client
         /// <param name="totalRows">Number of documents in the database/view.</param>
         /// <param name="updateSeq">Current update sequence for the database.</param>
         /// <param name="rows">Array of view row objects.</param>
-        public DocListResponse(int offset, int totalRows, int updateSeq, IEnumerable<DocListResponseRow<TDocument>> rows)
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        public DocListResponse(int offset, int totalRows, int updateSeq, List<DocListResponseRow<TDocument>> rows)
         {
             if (rows == null)
                 throw new ArgumentNullException(nameof(rows));
@@ -28,7 +29,7 @@ namespace CouchDB.Client
             TotalRows = totalRows;
             UpdateSeq = updateSeq;
 
-            Rows = new ReadOnlyCollection<DocListResponseRow<TDocument>>(rows.ToList());
+            Rows = new ReadOnlyCollection<DocListResponseRow<TDocument>>(rows);
         }
 
         /// <summary>
@@ -51,6 +52,12 @@ namespace CouchDB.Client
         /// </summary>
         public int UpdateSeq { get; }
 
+        /// <summary>
+        /// Convert all docs JSON into <see cref="DocListResponse{String}"/>.
+        /// </summary>
+        /// <param name="allDocsJsonString"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Malformed input json (cannot read as list of objects).</exception>
         internal static DocListResponse<string> FromJsonToStringList(string allDocsJsonString)
         {
             var allDocsJsonObject = JObject.Parse(allDocsJsonString);
@@ -64,12 +71,19 @@ namespace CouchDB.Client
             return new DocListResponse<string>(offset, totalRows, updateSeq, responseRows);
         }
         
+        /// <summary>
+        /// Cart current <see cref="DocListResponse{TDocument}"/> to <see cref="DocListResponse{TResult}"/>.
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="converter"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         internal DocListResponse<TResult> Cast<TResult>(Func<TDocument, TResult> converter)
         {
             if (converter == null)
                 throw new ArgumentNullException(nameof(converter));
 
-            return new DocListResponse<TResult>(Offset, TotalRows, UpdateSeq, Rows.Select(row => row.Cast(converter)));
+            return new DocListResponse<TResult>(Offset, TotalRows, UpdateSeq, Rows.Select(row => row.Cast(converter)).ToList());
         }
     }
 }

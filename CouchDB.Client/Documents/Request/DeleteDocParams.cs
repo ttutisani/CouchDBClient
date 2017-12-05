@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CouchDB.Client
 {
@@ -9,6 +8,11 @@ namespace CouchDB.Client
 
         public bool Batch { get; set; }
 
+        /// <summary>
+        /// Converts current instance of <see cref="DeleteDocParams"/> to <see cref="string"/>.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NoException"></exception>
         internal override string ToQueryString()
         {
             var queryParts = new List<string>();

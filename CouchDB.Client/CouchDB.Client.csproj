@@ -51,6 +51,7 @@
     <Compile Include="Database\CouchDBDatabase.cs" />
     <Compile Include="Database\EntityStore.cs" />
     <Compile Include="Database\ICouchDBDatabase.cs" />
+    <Compile Include="Database\IEntityStore.cs" />
     <Compile Include="Documents\Request\DeleteDocParams.cs" />
     <Compile Include="Documents\Request\SaveDocListRequest.cs" />
     <Compile Include="Documents\Response\DocListResponse.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Documents\Request\DocQueryParams.cs" />
+    <Compile Include="NoException.cs" />
     <Compile Include="Queries\QueryParams.cs" />
     <Compile Include="Response\ServerResponseDTO.cs" />
     <Compile Include="Response\ServerResponseError.cs" />

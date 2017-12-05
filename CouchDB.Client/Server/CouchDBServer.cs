@@ -25,6 +25,11 @@ namespace CouchDB.Client
 
         private readonly ICouchDBHandler _handler;
 
+        /// <summary>
+        /// Initializes new instance of <see cref=" CouchDBServer"/> class.
+        /// </summary>
+        /// <param name="handler">CouchDB Handler.</param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         internal CouchDBServer(ICouchDBHandler handler)
         {
             if (handler == null)
@@ -41,6 +46,7 @@ namespace CouchDB.Client
         /// about the server, including a welcome message and the version of the server.
         /// </summary>
         /// <returns><see cref="ServerInfo"/> object containing server metadata information.</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<ServerInfo> GetInfoAsync()
         {
             ServerInfo serverInfo = null;
@@ -93,6 +99,7 @@ namespace CouchDB.Client
         /// Returns a list of all the databases in the CouchDB instance.
         /// </summary>
         /// <returns>String array containing all database names.</returns>
+        /// <exception cref="CouchDBClientException">Error response receive from CouchDB server.</exception>
         public async Task<string[]> GetAllDbNamesAsync(ListQueryParams queryParams = null)
         {
             string[] dbNames = null;
@@ -112,6 +119,7 @@ namespace CouchDB.Client
         /// <param name="dbName">Database name which will be created.</param>
         /// <returns><see cref="Task"/> which can be awaited.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task CreateDbAsync(string dbName)
         { 
             if (string.IsNullOrWhiteSpace(dbName))
@@ -129,6 +137,8 @@ namespace CouchDB.Client
         /// <param name="dbName">Database name to be deleted.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Delete request was already sent.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task DeleteDbAsync(string dbName)
         {
             if (string.IsNullOrWhiteSpace(dbName))
@@ -145,6 +155,7 @@ namespace CouchDB.Client
         /// <param name="dbName">Name of database to be selected.</param>
         /// <returns>Instance of <see cref="ICouchDBDatabase"/>.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="FormatException">Resulting URL with <paramref name="dbName"/> was not in valid format.</exception>
         public ICouchDBDatabase SelectDatabase(string dbName)
         {
             if (string.IsNullOrWhiteSpace(dbName))
@@ -157,6 +168,7 @@ namespace CouchDB.Client
         /// Retrieves instance of <see cref="ICouchDBHandler"/> which can be used to send raw requests to CouchDB.
         /// </summary>
         /// <returns>Instance of <see cref="ICouchDBHandler"/>.</returns>
+        /// <exception cref="NoException"></exception>
         public ICouchDBHandler GetHandler()
         {
             return _handler;

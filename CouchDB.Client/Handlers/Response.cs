@@ -15,6 +15,7 @@ namespace CouchDB.Client
         /// Initializes new instance of <see cref="Response"/> class.
         /// </summary>
         /// <param name="httpResponseMessage"></param>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
         public Response(HttpResponseMessage httpResponseMessage)
         {
             if (httpResponseMessage == null)
@@ -29,6 +30,7 @@ namespace CouchDB.Client
         /// <typeparam name="TResult">Deserialization type.</typeparam>
         /// <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
         /// <returns>Deserialized object.</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<TResult> ReadAsAsync<TResult>(bool nullIfNotFound)
         {
             return await HttpClientHelper.HandleObjectResponse<TResult>(_httpResponseMessage, nullIfNotFound).Safe();
@@ -39,6 +41,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
         /// <returns>String content read from the current instance of <see cref="Response"/>.</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<string> ReadAsStringAsync(bool nullIfNotFound)
         {
             return await HttpClientHelper.HandleStringResponse(_httpResponseMessage, nullIfNotFound).Safe();
@@ -49,6 +52,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
         /// <returns>Byte array content read from the current instance of <see cref="Response"/>.</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<byte[]> ReadAsByteArrayAsync(bool nullIfNotFound)
         {
             return await HttpClientHelper.HandleRawResponse(_httpResponseMessage, nullIfNotFound).Safe();
@@ -59,6 +63,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
         /// <returns></returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task EnsureSuccessAsync(bool nullIfNotFound)
         {
             await HttpClientHelper.HandleVoidResponse(_httpResponseMessage, nullIfNotFound).Safe();

@@ -4,6 +4,12 @@ namespace CouchDB.Client
 {
     internal static class EntityHelper
     {
+        /// <summary>
+        /// Convert entity to JSON (honoring Id and Revision).
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <exception cref="NoException"></exception>
         public static JObject ConvertEntityToJSON(IEntity entity)
         {
             if (entity == null)
