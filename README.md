@@ -8,7 +8,7 @@ This is a client framework for working with CouchDB from .NET code. It abstracts
 * Fully object oriented.
 * Fully unit tested.
 * Fully async (uses async/await).
-* Fully abstract (consumers depend on interfaces, so that they can easily be unit tested).
+* Fully abstract, unit test friendly (consumers depend on interfaces, so that they can easily be unit tested).
 * Designed for simplicity in usage.
 
 PS: unit tested using TDD (Test Driven Development), which ensures minimum number of code lines to get the job done.
