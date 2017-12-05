@@ -8,7 +8,7 @@ namespace CouchDB.Client
     /// Represents an abstraction over database for working with documents as entities.
     /// Entities avoid the hassle of manually maintaining ID and Revision for each document.
     /// </summary>
-    public sealed class EntityStore
+    public sealed class EntityStore : IEntityStore
     {
         private readonly ICouchDBDatabase _db;
 
@@ -30,6 +30,8 @@ namespace CouchDB.Client
         /// <param name="entity">Instance of entity to be saved.</param>
         /// <param name="entityUpdateParams">Additional parameters for saving.</param>
         /// <returns>Awaitable task.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task SaveEntityAsync(IEntity entity, DocUpdateParams entityUpdateParams = null)
         {
             if (entity == null)
@@ -49,6 +51,8 @@ namespace CouchDB.Client
         /// <param name="entityId">ID of entity to be retrieved.</param>
         /// <param name="entityQueryParams">Additional parameters for retrieving.</param>
         /// <returns>Entity.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<TEntity> GetEntityAsync<TEntity>(string entityId, DocQueryParams entityQueryParams = null)
             where TEntity : IEntity
         {
@@ -61,6 +65,8 @@ namespace CouchDB.Client
         /// <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
         /// <param name="entityListQueryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{TEntity}"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
+        /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public async Task<DocListResponse<TEntity>> GetAllEntitiesAsync<TEntity>(ListQueryParams entityListQueryParams = null)
             where TEntity : IEntity
         {
@@ -79,13 +85,13 @@ namespace CouchDB.Client
         /// <param name="entityIdList">List if IDs for finding entities.</param>
         /// <param name="entityListQueryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{TEntity}"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
+        /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public async Task<DocListResponse<TEntity>> GetEntitiesAsync<TEntity>(string[] entityIdList, ListQueryParams entityListQueryParams = null)
         {
-            if (entityIdList == null)
+            if (entityIdList == null || entityIdList.Length == 0)
                 throw new ArgumentNullException(nameof(entityIdList));
-
-            if (entityIdList.Length == 0)
-                throw new ArgumentException($"{nameof(entityIdList)} should not be empty.", nameof(entityIdList));
 
             if (entityListQueryParams == null)
                 entityListQueryParams = new ListQueryParams();
@@ -101,6 +107,9 @@ namespace CouchDB.Client
         /// <param name="entity">Entity object to be deleted.</param>
         /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns>Awaitable task.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Delete request was already sent.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task DeleteEntityAsync(IEntity entity, bool batch = false)
         {
             if (entity == null)
@@ -121,8 +130,12 @@ namespace CouchDB.Client
         /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<SaveDocListResponse> SaveEntitiesAsync(IEntity[] entities, bool newEdits = true)
         {
+            if (entities == null || entities.Length == 0)
+                throw new ArgumentNullException(nameof(entities));
+
             var entityJsonObjects = entities.Select(entity => EntityHelper.ConvertEntityToJSON(entity)).ToArray();
 
             var saveResponse = await _db.SaveJsonDocumentsAsync(entityJsonObjects, newEdits).Safe();
@@ -156,6 +169,7 @@ namespace CouchDB.Client
         /// <param name="attachment">Attachment content as byte array.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task SaveAttachmentAsync(IEntity entity, string attName, byte[] attachment)
         {
             if (entity == null)
@@ -178,6 +192,7 @@ namespace CouchDB.Client
         /// <param name="attName">Attachment name.</param>
         /// <returns>Attachment as byte array.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task<byte[]> GetAttachmentAsync(IEntity entity, string attName)
         {
             if (entity == null)
@@ -197,6 +212,8 @@ namespace CouchDB.Client
         /// <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Delete request was already sent.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public async Task DeleteAttachmentAsync(IEntity entity, string attName, bool batch = false)
         {
             if (entity == null)

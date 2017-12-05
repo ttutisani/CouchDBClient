@@ -21,6 +21,7 @@ namespace CouchDB.Client
         /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns>Awaitable task.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public static async Task SaveJsonDocumentAsync(this ICouchDBDatabase @this, JObject documentJsonObject, DocUpdateParams updateParams = null)
         {
             if (documentJsonObject == null)
@@ -39,6 +40,7 @@ namespace CouchDB.Client
         /// <param name="updateParams">Query parameters for updating document.</param>
         /// <returns><see cref="SaveDocResponse"/> with operation results in it.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public static async Task<SaveDocResponse> SaveObjectDocumentAsync(this ICouchDBDatabase @this, object documentObject, DocUpdateParams updateParams = null)
         {
             if (documentObject == null)
@@ -64,6 +66,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Additional query parameters for retrieving document.</param>
         /// <returns><see cref="JObject"/> containing document JSON.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public static async Task<JObject> GetJsonDocumentAsync(this ICouchDBDatabase @this, string docId, DocQueryParams queryParams = null)
         {
             if (string.IsNullOrWhiteSpace(docId))
@@ -87,6 +90,7 @@ namespace CouchDB.Client
         /// <param name="queryParams">Additional query parameters for retrieving document.</param>
         /// <returns>Object containing deserialized document.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public static async Task<TResult> GetObjectDocumentAsync<TResult>(this ICouchDBDatabase @this, string docId, DocQueryParams queryParams = null)
         {
             if (string.IsNullOrWhiteSpace(docId))
@@ -115,6 +119,10 @@ namespace CouchDB.Client
         /// <param name="document"><see cref="JObject"/> instance representing a document.</param>
         /// <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
         /// <returns>Awaitable task.</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="ArgumentException">Document should have _id and _rev.</exception>
+        /// <exception cref="InvalidOperationException">Delete request was already sent.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public static async Task DeleteJsonDocumentAsync(this ICouchDBDatabase @this, JObject document, bool batch = false)
         {
             if (document == null)
@@ -126,7 +134,7 @@ namespace CouchDB.Client
 
             var revision = document[CouchDBDatabase.RevisionPropertyName]?.ToString();
             if (string.IsNullOrWhiteSpace(revision))
-                throw new ArgumentException("Document shoudl have _rev.", nameof(document));
+                throw new ArgumentException("Document should have _rev.", nameof(document));
 
             var deletionResponse = await @this.DeleteDocumentAsync(docId, revision, batch).Safe();
             document[CouchDBDatabase.IdPropertyName] = deletionResponse.Id;
@@ -146,6 +154,8 @@ namespace CouchDB.Client
         /// <param name="this">Instance of <see cref="ICouchDBDatabase"/>.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
+        /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public static async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(this ICouchDBDatabase @this, ListQueryParams queryParams = null)
         {
             var stringDocs = await @this.GetAllStringDocumentsAsync(queryParams).Safe();
@@ -167,6 +177,8 @@ namespace CouchDB.Client
         /// NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
         /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
         /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
+        /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public static async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, ListQueryParams queryParams = null, Func<string, TDocument> deserializer = null)
         {
             var jsonDocs = await @this.GetAllStringDocumentsAsync(queryParams).Safe();
@@ -185,13 +197,13 @@ namespace CouchDB.Client
         /// <param name="docIdList">Array of document IDs for retrieving documents.</param>
         /// <param name="queryParams">Instance of <see cref="ListQueryParams"/> to be used for filtering.</param>
         /// <returns><see cref="DocListResponse{JObject}"/> containing list of JSON objects (<see cref="JObject"/>).</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
+        /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public static async Task<DocListResponse<JObject>> GetJsonDocumentsAsync(this ICouchDBDatabase @this, string[] docIdList, ListQueryParams queryParams = null)
         {
-            if (docIdList == null)
+            if (docIdList == null || docIdList.Length == 0)
                 throw new ArgumentNullException(nameof(docIdList));
-
-            if (docIdList.Length == 0)
-                throw new ArgumentException($"{nameof(docIdList)} should not be empty.", nameof(docIdList));
 
             var stringDocs = await @this.GetStringDocumentsAsync(docIdList, queryParams).Safe();
 
@@ -213,13 +225,13 @@ namespace CouchDB.Client
         /// NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
         /// you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
         /// <returns><see cref="DocListResponse{TDOcument}"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+        /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
+        /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public static async Task<DocListResponse<TDocument>> GetObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, string[] docIdList, ListQueryParams queryParams = null, Func<string, TDocument> deserializer = null)
         {
-            if (docIdList == null)
+            if (docIdList == null || docIdList.Length == 0)
                 throw new ArgumentNullException(nameof(docIdList));
-
-            if (docIdList.Length == 0)
-                throw new ArgumentException($"{nameof(docIdList)} should not be empty.", nameof(docIdList));
 
             var stringDocs = await @this.GetStringDocumentsAsync(docIdList, queryParams).Safe();
             return stringDocs.Cast(deserializer ?? new Func<string, TDocument>(strDoc => strDoc != null ? JsonConvert.DeserializeObject<TDocument>(strDoc) : default(TDocument)));
@@ -240,6 +252,7 @@ namespace CouchDB.Client
         /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public static async Task<SaveDocListResponse> SaveJsonDocumentsAsync(this ICouchDBDatabase @this, JObject[] documents, bool newEdits = true)
         {
             if (documents == null || documents.Length == 0)
@@ -280,6 +293,7 @@ namespace CouchDB.Client
         /// <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
         /// <returns>Instance of <see cref="SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
         /// <exception cref="ArgumentNullException">Required parameter is null or empty.</exception>
+        /// <exception cref="CouchDBClientException">Error response received from CouchDB server.</exception>
         public static async Task<SaveDocListResponse> SaveObjectDocumentsAsync(this ICouchDBDatabase @this, object[] documents, bool newEdits = true)
         {
             if (documents == null || documents.Length == 0)

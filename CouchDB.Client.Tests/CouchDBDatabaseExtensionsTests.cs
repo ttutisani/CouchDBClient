@@ -424,7 +424,7 @@ namespace CouchDB.Client.Tests
         public async void GetObjectDocumentsAsync_Requires_NotEmpty_IdList()
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetObjectDocumentsAsync<SampleDoc>(null));
-            await Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { }));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { }));
         }
 
         [Fact]
@@ -534,7 +534,7 @@ namespace CouchDB.Client.Tests
         public async void GetJsonDocumentsAsync_Requires_NotEmpty_IdList()
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetJsonDocumentsAsync(null));
-            await Assert.ThrowsAsync<ArgumentException>(() => _sut.Object.GetJsonDocumentsAsync(new string[] { }));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetJsonDocumentsAsync(new string[] { }));
         }
 
         [Fact]

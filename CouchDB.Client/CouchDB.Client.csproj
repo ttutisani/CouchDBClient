@@ -51,6 +51,7 @@
     <Compile Include="Database\CouchDBDatabase.cs" />
     <Compile Include="Database\EntityStore.cs" />
     <Compile Include="Database\ICouchDBDatabase.cs" />
+    <Compile Include="Database\IEntityStore.cs" />
     <Compile Include="Documents\Request\DeleteDocParams.cs" />
     <Compile Include="Documents\Request\SaveDocListRequest.cs" />
     <Compile Include="Documents\Response\DocListResponse.cs" />

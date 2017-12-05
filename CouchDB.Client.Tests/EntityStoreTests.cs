@@ -258,7 +258,7 @@ namespace CouchDB.Client.Tests
         {
             //assert.
             await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetEntitiesAsync<SampleEntity>(null));
-            await Assert.ThrowsAsync<ArgumentException>(() => _sut.GetEntitiesAsync<SampleEntity>(new string[] { }));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetEntitiesAsync<SampleEntity>(new string[] { }));
         }
 
         [Fact]
