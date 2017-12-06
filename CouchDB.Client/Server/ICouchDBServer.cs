@@ -40,7 +40,7 @@ namespace CouchDB.Client
         /// Retrieves instance of <see cref="ICouchDBHandler"/> which can be used to send raw requests to CouchDB.
         /// </summary>
         /// <returns>Instance of <see cref="ICouchDBHandler"/>.</returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         ICouchDBHandler GetHandler();
 
         /// <summary>

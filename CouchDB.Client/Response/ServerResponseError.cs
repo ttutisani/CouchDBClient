@@ -48,7 +48,7 @@ namespace CouchDB.Client
         /// <param name="error"></param>
         /// <param name="reason"></param>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal static ServerResponseError FromString(string error, string reason = null)
         {
             return string.IsNullOrWhiteSpace(error) ? null : new ServerResponseError(error, reason);

@@ -24,7 +24,7 @@ namespace CouchDB.Client
         /// Converts current instance of <see cref="DocUpdateParams"/> to <see cref="string"/>.
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal override string ToQueryString()
         {
             var queryParts = new List<string>();

@@ -1,0 +1,1774 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CouchDB.Client</name>
+    </assembly>
+    <members>
+        <member name="M:CouchDB.Client.AttachmentQueryParams.ToQueryString">
+            <summary>
+            Converts current instance of <see cref="T:CouchDB.Client.AttachmentQueryParams"/> to <see cref="T:System.String"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBClientException">
+            <summary>
+            Represents CouchDB exception.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBClientException.ServerResponse">
+            <summary>
+            Gets <see cref="P:CouchDB.Client.CouchDBClientException.ServerResponse"/> which represents JSON object returned by CouchDB server.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBClientException.#ctor(System.String,CouchDB.Client.ServerResponse,System.Exception)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.CouchDBClientException"/> class.
+            </summary>
+            <param name="message">Error message which describes this exception.</param>
+            <param name="serverResponse">(optional) instance of <see cref="P:CouchDB.Client.CouchDBClientException.ServerResponse"/> received from server.</param>
+            <param name="innerException">Inner exception describing more specific error.</param>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBClientException.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            When overridden in a derived class, sets the System.Runtime.Serialization.SerializationInfo
+            with information about the exception.
+            </summary>
+            <param name="info">The System.Runtime.Serialization.SerializationInfo that holds the serialized
+            object data about the exception being thrown.</param>
+            <param name="context">The System.Runtime.Serialization.StreamingContext that contains contextual information
+            about the source or destination.</param>
+            <exception cref="T:System.ArgumentNullException">The info parameter is a null reference (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBDatabaseExtensions">
+            <summary>
+            Extension methods (overloads) over <see cref="T:CouchDB.Client.ICouchDBDatabase"/> interface.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.SaveJsonDocumentAsync(CouchDB.Client.ICouchDBDatabase,Newtonsoft.Json.Linq.JObject,CouchDB.Client.DocUpdateParams)">
+            <summary>
+            Creates a new named document, or creates a new revision of the existing document.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="documentJsonObject">JSON of document to be saved.</param>
+            <param name="updateParams">Query parameters for updating document.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.SaveObjectDocumentAsync(CouchDB.Client.ICouchDBDatabase,System.Object,CouchDB.Client.DocUpdateParams)">
+            <summary>
+            Creates a new named document, or creates a new revision of the existing document.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="documentObject">Document object to be saved.</param>
+            <param name="updateParams">Query parameters for updating document.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.GetJsonDocumentAsync(CouchDB.Client.ICouchDBDatabase,System.String,CouchDB.Client.DocQueryParams)">
+            <summary>
+            Returns document by the specified docid from the specified db. 
+            Unless you request a specific revision, the latest revision of the document will always be returned.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="docId">Document ID.</param>
+            <param name="queryParams">Additional query parameters for retrieving document.</param>
+            <returns><see cref="T:Newtonsoft.Json.Linq.JObject"/> containing document JSON.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.GetObjectDocumentAsync``1(CouchDB.Client.ICouchDBDatabase,System.String,CouchDB.Client.DocQueryParams)">
+            <summary>
+            Returns document by the specified docid from the specified db. 
+            Unless you request a specific revision, the latest revision of the document will always be returned.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <typeparam name="TResult">Specify type to which the document will be deserialized.</typeparam>
+            <param name="docId">Document ID.</param>
+            <param name="queryParams">Additional query parameters for retrieving document.</param>
+            <returns>Object containing deserialized document.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.DeleteJsonDocumentAsync(CouchDB.Client.ICouchDBDatabase,Newtonsoft.Json.Linq.JObject,System.Boolean)">
+            <summary>
+            Marks the specified document as deleted by adding a field 
+            _deleted with the value true. 
+            Documents with this field will not be returned within requests anymore, 
+            but stay in the database. 
+            You must supply the current (latest) revision, by using the "_rev" property.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="document"><see cref="T:Newtonsoft.Json.Linq.JObject"/> instance representing a document.</param>
+            <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.ArgumentException">Document should have _id and _rev.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.GetAllJsonDocumentsAsync(CouchDB.Client.ICouchDBDatabase,CouchDB.Client.ListQueryParams)">
+            <summary>
+            Returns a JSON structure of all of the documents in a given database. 
+            The information is returned as a JSON structure containing meta information 
+            about the return structure, including a list of all documents and basic contents, 
+            consisting the ID, revision and key. The key is the from the document’s _id.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="queryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON objects (<see cref="T:Newtonsoft.Json.Linq.JObject"/>).</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.GetAllObjectDocumentsAsync``1(CouchDB.Client.ICouchDBDatabase,CouchDB.Client.ListQueryParams,System.Func{System.String,``0})">
+            <summary>
+            Returns a JSON structure of all of the documents in a given database. 
+            The information is returned as a JSON structure containing meta information 
+            about the return structure, including a list of all documents and basic contents, 
+            consisting the ID, revision and key. The key is the from the document’s _id.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <typeparam name="TDocument">Specifies resulting document object type.</typeparam>
+            <param name="queryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <param name="deserializer">Provide your own deserializer if you prefer. 
+            By default, it will deserialize by using NewtonSoft.Json methods.
+            NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
+            you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.GetJsonDocumentsAsync(CouchDB.Client.ICouchDBDatabase,System.String[],CouchDB.Client.ListQueryParams)">
+            <summary>
+            Returns a JSON structure of documents in a given database, by multiple IDs.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="docIdList">Array of document IDs for retrieving documents.</param>
+            <param name="queryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON objects (<see cref="T:Newtonsoft.Json.Linq.JObject"/>).</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.GetObjectDocumentsAsync``1(CouchDB.Client.ICouchDBDatabase,System.String[],CouchDB.Client.ListQueryParams,System.Func{System.String,``0})">
+            <summary>
+            Returns a JSON structure of the documents in a given database, found by ID list. 
+            The information is returned as a JSON structure containing meta information 
+            about the return structure, including a list of all documents and basic contents, 
+            consisting the ID, revision and key. The key is the from the document’s _id.
+            </summary>
+            <typeparam name="TDocument">Specifies resulting document object type.</typeparam>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="docIdList">Array of document IDs to be retrieved.</param>
+            <param name="queryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <param name="deserializer">Provide your own deserializer if you prefer. 
+            By default, it will deserialize by using NewtonSoft.Json methods.
+            NOTE: if the specified <typeparamref name="TDocument"/> does not have parameterless constructor,
+            you should specify the deserializer as well. Otherwise, runtime exception will be thrown.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON objects (<typeparamref name="TDocument"/>).</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.SaveJsonDocumentsAsync(CouchDB.Client.ICouchDBDatabase,Newtonsoft.Json.Linq.JObject[],System.Boolean)">
+            <summary>
+            Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+            When creating new documents the document ID (_id) is optional.
+            For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
+            In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="documents">List of documents JSON objects.</param>
+            <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabaseExtensions.SaveObjectDocumentsAsync(CouchDB.Client.ICouchDBDatabase,System.Object[],System.Boolean)">
+            <summary>
+            Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+            When creating new documents the document ID (_id) is optional.
+            For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
+            In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</param>
+            <param name="documents">List of documents objects.</param>
+            <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBDatabase">
+            <summary>
+            Represents signle database within CouchDB server instance.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.#ctor(System.String)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.CouchDBDatabase"/> class.
+            </summary>
+            <param name="baseUrl"></param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.FormatException">URL is not in valid format.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.#ctor(CouchDB.Client.ICouchDBHandler)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.CouchDBDatabase"/> class.
+            </summary>
+            <param name="handler"></param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.Dispose">
+            <summary>
+            Disposes current instance of <see cref="T:CouchDB.Client.CouchDBDatabase"/>, after which it becomes unusable.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBDatabase.SaveDocResponseDTO">
+            <summary>
+            Represents response of document operation.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBDatabase.SaveDocResponseDTO.Id">
+            <summary>
+            Gets or sets document id.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBDatabase.SaveDocResponseDTO.Rev">
+            <summary>
+            Gets or sets document revision.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBDatabase.SaveDocResponseDTO.Error">
+            <summary>
+            Gets or sets raw error string.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBDatabase.SaveDocResponseDTO.Reason">
+            <summary>
+            Gets or sets reason phrase.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.SaveStringDocumentAsync(System.String,CouchDB.Client.DocUpdateParams)">
+            <summary>
+            Creates a new named document, or creates a new revision of the existing document.
+            </summary>
+            <param name="documentJsonString">JSON of document to be saved.</param>
+            <param name="updateParams">Query parameters for updating document.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.GetStringDocumentAsync(System.String,CouchDB.Client.DocQueryParams)">
+            <summary>
+            Returns document by the specified docid from the specified db. 
+            Unless you request a specific revision, the latest revision of the document will always be returned.
+            </summary>
+            <param name="docId">Document ID.</param>
+            <param name="queryParams">Additional query parameters for retrieving document.</param>
+            <returns><see cref="T:System.String"/> containing document JSON.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.DeleteDocumentAsync(System.String,System.String,System.Boolean)">
+            <summary>
+            Marks the specified document as deleted by adding a field 
+            _deleted with the value true. 
+            Documents with this field will not be returned within requests anymore, 
+            but stay in the database. 
+            You must supply the current (latest) revision, by using the <paramref name="revision"/> parameter.
+            </summary>
+            <param name="docId">Document ID.</param>
+            <param name="revision">Actual document’s revision.</param>
+            <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.GetAllStringDocumentsAsync(CouchDB.Client.ListQueryParams)">
+            <summary>
+            Returns a JSON structure of all of the documents in a given database. 
+            The information is returned as a JSON structure containing meta information 
+            about the return structure, including a list of all documents and basic contents, 
+            consisting the ID, revision and key. The key is the from the document’s _id.
+            </summary>
+            <param name="queryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON strings.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.GetStringDocumentsAsync(System.String[],CouchDB.Client.ListQueryParams)">
+            <summary>
+            Returns a JSON structure of the documents in a given database, found by ID list. 
+            The information is returned as a JSON structure containing meta information 
+            about the return structure, including a list of all documents and basic contents, 
+            consisting the ID, revision and key. The key is the from the document’s _id.
+            </summary>
+            <param name="docIdList">Array of document IDs to be retrieved.</param>
+            <param name="queryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON strings.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBDatabase.SaveDocListResponseDTO">
+            <summary>
+            Represents collection of responses for save operation of the documents.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.SaveStringDocumentsAsync(System.String[],System.Boolean)">
+            <summary>
+            Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+            When creating new documents the document ID (_id) is optional.
+            For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
+            In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+            </summary>
+            <param name="documents">List of documents strings.</param>
+            <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.SaveAttachmentAsync(System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Uploads the supplied content as an attachment to the specified document.
+            </summary>
+            <param name="docId">Document ID</param>
+            <param name="attName">Attachment name</param>
+            <param name="revision">Document revision. Required.</param>
+            <param name="attachment">Attachment content.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.GetAttachmentAsync(System.String,System.String)">
+            <summary>
+            Returns the file attachment associated with the document. 
+            The raw data of the associated attachment is returned (just as if you were accessing a static file).
+            </summary>
+            <param name="docId">Document ID.</param>
+            <param name="attName">Attachment name.</param>
+            <returns>Attachment content.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBDatabase.DeleteAttachmentAsync(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Deletes the attachment of the specified doc.
+            You must supply the current revision to delete the attachment.
+            </summary>
+            <param name="docId">Document ID.</param>
+            <param name="attName">Attachment name.</param>
+            <param name="revision">Document revision. Required.</param>
+            <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="T:CouchDB.Client.EntityStore">
+            <summary>
+            Represents an abstraction over database for working with documents as entities.
+            Entities avoid the hassle of manually maintaining ID and Revision for each document.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.#ctor(CouchDB.Client.ICouchDBDatabase)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.EntityStore"/> class.
+            </summary>
+            <param name="db"></param>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.SaveEntityAsync(CouchDB.Client.IEntity,CouchDB.Client.DocUpdateParams)">
+            <summary>
+            Saves entity into the database.
+            </summary>
+            <param name="entity">Instance of entity to be saved.</param>
+            <param name="entityUpdateParams">Additional parameters for saving.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.GetEntityAsync``1(System.String,CouchDB.Client.DocQueryParams)">
+            <summary>
+            Retrieves entity from database.
+            </summary>
+            <typeparam name="TEntity">Type of entity to be retrieved.</typeparam>
+            <param name="entityId">ID of entity to be retrieved.</param>
+            <param name="entityQueryParams">Additional parameters for retrieving.</param>
+            <returns>Entity.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.GetAllEntitiesAsync``1(CouchDB.Client.ListQueryParams)">
+            <summary>
+            Gets all entities from database.
+            </summary>
+            <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
+            <param name="entityListQueryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.GetEntitiesAsync``1(System.String[],CouchDB.Client.ListQueryParams)">
+            <summary>
+            Gets entities from database by list of IDs.
+            </summary>
+            <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
+            <param name="entityIdList">List if IDs for finding entities.</param>
+            <param name="entityListQueryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.DeleteEntityAsync(CouchDB.Client.IEntity,System.Boolean)">
+            <summary>
+            Deletes given entity object.
+            </summary>
+            <param name="entity">Entity object to be deleted.</param>
+            <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.SaveEntitiesAsync(CouchDB.Client.IEntity[],System.Boolean)">
+            <summary>
+            Allows you to create and update multiple entities at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+            When creating new documents the document ID (_id) is optional.
+            For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
+            In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+            </summary>
+            <param name="entities">List of documents objects.</param>
+            <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.SaveAttachmentAsync(CouchDB.Client.IEntity,System.String,System.Byte[])">
+            <summary>
+            Saves attachment on the entity.
+            </summary>
+            <param name="entity">Entity to which the attachment will be associated.</param>
+            <param name="attName">Attachmend name.</param>
+            <param name="attachment">Attachment content as byte array.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.GetAttachmentAsync(CouchDB.Client.IEntity,System.String)">
+            <summary>
+            Retrieves attachment from database.
+            </summary>
+            <param name="entity">Entity instance which owns the attachment.</param>
+            <param name="attName">Attachment name.</param>
+            <returns>Attachment as byte array.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.EntityStore.DeleteAttachmentAsync(CouchDB.Client.IEntity,System.String,System.Boolean)">
+            <summary>
+            Deletes attachment from database.
+            </summary>
+            <param name="entity">Instance of entity owning the attachment to delete.</param>
+            <param name="attName">Attachment name.</param>
+            <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="T:CouchDB.Client.ICouchDBDatabase">
+            <summary>
+            Base interface representing core capabilities of Couch DB Database.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.SaveStringDocumentAsync(System.String,CouchDB.Client.DocUpdateParams)">
+            <summary>
+            Creates a new named document, or creates a new revision of the existing document.
+            </summary>
+            <param name="documentJsonString">JSON of document to be saved.</param>
+            <param name="updateParams">Query parameters for updating document.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.GetStringDocumentAsync(System.String,CouchDB.Client.DocQueryParams)">
+            <summary>
+            Returns document by the specified docid from the specified db. 
+            Unless you request a specific revision, the latest revision of the document will always be returned.
+            </summary>
+            <param name="docId">Document ID.</param>
+            <param name="queryParams">Additional query parameters for retrieving document.</param>
+            <returns><see cref="T:System.String"/> containing document JSON.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.DeleteDocumentAsync(System.String,System.String,System.Boolean)">
+            <summary>
+            Marks the specified document as deleted by adding a field 
+            _deleted with the value true. 
+            Documents with this field will not be returned within requests anymore, 
+            but stay in the database. 
+            You must supply the current (latest) revision, by using the <paramref name="revision"/> parameter.
+            </summary>
+            <param name="docId">Document ID.</param>
+            <param name="revision">Actual document’s revision.</param>
+            <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.GetAllStringDocumentsAsync(CouchDB.Client.ListQueryParams)">
+            <summary>
+            Returns a JSON structure of all of the documents in a given database. 
+            The information is returned as a JSON structure containing meta information 
+            about the return structure, including a list of all documents and basic contents, 
+            consisting the ID, revision and key. The key is the from the document’s _id.
+            </summary>
+            <param name="queryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON strings.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.GetStringDocumentsAsync(System.String[],CouchDB.Client.ListQueryParams)">
+            <summary>
+            Returns a JSON structure of the documents in a given database, found by ID list. 
+            The information is returned as a JSON structure containing meta information 
+            about the return structure, including a list of all documents and basic contents, 
+            consisting the ID, revision and key. The key is the from the document’s _id.
+            </summary>
+            <param name="docIdList">Array of document IDs to be retrieved.</param>
+            <param name="queryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON strings.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.SaveStringDocumentsAsync(System.String[],System.Boolean)">
+            <summary>
+            Allows you to create and update multiple documents at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+            When creating new documents the document ID (_id) is optional.
+            For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
+            In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+            </summary>
+            <param name="documents">List of documents strings.</param>
+            <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.SaveAttachmentAsync(System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Uploads the supplied content as an attachment to the specified document.
+            </summary>
+            <param name="docId">Document ID</param>
+            <param name="attName">Attachment name</param>
+            <param name="revision">Document revision. Required.</param>
+            <param name="attachment">Attachment content.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.GetAttachmentAsync(System.String,System.String)">
+            <summary>
+            Returns the file attachment associated with the document. 
+            The raw data of the associated attachment is returned (just as if you were accessing a static file).
+            </summary>
+            <param name="docId">Document ID.</param>
+            <param name="attName">Attachment name.</param>
+            <returns>Attachment content.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBDatabase.DeleteAttachmentAsync(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Deletes the attachment of the specified doc.
+            You must supply the current revision to delete the attachment.
+            </summary>
+            <param name="docId">Document ID.</param>
+            <param name="attName">Attachment name.</param>
+            <param name="revision">Document revision. Required.</param>
+            <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns><see cref="T:CouchDB.Client.SaveDocResponse"/> with operation results in it.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="T:CouchDB.Client.IEntityStore">
+            <summary>
+            Represents an abstraction over database for working with documents as entities.
+            Entities avoid the hassle of manually maintaining ID and Revision for each document.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.DeleteAttachmentAsync(CouchDB.Client.IEntity,System.String,System.Boolean)">
+            <summary>
+            Deletes attachment from database.
+            </summary>
+            <param name="entity">Instance of entity owning the attachment to delete.</param>
+            <param name="attName">Attachment name.</param>
+            <param name="batch">Store changes in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.DeleteEntityAsync(CouchDB.Client.IEntity,System.Boolean)">
+            <summary>
+            Deletes given entity object.
+            </summary>
+            <param name="entity">Entity object to be deleted.</param>
+            <param name="batch">Stores document in batch mode Possible values: ok (when set to true). Optional.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.GetAllEntitiesAsync``1(CouchDB.Client.ListQueryParams)">
+            <summary>
+            Gets all entities from database.
+            </summary>
+            <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
+            <param name="entityListQueryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.GetAttachmentAsync(CouchDB.Client.IEntity,System.String)">
+            <summary>
+            Retrieves attachment from database.
+            </summary>
+            <param name="entity">Entity instance which owns the attachment.</param>
+            <param name="attName">Attachment name.</param>
+            <returns>Attachment as byte array.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.GetEntitiesAsync``1(System.String[],CouchDB.Client.ListQueryParams)">
+            <summary>
+            Gets entities from database by list of IDs.
+            </summary>
+            <typeparam name="TEntity">Each entity will be casted to this type.</typeparam>
+            <param name="entityIdList">List if IDs for finding entities.</param>
+            <param name="entityListQueryParams">Instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to be used for filtering.</param>
+            <returns><see cref="T:CouchDB.Client.DocListResponse`1"/> containing list of JSON objects (<typeparamref name="TEntity"/>).</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+            <exception cref="T:System.InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.GetEntityAsync``1(System.String,CouchDB.Client.DocQueryParams)">
+            <summary>
+            Retrieves entity from database.
+            </summary>
+            <typeparam name="TEntity">Type of entity to be retrieved.</typeparam>
+            <param name="entityId">ID of entity to be retrieved.</param>
+            <param name="entityQueryParams">Additional parameters for retrieving.</param>
+            <returns>Entity.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.SaveAttachmentAsync(CouchDB.Client.IEntity,System.String,System.Byte[])">
+            <summary>
+            Saves attachment on the entity.
+            </summary>
+            <param name="entity">Entity to which the attachment will be associated.</param>
+            <param name="attName">Attachmend name.</param>
+            <param name="attachment">Attachment content as byte array.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.SaveEntitiesAsync(CouchDB.Client.IEntity[],System.Boolean)">
+            <summary>
+            Allows you to create and update multiple entities at the same time within a single request. The basic operation is similar to creating or updating a single document, except that you batch the document structure and information.
+            When creating new documents the document ID (_id) is optional.
+            For updating existing documents, you must provide the document ID, revision information (_rev), and new document values.
+            In case of batch deleting documents all fields as document ID, revision information and deletion status (_deleted) are required.
+            </summary>
+            <param name="entities">List of documents objects.</param>
+            <param name="newEdits">If false, prevents the database from assigning them new revision IDs. Default is true. Optional</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.SaveDocListResponse"/> with detailed information for each requested document to save.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.IEntityStore.SaveEntityAsync(CouchDB.Client.IEntity,CouchDB.Client.DocUpdateParams)">
+            <summary>
+            Saves entity into the database.
+            </summary>
+            <param name="entity">Instance of entity to be saved.</param>
+            <param name="entityUpdateParams">Additional parameters for saving.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.DeleteDocParams.ToQueryString">
+            <summary>
+            Converts current instance of <see cref="T:CouchDB.Client.DeleteDocParams"/> to <see cref="T:System.String"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.SaveDocListRequest.#ctor(System.Boolean)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.SaveDocListRequest"/> class.
+            </summary>
+            <param name="newEdits"></param>
+        </member>
+        <member name="M:CouchDB.Client.SaveDocListRequest.AddDocuments(System.String[])">
+            <summary>
+            Adds document json strings to corrent instance of <see cref="T:CouchDB.Client.SaveDocListRequest"/>.
+            </summary>
+            <param name="documents"></param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="M:CouchDB.Client.SaveDocListRequest.ToJson">
+            <summary>
+            Converts current <see cref="T:CouchDB.Client.SaveDocListRequest"/> into <see cref="T:Newtonsoft.Json.Linq.JObject"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CouchDB.Client.DocListResponse`1">
+            <summary>
+            Represents response object for retrieving list of documents.
+            </summary>
+            <typeparam name="TDocument">Type of document object.</typeparam>
+        </member>
+        <member name="M:CouchDB.Client.DocListResponse`1.#ctor(System.Int32,System.Int32,System.Int32,System.Collections.Generic.List{CouchDB.Client.DocListResponseRow{`0}})">
+            <summary>
+            Inisitalizes new instance of <see cref="T:CouchDB.Client.DocListResponse`1"/> class.
+            </summary>
+            <param name="offset">Offset where the document list started.</param>
+            <param name="totalRows">Number of documents in the database/view.</param>
+            <param name="updateSeq">Current update sequence for the database.</param>
+            <param name="rows">Array of view row objects.</param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponse`1.Offset">
+            <summary>
+            Offset where the document list started.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponse`1.Rows">
+            <summary>
+            Array of view row objects. By default the information returned contains only the document ID and revision.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponse`1.TotalRows">
+            <summary>
+            Number of documents in the database/view. Note that this is not the number of rows returned in the actual query.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponse`1.UpdateSeq">
+            <summary>
+            Current update sequence for the database.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.DocListResponse`1.FromJsonToStringList(System.String)">
+            <summary>
+            Convert all docs JSON into <see cref="T:CouchDB.Client.DocListResponse`1"/>.
+            </summary>
+            <param name="allDocsJsonString"></param>
+            <returns></returns>
+            <exception cref="T:System.InvalidOperationException">Malformed input json (cannot read as list of objects).</exception>
+        </member>
+        <member name="M:CouchDB.Client.DocListResponse`1.Cast``1(System.Func{`0,``0})">
+            <summary>
+            Cart current <see cref="T:CouchDB.Client.DocListResponse`1"/> to <see cref="T:CouchDB.Client.DocListResponse`1"/>.
+            </summary>
+            <typeparam name="TResult"></typeparam>
+            <param name="converter"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="T:CouchDB.Client.DocListResponseRow`1">
+            <summary>
+            Represents row in the document list response.
+            </summary>
+            <typeparam name="TDocument">Type of document.</typeparam>
+        </member>
+        <member name="M:CouchDB.Client.DocListResponseRow`1.#ctor(System.String,System.String,CouchDB.Client.DocListResponseRowValue,`0,CouchDB.Client.ServerResponseError)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.DocListResponseRow`1"/> class.
+            </summary>
+            <param name="id">ID of the row.</param>
+            <param name="key">Key of the row.</param>
+            <param name="value"><see cref="T:CouchDB.Client.DocListResponseRowValue"/> of the row, which holds revision.</param>
+            <param name="document">Document.</param>
+            <param name="error">Error information (if any).</param>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponseRow`1.Id">
+            <summary>
+            Gets ID of the row.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponseRow`1.Key">
+            <summary>
+            Gets Key of the row.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponseRow`1.Value">
+            <summary>
+            Gets <see cref="T:CouchDB.Client.DocListResponseRowValue"/> of the row, which holds revision.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponseRow`1.Document">
+            <summary>
+            Gets document.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponseRow`1.Error">
+            <summary>
+            Gets error information (if any).
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.DocListResponseRow`1.Cast``1(System.Func{`0,``0})">
+            <summary>
+            Cast current <see cref="T:CouchDB.Client.DocListResponseRow`1"/> into <see cref="T:CouchDB.Client.DocListResponseRow`1"/>.
+            </summary>
+            <typeparam name="TResult"></typeparam>
+            <param name="converter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.DocListResponseRow`1.FromJsonToString(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Create <see cref="T:CouchDB.Client.DocListResponseRow`1"/> by <see cref="T:Newtonsoft.Json.Linq.JObject"/>.
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CouchDB.Client.IEntity">
+            <summary>
+            Represents Entity.
+            All objects that need to be treated as entities should implement this interface.
+            Entity will automatically reflect the database status after each operation, 
+            so it can repeatedly be passed to all kinds of operations through <see cref="T:CouchDB.Client.CouchDBDatabase"/>.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.IEntity._id">
+            <summary>
+            ID of entity.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.IEntity._rev">
+            <summary>
+            Revision of entity.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.DocListResponseRowValue">
+            <summary>
+            Represents value within document list response row.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.DocListResponseRowValue.#ctor(System.String)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.DocListResponseRowValue"/> class.
+            </summary>
+            <param name="revision">Revision of the document.</param>
+        </member>
+        <member name="P:CouchDB.Client.DocListResponseRowValue.Revision">
+            <summary>
+            Gets revision of the document.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.DocListResponseRowValue.FromJson(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Create <see cref="T:CouchDB.Client.DocListResponseRowValue"/> by <see cref="T:Newtonsoft.Json.Linq.JObject"/>.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CouchDB.Client.SaveDocListResponse">
+            <summary>
+            Represents collection of responses for save operation of the documents.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.SaveDocListResponse.#ctor(CouchDB.Client.CouchDBDatabase.SaveDocListResponseDTO)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.SaveDocListResponse"/> class.
+            </summary>
+            <param name="saveDocListResponseDTO">Collection of responses for save operation of the documents.</param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="P:CouchDB.Client.SaveDocListResponse.DocumentResponses">
+            <summary>
+            Collection of responses for save operation of the documents.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.SaveDocResponse">
+            <summary>
+            Represents response of document operation.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.SaveDocResponse.#ctor(CouchDB.Client.CouchDBDatabase.SaveDocResponseDTO)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.SaveDocResponse"/> class.
+            </summary>
+            <param name="docResponseDTO">DTO with vaues for initialization.</param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="P:CouchDB.Client.SaveDocResponse.Id">
+            <summary>
+            Gets document id.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.SaveDocResponse.Revision">
+            <summary>
+            Gets document revision.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.SaveDocResponse.Error">
+            <summary>
+            Error related information, if any.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.DocUpdateParams">
+            <summary>
+            Represents query parameters for updating CouchDB document.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocUpdateParams.Batch">
+            <summary>
+            Stores document in batch mode. Possible values: ok (when assigned true). Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocUpdateParams.New_Edits">
+            <summary>
+            Prevents insertion of a conflicting document. Possible values: true (default) and false. 
+            If false, a well-formed _rev must be included in the document. 
+            new_edits=false is used by the replicator to insert documents into the target database 
+            even if that leads to the creation of conflicts. Optional.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.DocUpdateParams.ToQueryString">
+            <summary>
+            Converts current instance of <see cref="T:CouchDB.Client.DocUpdateParams"/> to <see cref="T:System.String"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CouchDB.Client.TaskExtensions">
+            <summary>
+            Defines extension methods over <see cref="T:System.Threading.Tasks.Task"/> and <see cref="T:System.Threading.Tasks.Task`1"/>.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.TaskExtensions.Safe(System.Threading.Tasks.Task)">
+            <summary>
+            Configures awaitable task so that it does not have to continue on the currently captured context.
+            </summary>
+            <param name="task">Instance of <see cref="T:System.Threading.Tasks.Task"/> type.</param>
+            <returns>Instance of <see cref="T:System.Runtime.CompilerServices.ConfiguredTaskAwaitable"/> type.</returns>
+        </member>
+        <member name="M:CouchDB.Client.TaskExtensions.Safe``1(System.Threading.Tasks.Task{``0})">
+            <summary>
+            Configures awaitable task so that it does not have to continue on the currently captured context.
+            </summary>
+            <typeparam name="TResult">Type of result that the given task returns.</typeparam>
+            <param name="task">Instance of <see cref="T:System.Threading.Tasks.Task`1"/> type.</param>
+            <returns>Instance of <see cref="T:System.Runtime.CompilerServices.ConfiguredTaskAwaitable`1"/> type.</returns>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBHandler">
+            <summary>
+            CouchDB Handler, which is capable of sending raw requests to CouchDB.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBHandler.#ctor(System.String)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.CouchDBHandler"/> class.
+            </summary>
+            <param name="baseUrl">Base url to be used when sending requests.</param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is nul or empty.</exception>
+            <exception cref="T:System.FormatException">URL is not in valid format.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBHandler.Dispose">
+            <summary>
+            Disposes current instance of <see cref="T:CouchDB.Client.CouchDBHandler"/>.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBHandler.SendRequestAsync(System.String,CouchDB.Client.RequestMethod,CouchDB.Client.Request)">
+            <summary>
+            Sends request to CouchDB and returns response.
+            </summary>
+            <param name="relativeUrl">Relative url to the CouchDB endpoint.</param>
+            <param name="requestMethod"><see cref="T:CouchDB.Client.RequestMethod"/> to be used when sending request.</param>
+            <param name="request">Instance of <see cref="T:CouchDB.Client.Request"/> to be sent.</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.Response"/> received from CouchDB.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.NotSupportedException">Request method is not supported.</exception>
+            <exception cref="T:System.InvalidOperationException">Deletion request was already sent.</exception>
+        </member>
+        <member name="T:CouchDB.Client.ICouchDBHandler">
+            <summary>
+            Represents CouchDB Handler, which is capable of sending raw requests to CouchDB.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBHandler.SendRequestAsync(System.String,CouchDB.Client.RequestMethod,CouchDB.Client.Request)">
+            <summary>
+            Sends request to CouchDB and returns response.
+            </summary>
+            <param name="relativeUrl">Relative url to the CouchDB endpoint.</param>
+            <param name="requestMethod"><see cref="T:CouchDB.Client.RequestMethod"/> to be used when sending request.</param>
+            <param name="request">Instance of <see cref="T:CouchDB.Client.Request"/> to be sent.</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.Response"/> received from CouchDB.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.NotSupportedException">Request method is not supported.</exception>
+            <exception cref="T:System.InvalidOperationException">Deletion request was already sent.</exception>
+        </member>
+        <member name="T:CouchDB.Client.Request">
+            <summary>
+            Represents request sent to CouchDB.
+            This class cannot be instantiated (it's abstract).
+            Instances of it can be obtained from static members of this class (e.g. <see cref="F:CouchDB.Client.Request.Empty"/>),
+            or by inheriting it.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.Request.Empty">
+            <summary>
+            Empty request content.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.Request.ToHttpContent">
+            <summary>
+            Converts given <see cref="T:CouchDB.Client.Request"/> instance into <see cref="T:System.Net.Http.HttpContent"/> instance.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.Request.JsonString(System.String)">
+            <summary>
+            Generates <see cref="T:CouchDB.Client.Request"/> with json string content in it.
+            </summary>
+            <param name="content">Json string.</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.Request"/>.</returns>
+        </member>
+        <member name="M:CouchDB.Client.Request.Raw(System.Byte[])">
+            <summary>
+            Generates <see cref="T:CouchDB.Client.Request"/> with row byte array content in it.
+            </summary>
+            <param name="content">Byte array content.</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.Request"/>.</returns>
+        </member>
+        <member name="T:CouchDB.Client.RequestMethod">
+            <summary>
+            Request methods when sending requests to CouchDB.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.RequestMethod.GET">
+            <summary>
+            HTTP GET.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.RequestMethod.PUT">
+            <summary>
+            HTTP PUT.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.RequestMethod.DELETE">
+            <summary>
+            HTTP DELETE.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.RequestMethod.POST">
+            <summary>
+            HTTP POST.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.Response">
+            <summary>
+            Represents response received from CouchDB.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.Response.#ctor(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.Response"/> class.
+            </summary>
+            <param name="httpResponseMessage"></param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="M:CouchDB.Client.Response.ReadAsAsync``1(System.Boolean)">
+            <summary>
+            Reads response as JSON by deserializing it into given type.
+            </summary>
+            <typeparam name="TResult">Deserialization type.</typeparam>
+            <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
+            <returns>Deserialized object.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.Response.ReadAsStringAsync(System.Boolean)">
+            <summary>
+            Reads response as string.
+            </summary>
+            <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
+            <returns>String content read from the current instance of <see cref="T:CouchDB.Client.Response"/>.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.Response.ReadAsByteArrayAsync(System.Boolean)">
+            <summary>
+            Reads response as raw byte array.
+            </summary>
+            <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
+            <returns>Byte array content read from the current instance of <see cref="T:CouchDB.Client.Response"/>.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.Response.EnsureSuccessAsync(System.Boolean)">
+            <summary>
+            Parses response to ensure there is no failure code received from server.
+            </summary>
+            <param name="nullIfNotFound">Boolean indicating whether to convert Not Found (404) into null.</param>
+            <returns></returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.Response.GetHttpResponseMessage">
+            <summary>
+            Retrieves underlying <see cref="T:System.Net.Http.HttpResponseMessage"/> object.
+            </summary>
+            <returns>Underlying <see cref="T:System.Net.Http.HttpResponseMessage"/>.</returns>
+        </member>
+        <member name="M:CouchDB.Client.EntityHelper.ConvertEntityToJSON(CouchDB.Client.IEntity)">
+            <summary>
+            Convert entity to JSON (honoring Id and Revision).
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.SerializationHelper.GetStringOrDefault(Newtonsoft.Json.Linq.JObject,System.String)">
+            <summary>
+            Get string of default (null).
+            </summary>
+            <param name="source"></param>
+            <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.SerializationHelper.GetIntOrDefault(Newtonsoft.Json.Linq.JObject,System.String)">
+            <summary>
+            Get int or default (0).
+            </summary>
+            <param name="source"></param>
+            <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.SerializationHelper.GetArrayOrEmpty(Newtonsoft.Json.Linq.JObject,System.String)">
+            <summary>
+            Get array or return an empty array.
+            </summary>
+            <param name="source"></param>
+            <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.SerializationHelper.JArrayMap(Newtonsoft.Json.Linq.JArray)">
+            <summary>
+            Convert <see cref="T:Newtonsoft.Json.Linq.JArray"/> into a list of <see cref="T:Newtonsoft.Json.Linq.JObject"/>.
+            </summary>
+            <param name="array"></param>
+            <returns></returns>
+            <exception cref="T:System.InvalidOperationException"><see cref="T:Newtonsoft.Json.Linq.JArray"/> is not a list of objects (one of the items cannot be converted into <see cref="T:Newtonsoft.Json.Linq.JObject"/>).</exception>
+        </member>
+        <member name="M:CouchDB.Client.SerializationHelper.GetObjectOrDefault(Newtonsoft.Json.Linq.JObject,System.String)">
+            <summary>
+            Get objects or default (null).
+            </summary>
+            <param name="source"></param>
+            <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.UrlHelper.CombineUrl(System.String,System.String)">
+            <summary>
+            Combiles 2 pieces of URL.
+            </summary>
+            <param name="prefix"></param>
+            <param name="suffix"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException">White space strings cannot be combined as URL.</exception>
+        </member>
+        <member name="T:CouchDB.Client.DocQueryParams">
+            <summary>
+            Represents query string parameters for retrieving document.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Attachments">
+            <summary>
+            Includes attachments bodies in response. Default is false
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Att_Encoding_Info">
+            <summary>
+            Includes encoding information in attachment stubs if the particular attachment is compressed. 
+            Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Atts_Since">
+            <summary>
+            Includes attachments only since specified revisions. 
+            Doesn’t include attachments for specified revisions. Optional
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Conflicts">
+            <summary>
+            Includes information about conflicts in document. Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Deleted_Conflicts">
+            <summary>
+            Includes information about deleted conflicted revisions. Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Latest">
+            <summary>
+            Forces retrieving latest “leaf” revision, no matter what rev was requested. 
+            Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Local_Seq">
+            <summary>
+            Includes last update sequence for the document. Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Meta">
+            <summary>
+            Acts same as specifying all conflicts, deleted_conflicts and open_revs query parameters. 
+            Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Open_Revs">
+            <summary>
+            Retrieves documents of specified leaf revisions. 
+            Additionally, it accepts value as all (empty constructor of <see cref="T:CouchDB.Client.DocQueryParams.OpenRevs"/>) 
+            to return all leaf revisions. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Rev">
+            <summary>
+            Retrieves document of specified revision. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Revs">
+            <summary>
+            Includes list of all known document revisions. Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.DocQueryParams.Revs_Info">
+            <summary>
+            Includes detailed information for all known document revisions. Default is false.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.DocQueryParams.ToQueryString">
+            <summary>
+            Converts current instance of <see cref="T:CouchDB.Client.DocQueryParams"/> to <see cref="T:System.String"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CouchDB.Client.DocQueryParams.OpenRevs">
+            <summary>
+            Represents possible values for 'open_revs' query parameter.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.DocQueryParams.OpenRevs.#ctor">
+            <summary>
+            Denotes all leaf revisions. 
+            Call this constructor to specify 'all' option for 'open_revs' query parameter.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.DocQueryParams.OpenRevs.#ctor(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Denotes specific leaf revisions.
+            Call this constructor to specify revisions array for 'open_revs' query parameter.
+            </summary>
+            <param name="revs"></param>
+        </member>
+        <member name="T:CouchDB.Client.NoException">
+            <summary>
+            Marker class for no exception (will be removed).
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.QueryParams">
+            <summary>
+            Represents base class of query parameters.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.QueryParams.ToQueryString">
+            <summary>
+            When implemented, converts current instance of <see cref="T:CouchDB.Client.QueryParams"/> to <see cref="T:System.String"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CouchDB.Client.QueryParams.AppendQueryParams(System.String,CouchDB.Client.QueryParams)">
+            <summary>
+            Append query params to URL.
+            </summary>
+            <param name="url"></param>
+            <param name="queryParams"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="T:CouchDB.Client.ServerResponseError">
+            <summary>
+            Represents Error which can be received in server response.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.ServerResponseError.#ctor(System.String,System.String)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.ServerResponseError"/> class.
+            </summary>
+            <param name="errorString">Raw error string.</param>
+            <param name="reason">Reason phrase.</param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="P:CouchDB.Client.ServerResponseError.CommonError">
+            <summary>
+            If the error is one of the common pre-defined error types, this will get respective value.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ServerResponseError.RawError">
+            <summary>
+            Gets raw error string.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ServerResponseError.Reason">
+            <summary>
+            Gets reason phrase.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.ServerResponseError.FromString(System.String,System.String)">
+            <summary>
+            Create <see cref="T:CouchDB.Client.ServerResponseError"/> by error message and reason phrase.
+            </summary>
+            <param name="error"></param>
+            <param name="reason"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBServer">
+            <summary>
+            Represents CouchDB server instance. 
+            Starting point for all interactions with CouchDB.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBServer.#ctor(System.String)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.CouchDBServer"/> class.
+            </summary>
+            <param name="baseUrl">(Required) base URL for CouchDB (e.g. "http://localhost:5984/")</param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.FormatException"><paramref name="baseUrl"/> is not in valid format.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBServer.#ctor(CouchDB.Client.ICouchDBHandler)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.CouchDBServer"/> class.
+            </summary>
+            <param name="handler">CouchDB Handler.</param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBServer.GetInfoAsync">
+            <summary>
+            Accessing the root of a CouchDB instance returns meta information about the instance. 
+            The response is a JSON structure (represented as C# object) containing information 
+            about the server, including a welcome message and the version of the server.
+            </summary>
+            <returns><see cref="T:CouchDB.Client.ServerInfo"/> object containing server metadata information.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBServer.ServerInfoDTO">
+            <summary>
+            Information about CouchDB server.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBServer.ServerInfoDTO.CouchDB">
+            <summary>
+            Gets or sets welcome message from CouchDB.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBServer.ServerInfoDTO.Version">
+            <summary>
+            Gets or sets version of CouchDB server.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBServer.ServerInfoDTO.Vendor">
+            <summary>
+            Gets or sets CouchDB vendor information.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.CouchDBServer.ServerInfoDTO.VendorInfoDTO">
+            <summary>
+            CouchDB vendor information.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.CouchDBServer.ServerInfoDTO.VendorInfoDTO.Name">
+            <summary>
+            Gets or sets name of CouchDB server vendor.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBServer.GetAllDbNamesAsync(CouchDB.Client.ListQueryParams)">
+            <summary>
+            Returns a list of all the databases in the CouchDB instance.
+            </summary>
+            <returns>String array containing all database names.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response receive from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBServer.CreateDbAsync(System.String)">
+            <summary>
+            Creates a new database.
+            </summary>
+            <param name="dbName">Database name which will be created.</param>
+            <returns><see cref="T:System.Threading.Tasks.Task"/> which can be awaited.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBServer.DeleteDbAsync(System.String)">
+            <summary>
+            Deletes the specified database, 
+            and all the documents and attachments contained within it.
+            </summary>
+            <param name="dbName">Database name to be deleted.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBServer.SelectDatabase(System.String)">
+            <summary>
+            Selects specific database for working with documents in it.
+            </summary>
+            <param name="dbName">Name of database to be selected.</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.FormatException">Resulting URL with <paramref name="dbName"/> was not in valid format.</exception>
+        </member>
+        <member name="M:CouchDB.Client.CouchDBServer.GetHandler">
+            <summary>
+            Retrieves instance of <see cref="T:CouchDB.Client.ICouchDBHandler"/> which can be used to send raw requests to CouchDB.
+            </summary>
+            <returns>Instance of <see cref="T:CouchDB.Client.ICouchDBHandler"/>.</returns>
+        </member>
+        <member name="M:CouchDB.Client.HttpClientHelper.HandleRawResponse(System.Net.Http.HttpResponseMessage,System.Boolean)">
+            <summary>
+            Handle response as byte array.
+            </summary>
+            <param name="httpResponse"></param>
+            <param name="convertNotFoundIntoNull"></param>
+            <returns></returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.HttpClientHelper.HandleVoidResponse(System.Net.Http.HttpResponseMessage,System.Boolean)">
+            <summary>
+            Handle object response.
+            </summary>
+            <param name="httpResponse"></param>
+            <param name="convertNotFoundIntoNull"></param>
+            <returns></returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.HttpClientHelper.HandleObjectResponse``1(System.Net.Http.HttpResponseMessage,System.Func{System.String,``0},System.Boolean)">
+            <summary>
+            Handle object response.
+            </summary>
+            <typeparam name="TResult"></typeparam>
+            <param name="httpResponse"></param>
+            <param name="deserializer"></param>
+            <param name="convertNotFoundIntoNull"></param>
+            <returns></returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.HttpClientHelper.HandleObjectResponse``1(System.Net.Http.HttpResponseMessage,System.Boolean)">
+            <summary>
+            Handle object response.
+            </summary>
+            <typeparam name="TResult"></typeparam>
+            <param name="httpResponse"></param>
+            <param name="convertNotFoundIntoNull"></param>
+            <returns></returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.HttpClientHelper.HandleStringResponse(System.Net.Http.HttpResponseMessage,System.Boolean)">
+            <summary>
+            Handle object response.
+            </summary>
+            <param name="httpResponse"></param>
+            <param name="convertNotFoundIntoNull"></param>
+            <returns></returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="T:CouchDB.Client.ListQueryParams">
+            <summary>
+            Represents query parameters to CouchDB server.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Conflicts">
+            <summary>
+            Includes conflicts information in response. Ignored if include_docs isn’t true. Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Descending">
+            <summary>
+            Return the documents in descending by key order. Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.EndKey">
+            <summary>
+            Stop returning records when the specified key is reached. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.EndKey_DocId">
+            <summary>
+            Stop returning records when the specified document ID is reached. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Include_Docs">
+            <summary>
+            Include the full content of the documents in the return. Default is false.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Inclusive_End">
+            <summary>
+            Specifies whether the specified end key should be included in the result. Default is true.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Key">
+            <summary>
+            Return only documents that match the specified key. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Keys">
+            <summary>
+            Return only documents that match the specified keys. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Limit">
+            <summary>
+            Limit the number of the returned documents to the specified number. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Skip">
+            <summary>
+            Skip this number of records before starting to return the results. Default is 0.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Stale">
+            <summary>
+            Allow the results from a stale view to be used, 
+            without triggering a rebuild of all views within the encompassing design doc. 
+            Supported values: ok and update_after. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.StartKey">
+            <summary>
+            Return records starting with the specified key. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.StartKey_DocId">
+            <summary>
+            Return records starting with the specified document ID. Optional.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ListQueryParams.Update_Seq">
+            <summary>
+            Response includes an update_seq value indicating which sequence id of the underlying database 
+            the view reflects. Default is false.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.ListQueryParams.ToQueryString">
+            <summary>
+            Converts current instance of <see cref="T:CouchDB.Client.ListQueryParams"/> to <see cref="T:System.String"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CouchDB.Client.ListQueryParams.StaleOption">
+            <summary>
+            Enumeration of options for stale data.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.ListQueryParams.StaleOption.Ok">
+            <summary>
+            Ok to include stale data.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.ListQueryParams.StaleOption.Update_After">
+            <summary>
+            Ok to include, but update after fetch.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.ICouchDBServer">
+            <summary>
+            Represents CouchDB server instance. 
+            Starting point for all interactions with CouchDB.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBServer.CreateDbAsync(System.String)">
+            <summary>
+            Creates a new database.
+            </summary>
+            <param name="dbName">Database name which will be created.</param>
+            <returns><see cref="T:System.Threading.Tasks.Task"/> which can be awaited.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBServer.DeleteDbAsync(System.String)">
+            <summary>
+            Deletes the specified database, 
+            and all the documents and attachments contained within it.
+            </summary>
+            <param name="dbName">Database name to be deleted.</param>
+            <returns>Awaitable task.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.InvalidOperationException">Delete request was already sent.</exception>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBServer.GetAllDbNamesAsync(CouchDB.Client.ListQueryParams)">
+            <summary>
+            Returns a list of all the databases in the CouchDB instance.
+            </summary>
+            <returns>String array containing all database names.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response receive from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBServer.GetHandler">
+            <summary>
+            Retrieves instance of <see cref="T:CouchDB.Client.ICouchDBHandler"/> which can be used to send raw requests to CouchDB.
+            </summary>
+            <returns>Instance of <see cref="T:CouchDB.Client.ICouchDBHandler"/>.</returns>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBServer.GetInfoAsync">
+            <summary>
+            Accessing the root of a CouchDB instance returns meta information about the instance. 
+            The response is a JSON structure (represented as C# object) containing information 
+            about the server, including a welcome message and the version of the server.
+            </summary>
+            <returns><see cref="T:CouchDB.Client.ServerInfo"/> object containing server metadata information.</returns>
+            <exception cref="T:CouchDB.Client.CouchDBClientException">Error response received from CouchDB server.</exception>
+        </member>
+        <member name="M:CouchDB.Client.ICouchDBServer.SelectDatabase(System.String)">
+            <summary>
+            Selects specific database for working with documents in it.
+            </summary>
+            <param name="dbName">Name of database to be selected.</param>
+            <returns>Instance of <see cref="T:CouchDB.Client.ICouchDBDatabase"/>.</returns>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+            <exception cref="T:System.FormatException">Resulting URL with <paramref name="dbName"/> was not in valid format.</exception>
+        </member>
+        <member name="T:CouchDB.Client.ServerInfo">
+            <summary>
+            Information about CouchDB server.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ServerInfo.CouchDB">
+            <summary>
+            Gets welcome message from CouchDB.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ServerInfo.Version">
+            <summary>
+            Gets version of CouchDB server.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ServerInfo.Vendor">
+            <summary>
+            CouchDB vendor information.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.ServerInfo.#ctor(CouchDB.Client.CouchDBServer.ServerInfoDTO)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.ServerInfo"/> class.
+            </summary>
+            <param name="serverInfoDTO">DTO with values for initialization.</param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="T:CouchDB.Client.VendorInfo">
+            <summary>
+            CouchDB vendor information.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.VendorInfo.#ctor(CouchDB.Client.CouchDBServer.ServerInfoDTO.VendorInfoDTO)">
+            <summary>
+            Initializes new instance of <see cref="T:CouchDB.Client.VendorInfo"/> class.
+            </summary>
+            <param name="vendorInfoDTO"></param>
+            <exception cref="T:System.ArgumentNullException">Required parameter is null or empty.</exception>
+        </member>
+        <member name="P:CouchDB.Client.VendorInfo.Name">
+            <summary>
+            Gets name of CouchDB server vendor.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.ServerResponse">
+            <summary>
+            Represents JSON object received from server in response to a request.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ServerResponse.OK">
+            <summary>
+            Gets <see cref="T:System.Boolean"/> specifying success of the operation.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ServerResponse.Error">
+            <summary>
+            Gets <see cref="T:CouchDB.Client.ServerResponseError"/> describing what kind of error happened.
+            </summary>
+        </member>
+        <member name="P:CouchDB.Client.ServerResponse.Reason">
+            <summary>
+            Gets reason text.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.CommonError">
+            <summary>
+            Defines list of possible server errors in CouchDB.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.CommonError.File_Exists">
+            <summary>
+            Specifies situation when something already exists and cannot be overwritten.
+            e.g. when trying to create a database with name that already exists.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.CommonError.Bad_Request">
+            <summary>
+            Bad request was sent to CouchDB server, which cannot be handled successfully.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.CommonError.Conflict">
+            <summary>
+            Conflict while executing operation. e.g. revision number did not match.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.CommonError.Not_Found">
+            <summary>
+            Object cannot be found on the server. e.g. database or document does not exist.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.CommonError.Bad_Content_Type">
+            <summary>
+            Data sent to server has invalid content type, i.e. "Content-Type" header has wrong value in it.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.CommonError.Illegal_DocId">
+            <summary>
+            Doc ID value supplied by the client is not valid.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.CommonError.Doc_Validation">
+            <summary>
+            Document format validation failed. e.g. if _id is passed with upper case property name, such as _Id.
+            </summary>
+        </member>
+        <member name="F:CouchDB.Client.CommonError.Unauthorized">
+            <summary>
+            Unauthorized request.
+            </summary>
+        </member>
+        <member name="T:CouchDB.Client.CommonErrorExtensions">
+            <summary>
+            Defines extension methods over <see cref="T:CouchDB.Client.CommonError"/> enumeration type.
+            </summary>
+        </member>
+        <member name="M:CouchDB.Client.CommonErrorExtensions.EqualsErrorString(CouchDB.Client.CommonError,System.String)">
+            <summary>
+            Compares <see cref="T:CouchDB.Client.CommonError"/> with <see cref="T:System.String"/> error.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.CommonError"/> value.</param>
+            <param name="error">Error string to compare with.</param>
+            <returns>True if values equal, otherwise false.</returns>
+        </member>
+        <member name="M:CouchDB.Client.CommonErrorExtensions.ToErrorString(CouchDB.Client.CommonError)">
+            <summary>
+            Returns string representation of <see cref="T:CouchDB.Client.CommonError"/> value.
+            </summary>
+            <param name="this">Instance of <see cref="T:CouchDB.Client.CommonError"/> value.</param>
+            <returns>String representation of the given value.</returns>
+        </member>
+    </members>
+</doc>

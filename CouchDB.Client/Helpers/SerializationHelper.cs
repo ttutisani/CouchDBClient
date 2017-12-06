@@ -12,7 +12,7 @@ namespace CouchDB.Client
         /// <param name="source"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal static string GetStringOrDefault(JObject source, string propertyName)
         {
             JToken propertyToken;
@@ -30,7 +30,7 @@ namespace CouchDB.Client
         /// <param name="source"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal static int GetIntOrDefault(JObject source, string propertyName)
         {
             JToken propertyToken;
@@ -48,7 +48,7 @@ namespace CouchDB.Client
         /// <param name="source"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal static JArray GetArrayOrEmpty(JObject source, string propertyName)
         {
             var arrayValue = source[propertyName] as JArray;
@@ -83,7 +83,7 @@ namespace CouchDB.Client
         /// <param name="source"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal static JObject GetObjectOrDefault(JObject source, string propertyName)
         {
             var propValue = source[propertyName] as JObject;

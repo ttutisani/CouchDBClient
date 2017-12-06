@@ -11,7 +11,7 @@ namespace CouchDB.Client
         /// When implemented, converts current instance of <see cref="QueryParams"/> to <see cref="string"/>.
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal abstract string ToQueryString();
 
         /// <summary>

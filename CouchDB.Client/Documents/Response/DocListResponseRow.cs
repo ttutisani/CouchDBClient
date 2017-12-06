@@ -17,7 +17,7 @@ namespace CouchDB.Client
         /// <param name="value"><see cref="DocListResponseRowValue"/> of the row, which holds revision.</param>
         /// <param name="document">Document.</param>
         /// <param name="error">Error information (if any).</param>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         public DocListResponseRow(string id, string key, DocListResponseRowValue value, TDocument document, ServerResponseError error)
         {
             Id = id;
@@ -58,7 +58,7 @@ namespace CouchDB.Client
         /// <typeparam name="TResult"></typeparam>
         /// <param name="converter"></param>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal DocListResponseRow<TResult> Cast<TResult>(Func<TDocument, TResult> converter)
         {
             return new DocListResponseRow<TResult>(Id, Key, Value, converter(Document), Error);
@@ -69,7 +69,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         internal static DocListResponseRow<string> FromJsonToString(JObject json)
         {
             var id = SerializationHelper.GetStringOrDefault(json, "id");

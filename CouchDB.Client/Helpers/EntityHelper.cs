@@ -9,7 +9,7 @@ namespace CouchDB.Client
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         public static JObject ConvertEntityToJSON(IEntity entity)
         {
             if (entity == null)

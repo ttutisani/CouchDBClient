@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Type="http://schemas.microsoft.com/packaging/2010/07/manifest" Target="/TengizTutisani.CouchDB.Client.nuspec" Id="R55fc63345fc6424c" />
+  <Relationship Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="/package/services/metadata/core-properties/ad05a10a3513440c9dfd29dec6c3b765.psmdcp" Id="R5307f4d869ec4ff9" />
+</Relationships>

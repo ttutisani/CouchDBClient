@@ -13,7 +13,7 @@ namespace CouchDB.Client
         /// Initializes new instance of <see cref="SaveDocListRequest"/> class.
         /// </summary>
         /// <param name="newEdits"></param>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         public SaveDocListRequest(bool newEdits)
         {
             NewEdits = newEdits;
@@ -38,7 +38,7 @@ namespace CouchDB.Client
         /// Converts current <see cref="SaveDocListRequest"/> into <see cref="JObject"/>.
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception>
+        ///// <exception cref="NoException"></exception>
         public JObject ToJson()
         {
             var json = JObject.FromObject(

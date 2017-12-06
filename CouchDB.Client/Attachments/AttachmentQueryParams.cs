@@ -10,7 +10,7 @@ namespace CouchDB.Client
         /// Converts current instance of <see cref="AttachmentQueryParams"/> to <see cref="string"/>.
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="NoException"></exception> //TODO: remove all KeyNotFoundException comments (this is just a marker for NONE).
+        ///// <exception cref="NoException"></exception> //TODO: remove all KeyNotFoundException comments (this is just a marker for NONE).
         internal override string ToQueryString()
         {
             var queryParts = new List<string>();
