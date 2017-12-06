@@ -70,6 +70,7 @@
     <Compile Include="CouchDBDatabaseIsMockable.cs" />
     <Compile Include="CouchDBHandlerIsMockable.cs" />
     <Compile Include="CouchDBServerIsMockable.cs" />
+    <Compile Include="EntityStoreIsMockable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
