@@ -1,7 +1,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/480lej89839hjc39/branch/master?svg=true)](https://ci.appveyor.com/project/ttutisani/couchdbclient/branch/master)
 
 # CouchDBClient (CouchDB .NET Client)
-CouchDBClient is a client framework for working with CouchDB from .NET code. It abstracts and simplifies the usage of CouchDB, so that you can easily use it from your application code. All the complexity of working with plain json and http request/responses is burried under the framework. You will be able create, retrieve, save, and delete documents as plain objects, by using this framework.
+CouchDBClient is a framework for working with CouchDB from .NET code. It abstracts and simplifies the usage of CouchDB, so that you can easily use it from your application code. All the complexity of working with plain json and http request/responses is burried under the framework. You will be able create, retrieve, save, and delete documents as plain objects, by using this framework.
 
 ## Key Strengths of CouchDBClient Framework
 
