@@ -168,7 +168,8 @@ public sealed class SampleEntity : IEntity
 
 using (var server = new CouchDBServer("http://localhost:5984"))
 {
-    using (var db = server.SelectDatabase("my-db"))
+    var db = server.SelectDatabase("my-db");
+    
     {
         // Treat database as Entity store.
         var store = new EntityStore(db);
