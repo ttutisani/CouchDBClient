@@ -158,6 +158,9 @@ namespace CouchDB.Client
         /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public static async Task<DocListResponse<JObject>> GetAllJsonDocumentsAsync(this ICouchDBDatabase @this, ListQueryParams queryParams = null)
         {
+            if (queryParams == null)
+                queryParams = new ListQueryParams();
+
             var stringDocs = await @this.GetAllStringDocumentsAsync(queryParams).Safe();
 
             return stringDocs.Cast(strDoc => !string.IsNullOrWhiteSpace(strDoc) ? JObject.Parse(strDoc) : null);
@@ -181,6 +184,9 @@ namespace CouchDB.Client
         /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public static async Task<DocListResponse<TDocument>> GetAllObjectDocumentsAsync<TDocument>(this ICouchDBDatabase @this, ListQueryParams queryParams = null, Func<string, TDocument> deserializer = null)
         {
+            if (queryParams == null)
+                queryParams = new ListQueryParams();
+
             var jsonDocs = await @this.GetAllStringDocumentsAsync(queryParams).Safe();
 
             return jsonDocs.Cast(deserializer ?? new Func<string, TDocument>(json => !string.IsNullOrWhiteSpace(json) ? JsonConvert.DeserializeObject<TDocument>(json) : default(TDocument)));
@@ -204,6 +210,9 @@ namespace CouchDB.Client
         {
             if (docIdList == null || docIdList.Length == 0)
                 throw new ArgumentNullException(nameof(docIdList));
+
+            if (queryParams == null)
+                queryParams = new ListQueryParams();
 
             var stringDocs = await @this.GetStringDocumentsAsync(docIdList, queryParams).Safe();
 
@@ -232,6 +241,9 @@ namespace CouchDB.Client
         {
             if (docIdList == null || docIdList.Length == 0)
                 throw new ArgumentNullException(nameof(docIdList));
+
+            if (queryParams == null)
+                queryParams = new ListQueryParams();
 
             var stringDocs = await @this.GetStringDocumentsAsync(docIdList, queryParams).Safe();
             return stringDocs.Cast(deserializer ?? new Func<string, TDocument>(strDoc => !string.IsNullOrWhiteSpace(strDoc) ? JsonConvert.DeserializeObject<TDocument>(strDoc) : default(TDocument)));

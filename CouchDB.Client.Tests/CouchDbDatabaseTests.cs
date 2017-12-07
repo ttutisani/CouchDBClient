@@ -263,8 +263,21 @@ namespace CouchDB.Client.Tests
 
         #region GetAllDocumentsAsync
 
+        [Fact]
+        public async Task GetAllDocumentsAsync_Request_Passes_Include_Docs_Even_For_Empty_Params()
+        {
+            //act.
+            await _sut.GetAllStringDocumentsAsync(null);
+
+            //assert.
+            var expectedUrl = QueryParams.AppendQueryParams("_all_docs", new ListQueryParams());
+            _handler.Verify(h => h.SendRequestAsync(expectedUrl, RequestMethod.GET, It.IsAny<Request>()), Times.Once);
+        }
+
         [Theory]
         [InlineData(true, false, "endkey", null, true, false, "key", new string[0], 123, null, 
+            ListQueryParams.StaleOption.Update_After, null, "startkeydocid", null)]
+        [InlineData(true, false, "endkey", null, null, false, "key", new string[0], 123, null,
             ListQueryParams.StaleOption.Update_After, null, "startkeydocid", null)]
         public async Task GetAllDocumentsAsync_Request(
             bool? conflicts,
@@ -289,7 +302,7 @@ namespace CouchDB.Client.Tests
                 Descending = descending,
                 EndKey = endKey,
                 EndKey_DocId = endKey_DocId,
-                Include_Docs = include_Docs,
+                Include_Docs = include_Docs.HasValue ? include_Docs : true,
                 Inclusive_End = inclusive_End,
                 Key = key,
                 Keys = keys,
@@ -306,7 +319,7 @@ namespace CouchDB.Client.Tests
 
             //assert.
             var expectedUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
-            _handler.Verify(h => h.SendRequestAsync(expectedUrl, RequestMethod.GET, RequestIs.Empty()));
+            _handler.Verify(h => h.SendRequestAsync(expectedUrl, RequestMethod.GET, RequestIs.Empty()), Times.Once);
         }
 
         [Fact]
@@ -368,6 +381,18 @@ namespace CouchDB.Client.Tests
         public async Task GetDocumentsAsync_RequiresParams(string[] docIdList)
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetStringDocumentsAsync(docIdList));
+        }
+
+        [Fact]
+        public async Task GetDocumentsAsync_Request_Passes_Include_Docs_For_Empty_Params()
+        {
+            //act.
+            await _sut.GetStringDocumentsAsync(new[] { "1", "2", "3" }, null);
+
+            //assrert.
+            var expectedUrl = QueryParams.AppendQueryParams("_all_docs", new ListQueryParams());
+            _handler.Verify(h => h.SendRequestAsync(expectedUrl, RequestMethod.POST,
+                It.IsAny<Request>()), Times.Once);
         }
 
         [Theory]

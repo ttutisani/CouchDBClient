@@ -299,6 +299,20 @@ namespace CouchDB.Client.Tests
         #region Get All Object Docs
 
         [Fact]
+        public async void GetAllObjectDocumentsAsync_Passes_QueryParams_Even_If_Null()
+        {
+            //arrange.
+            _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
+
+            //act.
+            await _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null);
+
+            //assert.
+            _sut.Verify(db => db.GetAllStringDocumentsAsync(It.Is<ListQueryParams>(p => p != null)), Times.Once());
+        }
+
+        [Fact]
         public async void GetAllObjectDocumentsAsync_Passes_QueryParams_AsReceived()
         {
             //arrange.
@@ -398,6 +412,20 @@ namespace CouchDB.Client.Tests
         #region Get All JSON Docs
 
         [Fact]
+        public async void GetAllJsonDocumentsAsync_Passes_QueryParams_Even_If_Null()
+        {
+            //arrange
+            _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
+
+            //act.
+            await _sut.Object.GetAllJsonDocumentsAsync(null);
+
+            //assert.
+            _sut.Verify(db => db.GetAllStringDocumentsAsync(It.Is<ListQueryParams>(p => p != null)), Times.Once());
+        }
+
+        [Fact]
         public async void GetAllJsonDocumentsAsync_Passes_QueryParams_AsReceived()
         {
             //arrange
@@ -477,6 +505,20 @@ namespace CouchDB.Client.Tests
 
             //assert.
             _sut.Verify(db => db.GetStringDocumentsAsync(docIdList, queryParams), Times.Once());
+        }
+
+        [Fact]
+        public async void GetObjectDocumentsAsync_Passes_Params_Even_If_Null()
+        {
+            //arrange.
+            _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
+
+            //act.
+            await _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { "id-1" }, null);
+
+            //assert.
+            _sut.Verify(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.Is<ListQueryParams>(p => p != null)), Times.Once());
         }
 
         [Fact]
@@ -588,6 +630,20 @@ namespace CouchDB.Client.Tests
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetJsonDocumentsAsync(null));
             await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Object.GetJsonDocumentsAsync(new string[] { }));
+        }
+
+        [Fact]
+        public async void GetJsonDocumentsAsync_Passes_Params_Even_If_Null()
+        {
+            //arrange
+            _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>>())));
+
+            //act.
+            await _sut.Object.GetJsonDocumentsAsync(new string[] { "id1" }, null);
+
+            //assert.
+            _sut.Verify(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.Is<ListQueryParams>(p => p != null)), Times.Once());
         }
 
         [Fact]

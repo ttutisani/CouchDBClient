@@ -182,6 +182,9 @@ namespace CouchDB.Client
         /// <exception cref="InvalidOperationException">Malformed JSON string received from CouchDB server..</exception>
         public async Task<DocListResponse<string>> GetAllStringDocumentsAsync(ListQueryParams queryParams = null)
         {
+            if (queryParams == null)
+                queryParams = new ListQueryParams();
+
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
             var response = await _handler.SendRequestAsync(allDocsUrl, RequestMethod.GET, Request.Empty).Safe();
             if (response == null)
@@ -212,6 +215,9 @@ namespace CouchDB.Client
         {
             if (docIdList == null || docIdList.Length == 0)
                 throw new ArgumentNullException(nameof(docIdList));
+
+            if (queryParams == null)
+                queryParams = new ListQueryParams();
 
             var allDocsUrl = QueryParams.AppendQueryParams("_all_docs", queryParams);
             var allDocsRequest = new { keys = docIdList };
