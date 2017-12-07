@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CouchDB.Client")]
+[assembly: AssemblyTitle("CouchDBClient.NET")]
 [assembly: AssemblyDescription("CouchDB .NET Client Library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tengiz Tutisani")]
-[assembly: AssemblyProduct("CouchDB.Client")]
-[assembly: AssemblyCopyright("Copyright © Tengiz Tutisani 2016")]
+[assembly: AssemblyProduct("CouchDBClient.NET")]
+[assembly: AssemblyCopyright("Copyright © Tengiz Tutisani 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

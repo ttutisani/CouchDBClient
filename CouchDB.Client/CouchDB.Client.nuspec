@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>CouchDBClient</id>
+    <id>CouchDBClient.NET</id>
     <version>$version$</version>
     <title>$title$</title>
     <authors>Tengiz Tutisani</authors>
