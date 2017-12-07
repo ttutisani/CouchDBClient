@@ -342,6 +342,25 @@ namespace CouchDB.Client.Tests
         }
 
         [Fact]
+        public async void GetAllObjectDocumentsAsync_Returns_Null_For_Empty_Doc()
+        {
+            //arrange.
+            _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>> { new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("revision"), null, null) })));
+
+            //act.
+            var docs = await _sut.Object.GetAllObjectDocumentsAsync<SampleDoc>(null, null);
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(1, docs.Rows.Count);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Null(docs.Rows[0].Document);
+        }
+
+        [Fact]
         public async void GetAllObjectDocumentsAsync_Deserializes_Using_Deserializer_If_Provided()
         {
             //arrange.
@@ -376,7 +395,7 @@ namespace CouchDB.Client.Tests
 
         #endregion
 
-        #region Get All String Docs
+        #region Get All JSON Docs
 
         [Fact]
         public async void GetAllJsonDocumentsAsync_Passes_QueryParams_AsReceived()
@@ -414,6 +433,22 @@ namespace CouchDB.Client.Tests
 
             Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[0]), docs.Rows[0].Document));
             Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[1]), docs.Rows[1].Document));
+        }
+
+        [Fact]
+        public async void GetAllJsonDocumentsAsync_Returns_Null_For_Empty_Doc()
+        {
+            //arrange.
+            _sut.Setup(db => db.GetAllStringDocumentsAsync(It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>> { new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("revision"), null, null) })));
+
+            //act.
+            var docs = await _sut.Object.GetAllJsonDocumentsAsync(null);
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(1, docs.Rows.Count);
+            Assert.Null(docs.Rows[0].Document);
         }
 
         #endregion
@@ -469,6 +504,24 @@ namespace CouchDB.Client.Tests
             Assert.NotNull(docs.Rows[0]);
             Assert.Equal(jsonDocs[0].name, docs.Rows[0].Document.Name);
             Assert.Equal(jsonDocs[0].name2, docs.Rows[0].Document.Name2);
+        }
+
+        [Fact]
+        public async void GetObjectDocumentsAsync_Returns_Null_For_Empty_Doc()
+        {
+            //arrange.
+            _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>> { new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("revision"), null, null) })));
+
+            //act.
+            var docs = await _sut.Object.GetObjectDocumentsAsync<SampleDoc>(new string[] { "id-1" }, null);
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(1, docs.Rows.Count);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Null(docs.Rows[0].Document);
         }
 
         [Fact]
@@ -574,6 +627,24 @@ namespace CouchDB.Client.Tests
 
             Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[0]), docs.Rows[0].Document));
             Assert.True(StringIsJsonObject(JsonConvert.SerializeObject(jsonDocs[1]), docs.Rows[1].Document));
+        }
+
+        [Fact]
+        public async void GetJsonDocumentsAsync_Returns_Null_For_Empty_Doc()
+        {
+            //arrange.
+            _sut.Setup(db => db.GetStringDocumentsAsync(It.IsAny<string[]>(), It.IsAny<ListQueryParams>()))
+                .Returns(Task.FromResult(new DocListResponse<string>(0, 100, 1, new List<DocListResponseRow<string>> { new DocListResponseRow<string>("id", "key", new DocListResponseRowValue("revision"), null, null) })));
+
+            //act.
+            var docs = await _sut.Object.GetJsonDocumentsAsync(new string[] { "id-1" }, null);
+
+            //assert.
+            Assert.NotNull(docs);
+            Assert.Equal(1, docs.Rows.Count);
+
+            Assert.NotNull(docs.Rows[0]);
+            Assert.Null(docs.Rows[0].Document);
         }
 
         [Fact]

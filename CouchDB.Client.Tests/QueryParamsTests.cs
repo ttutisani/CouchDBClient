@@ -34,7 +34,7 @@ namespace CouchDB.Client.Tests
         {
             //arrange.
             var url = "url";
-            var queryParams = new ListQueryParams { };
+            var queryParams = ListQueryParams.CreateEmpty();
 
             //act.
             var newUrl = QueryParams.AppendQueryParams(url, queryParams);

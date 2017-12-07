@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CouchDB.Client
@@ -9,6 +8,14 @@ namespace CouchDB.Client
     /// </summary>
     public sealed class ListQueryParams : QueryParams
     {
+        /// <summary>
+        /// Initializes new instance of <see cref="ListQueryParams"/> type.
+        /// </summary>
+        public ListQueryParams()
+        {
+            Include_Docs = true;
+        }
+
         /// <summary>
         /// Includes conflicts information in response. Ignored if include_docs isn’t true. Default is false.
         /// </summary>
@@ -30,7 +37,7 @@ namespace CouchDB.Client
         public string EndKey_DocId { get; set; }
 
         /// <summary>
-        /// Include the full content of the documents in the return. Default is false.
+        /// Include the full content of the documents in the return. Default is true.
         /// </summary>
         public bool? Include_Docs { get; set; }
 
@@ -166,6 +173,11 @@ namespace CouchDB.Client
             /// Ok to include, but update after fetch.
             /// </summary>
             Update_After
+        }
+
+        internal static ListQueryParams CreateEmpty()
+        {
+            return new ListQueryParams { Include_Docs = null };
         }
     }
 }

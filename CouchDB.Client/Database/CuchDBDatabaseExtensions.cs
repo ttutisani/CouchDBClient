@@ -160,7 +160,7 @@ namespace CouchDB.Client
         {
             var stringDocs = await @this.GetAllStringDocumentsAsync(queryParams).Safe();
 
-            return stringDocs.Cast(strDoc => JObject.Parse(strDoc));
+            return stringDocs.Cast(strDoc => !string.IsNullOrWhiteSpace(strDoc) ? JObject.Parse(strDoc) : null);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace CouchDB.Client
         {
             var jsonDocs = await @this.GetAllStringDocumentsAsync(queryParams).Safe();
 
-            return jsonDocs.Cast(deserializer ?? new Func<string, TDocument>(json => json != null ? JsonConvert.DeserializeObject<TDocument>(json) : default(TDocument)));
+            return jsonDocs.Cast(deserializer ?? new Func<string, TDocument>(json => !string.IsNullOrWhiteSpace(json) ? JsonConvert.DeserializeObject<TDocument>(json) : default(TDocument)));
         }
 
         #endregion
@@ -207,7 +207,7 @@ namespace CouchDB.Client
 
             var stringDocs = await @this.GetStringDocumentsAsync(docIdList, queryParams).Safe();
 
-            return stringDocs.Cast(strDoc => strDoc != null ? JObject.Parse(strDoc) : null);
+            return stringDocs.Cast(strDoc => !string.IsNullOrWhiteSpace(strDoc) ? JObject.Parse(strDoc) : null);
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace CouchDB.Client
                 throw new ArgumentNullException(nameof(docIdList));
 
             var stringDocs = await @this.GetStringDocumentsAsync(docIdList, queryParams).Safe();
-            return stringDocs.Cast(deserializer ?? new Func<string, TDocument>(strDoc => strDoc != null ? JsonConvert.DeserializeObject<TDocument>(strDoc) : default(TDocument)));
+            return stringDocs.Cast(deserializer ?? new Func<string, TDocument>(strDoc => !string.IsNullOrWhiteSpace(strDoc) ? JsonConvert.DeserializeObject<TDocument>(strDoc) : default(TDocument)));
         }
 
         #endregion
