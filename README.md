@@ -3,6 +3,14 @@
 # CouchDBClient (CouchDB .NET Client)
 CouchDBClient is a framework for working with CouchDB from .NET code. It abstracts and simplifies the usage of CouchDB, so that you can easily use it from your application code. All the complexity of working with plain json and http request/responses is burried under the framework. You will be able to create, retrieve, save, and delete documents as plain objects, by using this framework.
 
+## Install CouchDBClient Nuget
+
+``` PowerShell
+Install-Package CouchDBClient -Version 1.0.0
+```
+
+
+
 ## Key Strengths of CouchDBClient Framework
 
 * Fully object oriented.
