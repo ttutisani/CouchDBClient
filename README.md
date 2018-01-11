@@ -9,7 +9,13 @@ CouchDBClient is a framework for working with CouchDB from .NET code. It abstrac
 Install-Package CouchDBClient -Version 1.0.0
 ```
 
+## Story Behind CouchDBClient
 
+I tried to make CouchDBClient more friendly to work with custom objects - that's what usually applications store in the database.
+
+Back when I started writing this framework, all others that I found and tried were making an impression of non-standardized method signatures (named using various conventions and harder to guess what they did), not unified interfaces (some operations around string docs, while others around json docs), not very flexible (some worked only with strings, others only with objects), or not very abstract (had to know CouchDB REST API first to use them correctly). I'm assuming and hoping they have matured since then, but at least this one is designed up to my taste.
+
+I'm hoping that CouchDB can create a feeling of comfortable abstraction without worrying about underlying API too much, and just focusing on your application, and how it stores and retrieves objects it needs.
 
 ## Key Strengths of CouchDBClient Framework
 
